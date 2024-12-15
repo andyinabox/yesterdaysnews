@@ -14,6 +14,7 @@ import (
 
 var verbose bool
 var userName string
+var videoCount int
 
 func init() {
 	err := godotenv.Load()
@@ -23,6 +24,7 @@ func init() {
 
 	flag.BoolVar(&verbose, "v", false, "verbose output")
 	flag.StringVar(&userName, "u", "@CNN", "channel username")
+	flag.IntVar(&videoCount, "c", 10, "how many ids to go for")
 	flag.Parse()
 
 	if verbose {
@@ -33,14 +35,16 @@ func init() {
 func main() {
 	apiClient := ytapi.New(os.Getenv("GOOGLE_API_KEY"))
 
-	id, err := apiClient.GetUploadsPlaylistIdForUser(context.Background(), "@CNN")
+	id, err := apiClient.GetUploadsPlaylistIdForUser(context.Background(), userName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Debug("got user id", "id", id)
 
-	ids, err := apiClient.GetPlaylistVideosForDate(context.Background(), id, time.Now().Add(-24*time.Hour), 10)
+	yesterday := time.Now().Add(-24 * time.Hour)
+
+	ids, err := apiClient.GetPlaylistVideosForDate(context.Background(), id, yesterday, videoCount)
 	if err != nil {
 		log.Fatal(err)
 	}
