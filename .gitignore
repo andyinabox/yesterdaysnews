@@ -1,3 +1,6 @@
+test/output/*
 output
 corpus
+dist
 .env
+.DS_Store
