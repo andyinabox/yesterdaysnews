@@ -11,16 +11,14 @@ clean:
 
 # video clips
 
-# output/models/cnn.json: models output/corpus/cnn.txt
-# 	go run ./cmd/build-model/main.go -f output/corpus/cnn.txt > $@
-output/clips/cnn: output/downloads/cnn
-	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/cnn/*.mp4' -o $@
+# output/clips/cnn: output/downloads/cnn
+# 	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/cnn/*.mp4' -o $@
 
-output/clips/msnbc: output/downloads/msnbc
-	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/msnbc/*.mp4' -o $@
+# output/clips/msnbc: output/downloads/msnbc
+# 	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/msnbc/*.mp4' -o $@
 
-output/clips/foxnews: output/downloads/foxnews
-	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/foxnews/*.mp4' -o $@
+# output/clips/foxnews: output/downloads/foxnews
+# 	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/foxnews/*.mp4' -o $@
 
 
 # markov models
