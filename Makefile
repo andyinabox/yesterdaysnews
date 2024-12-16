@@ -1,13 +1,26 @@
 .PHONY: build
-build: clean output/downloads/cnn output/downloads/msnbc output/downloads/foxnews
+build: output/corpus/cnn.txt output/corpus/msnbc.txt output/corpus/foxnews.txt
 
 .PHONY: clean
 clean:
 	rm -rf output
 
+# non-phony targets
+
+corpus:
+	-mkdir -p output/corpus
+
 output:
 	-mkdir -p output
 
+output/corpus/cnn.txt: corpus output/downloads/cnn
+	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/cnn/*.vtt' > output/corpus/cnn.txt
+
+output/corpus/msnbc.txt: corpus output/downloads/msnbc
+	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/msnbc/*.vtt' > output/corpus/msnbc.txt
+
+output/corpus/foxnews.txt: corpus output/downloads/foxnews
+	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/foxnews/*.vtt' > output/corpus/foxnews.txt
 
 output/downloads/cnn: output/cnn.txt
 	go run ./cmd/download-multiple/main.go -v -f output/cnn.txt -o output/downloads/cnn
