@@ -10,7 +10,7 @@ import (
 )
 
 type Downloader struct {
-	path  string
+	path  string // path to yt-dlp binary
 	shell *shell.Shell
 }
 

@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/charmbracelet/log"
+	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubedownloader"
 )
 
@@ -13,6 +14,11 @@ var verbose bool
 var url, outputDir string
 
 func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	flag.StringVar(&url, "u", "", "video url or id")
 	flag.StringVar(&outputDir, "o", "output", "output dir")
 	flag.BoolVar(&verbose, "v", true, "verbose output")
