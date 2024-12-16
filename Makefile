@@ -1,5 +1,5 @@
 .PHONY: build
-build: output/corpus/cnn.txt output/corpus/msnbc.txt output/corpus/foxnews.txt
+build: output/clips/cnn output/clips/msnbc output/clips/foxnews
 
 .PHONY: clean
 clean:

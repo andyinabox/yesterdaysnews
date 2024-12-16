@@ -22,6 +22,11 @@ func (a *Args) AddKeyed(key, value string) *Args {
 	return a
 }
 
+func (a *Args) AddKeyedSingleQuoted(key, value string) *Args {
+	a.args = append(a.args, []string{key, "'" + value + "'"})
+	return a
+}
+
 func (a *Args) String() string {
 	fmt.Print(len(a.args))
 	output := ""

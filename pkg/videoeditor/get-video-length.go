@@ -19,7 +19,7 @@ type ffprobeVideLengthResp struct {
 	Format ffprobeFormat `json:"format"`
 }
 
-func (e *Editor) GetVideoLength(ctx context.Context, inputPath string) (time.Duration, error) {
+func (e *Editor) GetVideoLength(ctx context.Context, inputPath string) (Duration, error) {
 
 	options := shellargs.New().
 		Add("-show_format").
@@ -49,5 +49,10 @@ func (e *Editor) GetVideoLength(ctx context.Context, inputPath string) (time.Dur
 		return 0, err
 	}
 
-	return time.ParseDuration(strings.TrimSpace(data.Format.Duration) + "s")
+	d, err := time.ParseDuration(strings.TrimSpace(data.Format.Duration) + "s")
+	if err != nil {
+		return 0, err
+	}
+
+	return Duration(d), nil
 }

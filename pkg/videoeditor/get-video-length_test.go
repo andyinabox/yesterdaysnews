@@ -13,7 +13,7 @@ func init() {
 func TestGetVideoLength(t *testing.T) {
 
 	path := "../../test/video.mp4"
-	expected := "11.011s"
+	expected := "00:00:11"
 
 	// TODO: find out why godotenv isn't working here
 	e := New("/opt/homebrew/bin/ffmpeg", "/opt/homebrew/bin/ffprobe")
