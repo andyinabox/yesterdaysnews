@@ -9,16 +9,28 @@ clean:
 # non-phony targets
 #
 
+# markov models
+
+# output/models/cnn.json: models output/corpus/cnn.txt
+# 	go run ./cmd/build-model/main.go -f output/corpus/cnn.txt > $@
+
+# output/models/msnbc.json: models output/corpus/msnbc.txt
+# 	go run ./cmd/build-model/main.go -f output/corpus/msnbc.txt > $@
+
+# output/models/foxnews.json: models output/corpus/foxnews.txt
+# 	go run ./cmd/build-model/main.go -f output/corpus/foxnews.txt > $@
+
+
 # combined subtitle text
 
 output/corpus/cnn.txt: corpus output/downloads/cnn
-	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/cnn/*.vtt' > output/corpus/cnn.txt
+	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/cnn/*.vtt' > $@
 
 output/corpus/msnbc.txt: corpus output/downloads/msnbc
-	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/msnbc/*.vtt' > output/corpus/msnbc.txt
+	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/msnbc/*.vtt' > $@
 
 output/corpus/foxnews.txt: corpus output/downloads/foxnews
-	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/foxnews/*.vtt' > output/corpus/foxnews.txt
+	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/foxnews/*.vtt' > $@
 
 # video and subtitle downloads
 
@@ -34,18 +46,21 @@ output/downloads/foxnews: output/foxnews.txt
 # video download lists
 
 output/cnn.txt: output
-	go run ./cmd/get-vid-ids/main.go -u @CNN -c 10 > output/cnn.txt
+	go run ./cmd/get-vid-ids/main.go -u @CNN -c 10 > $@
 
 output/msnbc.txt: output
-	go run ./cmd/get-vid-ids/main.go -u @msnbc -c 10 > output/msnbc.txt
+	go run ./cmd/get-vid-ids/main.go -u @msnbc -c 10 > $@
 
 output/foxnews.txt: output
-	go run ./cmd/get-vid-ids/main.go -u @FoxNews -c 10 > output/foxnews.txt
+	go run ./cmd/get-vid-ids/main.go -u @FoxNews -c 10 > $@
 
 # build dirs
+
+output:
+	-mkdir -p output
 
 corpus:
 	-mkdir -p output/corpus
 
-output:
-	-mkdir -p output
+models:
+	-mkdir -p output/models
