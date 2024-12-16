@@ -3,12 +3,11 @@ package main
 import (
 	"context"
 	"flag"
+	"os"
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubedownloader"
 )
-
-const ytdlpPath = "/opt/homebrew/bin/yt-dlp"
 
 var verbose bool
 var url, outputDir string
@@ -30,7 +29,7 @@ func init() {
 
 func main() {
 
-	dl := youtubedownloader.New(ytdlpPath)
+	dl := youtubedownloader.New(os.Getenv("YT_DLP_PATH"))
 
 	err := dl.DownloadVideoWithDefaults(context.Background(), url, outputDir)
 	if err != nil {

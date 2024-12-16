@@ -10,8 +10,6 @@ import (
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubedownloader"
 )
 
-const ytdlpPath = "/opt/homebrew/bin/yt-dlp"
-
 var verbose bool
 var listFilePath, outputDir string
 
@@ -31,7 +29,7 @@ func init() {
 }
 
 func main() {
-	dl := youtubedownloader.New(ytdlpPath)
+	dl := youtubedownloader.New(os.Getenv("YT_DLP_PATH"))
 
 	err := os.MkdirAll(outputDir, os.ModePerm)
 	if err != nil {
