@@ -5,13 +5,11 @@ build: output/corpus/cnn.txt output/corpus/msnbc.txt output/corpus/foxnews.txt
 clean:
 	rm -rf output
 
+#
 # non-phony targets
+#
 
-corpus:
-	-mkdir -p output/corpus
-
-output:
-	-mkdir -p output
+# combined subtitle text
 
 output/corpus/cnn.txt: corpus output/downloads/cnn
 	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/cnn/*.vtt' > output/corpus/cnn.txt
@@ -22,6 +20,8 @@ output/corpus/msnbc.txt: corpus output/downloads/msnbc
 output/corpus/foxnews.txt: corpus output/downloads/foxnews
 	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/foxnews/*.vtt' > output/corpus/foxnews.txt
 
+# video and subtitle downloads
+
 output/downloads/cnn: output/cnn.txt
 	go run ./cmd/download-multiple/main.go -v -f output/cnn.txt -o output/downloads/cnn
 
@@ -31,6 +31,8 @@ output/downloads/msnbc: output/msnbc.txt
 output/downloads/foxnews: output/foxnews.txt
 	go run ./cmd/download-multiple/main.go -v -f output/foxnews.txt -o output/downloads/foxnews
 
+# video download lists
+
 output/cnn.txt: output
 	go run ./cmd/get-vid-ids/main.go -u @CNN -c 10 > output/cnn.txt
 
@@ -39,3 +41,11 @@ output/msnbc.txt: output
 
 output/foxnews.txt: output
 	go run ./cmd/get-vid-ids/main.go -u @FoxNews -c 10 > output/foxnews.txt
+
+# build dirs
+
+corpus:
+	-mkdir -p output/corpus
+
+output:
+	-mkdir -p output
