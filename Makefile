@@ -9,6 +9,9 @@ clean:
 # non-phony targets
 #
 
+# video clips
+
+
 # markov models
 
 # output/models/cnn.json: models output/corpus/cnn.txt
@@ -35,13 +38,13 @@ output/corpus/foxnews.txt: corpus output/downloads/foxnews
 # video and subtitle downloads
 
 output/downloads/cnn: output/cnn.txt
-	go run ./cmd/download-multiple/main.go -v -f output/cnn.txt -o output/downloads/cnn
+	go run ./cmd/download-multiple/main.go -v -f output/cnn.txt -o $@
 
 output/downloads/msnbc: output/msnbc.txt
-	go run ./cmd/download-multiple/main.go -v -f output/msnbc.txt -o output/downloads/msnbc
+	go run ./cmd/download-multiple/main.go -v -f output/msnbc.txt -o $@
 
 output/downloads/foxnews: output/foxnews.txt
-	go run ./cmd/download-multiple/main.go -v -f output/foxnews.txt -o output/downloads/foxnews
+	go run ./cmd/download-multiple/main.go -v -f output/foxnews.txt -o $@
 
 # video download lists
 
