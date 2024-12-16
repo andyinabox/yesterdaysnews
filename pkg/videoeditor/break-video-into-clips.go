@@ -49,7 +49,7 @@ func (e *Editor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir stri
 		processingOutFile := filepath.Join(outDir, fmt.Sprintf("%s-%d.progress.%s", fileNameBase, i, fileNameExt))
 		outFile := filepath.Join(outDir, fmt.Sprintf("%s-%d.%s", fileNameBase, i, fileNameExt))
 
-		log.Info("start cutting video segment", "outFile", outFile, "start", start.Timestamp(), "duration", duration.Timestamp())
+		log.Info("start cutting video segment", "outFile", outFile, "start", start, "duration", duration)
 
 		err := e.CutVideo(ctx, inputPath, processingOutFile, start, duration)
 		if err != nil {

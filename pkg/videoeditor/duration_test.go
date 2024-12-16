@@ -18,7 +18,7 @@ func TestDurationToTimestamp(t *testing.T) {
 			t.Fatal(err)
 		}
 		d := Duration(duration)
-		result := d.Timestamp()
+		result := d.String()
 		if result != expected {
 			t.Errorf("expected %q, got %q", expected, result)
 		}

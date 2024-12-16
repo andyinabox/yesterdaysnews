@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/log"
 
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/shell"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/shellargs"
 )
 
 type Downloader struct {
@@ -21,15 +22,10 @@ func New(ytdlpPath string) *Downloader {
 	}
 }
 
-func (d *Downloader) execute(ctx context.Context, url string, options map[string]string) error {
+func (d *Downloader) execute(ctx context.Context, options *shellargs.Args) error {
 	command := d.path
-	for k, v := range options {
-		command = command + " " + k
-		if v != "" {
-			command = command + " '" + v + "'"
-		}
-	}
-	command = fmt.Sprintf("%s %s", command, url)
+
+	command = fmt.Sprintf("%s%s", d.path, options)
 
 	log.Debug("execute command", "comman", command)
 

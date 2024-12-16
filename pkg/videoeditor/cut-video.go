@@ -4,20 +4,21 @@ import (
 	"context"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/shellargs"
 )
 
 func (c *Editor) CutVideo(ctx context.Context, input, output string, start, duration Duration) error {
 
-	options := map[string]string{
-		"-i":  input,
-		"-ss": start.Timestamp(),
-		"-to": (start + duration).Timestamp(),
-		// "-c":  "copy",
-	}
+	options := shellargs.New().
+		AddKeyed("-i", input).
+		AddKeyed("-ss", start.String()).
+		AddKeyed("-to", (start+duration).String()).
+		AddKeyed("-c", "copy").
+		Add(output)
 
-	result, err := c.executeFfmpeg(ctx, output, options)
+	result, err := c.executeFfmpeg(ctx, options)
 
-	log.Debug(string(result))
+	log.Debug(result)
 
 	return err
 }

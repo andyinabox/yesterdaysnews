@@ -7,7 +7,7 @@ import (
 
 type Duration time.Duration
 
-func (d Duration) Timestamp() string {
+func (d Duration) String() string {
 	dur := time.Duration(d).Round(time.Second)
 	h := dur / time.Hour
 	dur -= h * time.Hour

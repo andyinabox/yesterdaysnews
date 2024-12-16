@@ -5,19 +5,21 @@ import (
 	"path/filepath"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/shellargs"
 )
 
 func (d *Downloader) DownloadVideoWithDefaults(ctx context.Context, url string, outputDir string) error {
 
-	options := map[string]string{
-		"--format":          "bv[ext=mp4][height<=1280]",
-		"--write-auto-subs": "",
-		"--sub-format":      "vtt",
-		"--output":          filepath.Join(outputDir, "%(id)s.%(ext)s"),
-	}
+	options := shellargs.
+		New().
+		AddKeyed("--format", "bv[ext=mp4][height<=1280]").
+		Add("--write-auto-subs").
+		AddKeyed("--sub-format", "vtt").
+		AddKeyed("--output", filepath.Join(outputDir, "%(id)s.%(ext)s")).
+		Add(url)
 
 	log.Debug("download video with defaults", "url", url, "outputDir", outputDir, "options", options)
 
-	return d.execute(ctx, url, options)
+	return d.execute(ctx, options)
 
 }

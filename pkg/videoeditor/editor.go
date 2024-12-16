@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/shell"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/shellargs"
 )
 
 type Editor struct {
@@ -25,29 +26,19 @@ func New(ffmpegPath string, ffprobePath string) *Editor {
 	}
 }
 
-func (e *Editor) execute(ctx context.Context, exePath string, finalArg string, options map[string]string) ([]byte, error) {
-	command := exePath
+func (e *Editor) execute(ctx context.Context, exePath string, options *shellargs.Args) ([]byte, error) {
 
-	// add arguments
-	for k, v := range options {
-		command = command + " " + k
-		if v != "" {
-			command = command + " '" + v + "'"
-		}
-	}
+	command := fmt.Sprintf("%s%s", exePath, options)
 
-	// add final argument
-	if finalArg != "" {
-		command = fmt.Sprintf("%s %s", command, finalArg)
-	}
+	log.Debug(command)
 
 	return e.shell.Execute(ctx, command)
 }
 
-func (e *Editor) executeFfmpeg(ctx context.Context, outPath string, options map[string]string) ([]byte, error) {
-	return e.execute(ctx, e.ffmpegPath, outPath, options)
+func (e *Editor) executeFfmpeg(ctx context.Context, options *shellargs.Args) ([]byte, error) {
+	return e.execute(ctx, e.ffmpegPath, options)
 }
 
-func (e *Editor) executeFfprobe(ctx context.Context, inPath string, options map[string]string) ([]byte, error) {
-	return e.execute(ctx, e.ffprobePath, inPath, options)
+func (e *Editor) executeFfprobe(ctx context.Context, options *shellargs.Args) ([]byte, error) {
+	return e.execute(ctx, e.ffprobePath, options)
 }
