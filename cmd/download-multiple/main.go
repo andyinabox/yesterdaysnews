@@ -1,0 +1,56 @@
+package main
+
+import (
+	"context"
+	"flag"
+	"os"
+	"strings"
+
+	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubedownloader"
+)
+
+const ytdlpPath = "/opt/homebrew/bin/yt-dlp"
+
+var verbose bool
+var listFilePath, outputDir string
+
+func init() {
+	flag.StringVar(&listFilePath, "f", "", "path to file with list of video ids")
+	flag.StringVar(&outputDir, "o", "output/downloads", "where to download files")
+	flag.BoolVar(&verbose, "v", false, "verbose output")
+	flag.Parse()
+
+	if listFilePath == "" {
+		log.Fatal("no list file path provided")
+	}
+
+	if verbose {
+		log.SetLevel(log.DebugLevel)
+	}
+}
+
+func main() {
+	dl := youtubedownloader.New(ytdlpPath)
+
+	err := os.MkdirAll(outputDir, os.ModePerm)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	data, err := os.ReadFile(listFilePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ids := strings.Split(strings.TrimSpace(string(data)), "\n")
+
+	log.Debug(ids)
+
+	log.Info("download videos", "listFilePath", listFilePath, "outputDir", outputDir)
+
+	err = dl.DownloadVideoListWithDefaults(context.Background(), ids, outputDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+}

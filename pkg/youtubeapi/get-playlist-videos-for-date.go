@@ -1,4 +1,4 @@
-package ytapi
+package youtubeapi
 
 import (
 	"context"
@@ -16,14 +16,18 @@ import (
 // we are requesting a large result so we can iterate and filter by date
 const getPlaylistVideosForDateResultsCount = 200
 
+type resourceID struct {
+	VideoID string `json:"videoId"`
+}
+
 type snippet struct {
-	PublishedAt time.Time `json:"publishedAt"`
+	PublishedAt time.Time  `json:"publishedAt"`
+	ResourceID  resourceID `json:"resourceId"`
 }
 
 type getPlaylistVideosForDateRespItem struct {
 	Kind    string  `json:"kind"`
 	Snippet snippet `json:"snippet"`
-	ID      string  `json:id`
 }
 
 type getPlaylistVideosForDateResp struct {
@@ -67,7 +71,7 @@ func (c *Client) GetPlaylistVideosForDate(ctx context.Context, playlistId string
 		// log.Debugf("\n%s\n%s\n", date, d)
 		if d.Year() == date.Year() && d.Month() == date.Month() && d.Day() == date.Day() {
 			// log.Debug("found an video", "id", item.ID)
-			ids = append(ids, item.ID)
+			ids = append(ids, item.Snippet.ResourceID.VideoID)
 		}
 		if len(ids) >= maxResults {
 			break

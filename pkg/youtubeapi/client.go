@@ -1,4 +1,4 @@
-package ytapi
+package youtubeapi
 
 const APIBase = "https://youtube.googleapis.com/youtube/v3"
 

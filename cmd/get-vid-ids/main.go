@@ -9,7 +9,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/ytapi"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubeapi"
 )
 
 var verbose bool
@@ -33,7 +33,7 @@ func init() {
 }
 
 func main() {
-	apiClient := ytapi.New(os.Getenv("GOOGLE_API_KEY"))
+	apiClient := youtubeapi.New(os.Getenv("GOOGLE_API_KEY"))
 
 	id, err := apiClient.GetUploadsPlaylistIdForUser(context.Background(), userName)
 	if err != nil {
