@@ -1,5 +1,10 @@
 package response
 
+type ChannelListResponse struct {
+	Response
+	Items []Channel `json:"items"`
+}
+
 type Channel struct {
 	Kind           string                `json:"kind"`
 	Etag           string                `json:"etag"`

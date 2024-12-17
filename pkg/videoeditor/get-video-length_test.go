@@ -5,18 +5,13 @@ import (
 	"testing"
 )
 
-func init() {
-	// godotenv.Load()
-	// log.SetLevel(log.DebugLevel)
-}
-
 func TestGetVideoLength(t *testing.T) {
 
 	path := "../../test/video.mp4"
 	expected := "00:00:11"
 
 	// TODO: find out why godotenv isn't working here
-	e := New("/opt/homebrew/bin/ffmpeg", "/opt/homebrew/bin/ffprobe")
+	e := New("", "")
 
 	result, err := e.GetVideoLength(context.Background(), path)
 	if err != nil {

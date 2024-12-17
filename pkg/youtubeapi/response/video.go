@@ -1,5 +1,10 @@
 package response
 
+type VideosListResponse struct {
+	Response
+	Items []Video `json:"items"`
+}
+
 type Video struct {
 	Kind string `json:"kind"`
 	Etag string `json:"etag"`

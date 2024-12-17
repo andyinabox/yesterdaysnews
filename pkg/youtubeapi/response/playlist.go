@@ -2,6 +2,11 @@ package response
 
 import "time"
 
+type PlaylistItemsListResponse struct {
+	Response
+	Items []PlaylistItem `json:"items"`
+}
+
 type PlaylistItem struct {
 	Kind           string                     `json:"kind"`
 	Etag           string                     `json:"etag"`
