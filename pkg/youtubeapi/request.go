@@ -10,6 +10,7 @@ import (
 	"net/url"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubeapi/response"
 )
 
 type requestParams struct {
@@ -19,7 +20,7 @@ type requestParams struct {
 	Body        []byte
 }
 
-func (c *Client) doGetRequest(ctx context.Context, endpoint string, q url.Values) (*successResponse, error) {
+func (c *Client) doGetRequest(ctx context.Context, endpoint string, q url.Values) (*response.Success, error) {
 	req, err := c.newRequest(ctx, requestParams{
 		Endpoint:    endpoint,
 		Method:      http.MethodGet,
@@ -47,7 +48,7 @@ func (c *Client) doGetRequest(ctx context.Context, endpoint string, q url.Values
 
 	log.Debug(string(body))
 
-	data := successResponse{}
+	data := response.Success{}
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return nil, err

@@ -2,54 +2,17 @@ package youtubeapi
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"io"
-	"net/http"
 	"net/url"
 	"strconv"
 	"time"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubeapi/response"
 )
 
 // we are requesting a large result so we can iterate and filter by date
 const getPlaylistVideosForDateMaxPages = 5
-
-// type thumbnailData struct {
-// 	URL    string `json:"url"`
-// 	Width  int    `json:"width"`
-// 	Height int    `json:"height"`
-// }
-
-// type resourceID struct {
-// 	VideoID string `json:"videoId"`
-// }
-
-// type pageInfo struct {
-// 	TotalResults   int `json:"totalResults"`
-// 	ResultsPerPage int `json:"resultsPerPage"`
-// }
-
-// type snippet struct {
-// 	PublishedAt time.Time                `json:"publishedAt"`
-// 	ResourceID  resourceID               `json:"resourceId"`
-// 	Thumbnails  map[string]thumbnailData `json:"thumbnails"`
-// }
-
-// type getPlaylistVideosForDateRespItem struct {
-// 	Kind    string  `json:"kind"`
-// 	Snippet snippet `json:"snippet"`
-// }
-
-// type getPlaylistVideosForDateResp struct {
-// 	Kind          string                             `json:"kind"`
-// 	Etag          string                             `json:"etag"`
-// 	NextPageToken string                             `json:"nextPageToken"`
-// 	PrevPageToken string                             `json:"prevPageToken"`
-// 	Items         []getPlaylistVideosForDateRespItem `json:"items"`
-// 	PageInfo      pageInfo                           `json:"pageInfo"`
-// }
 
 func (c *Client) GetPlaylistVideosForDate(ctx context.Context, playlistId string, date time.Time, maxResults int) (ids []string, err error) {
 	q := make(url.Values)
@@ -71,33 +34,28 @@ func (c *Client) GetPlaylistVideosForDate(ctx context.Context, playlistId string
 			q.Set("pageToken", nextPageToken)
 		}
 
-		var resp *http.Response
+		var resp *response.Success
 		resp, err = c.doGetRequest(ctx, "playlistItems", q)
 		if err != nil {
 			return
 		}
 
-		defer resp.Body.Close()
-		var body []byte
-		body, err = io.ReadAll(resp.Body)
+		var playlistItems []response.PlaylistItem
+		playlistItems, err = resp.PlaylistItems()
 		if err != nil {
 			return
 		}
-		log.Debug(string(body))
 
-		data := getPlaylistVideosForDateResp{}
-		err = json.Unmarshal(body, &data)
-
-		if len(data.Items) == 0 {
-			err = errors.New("no items in response")
-			log.Error(err.Error(), "body", data)
+		if len(playlistItems) == 0 {
+			err = errors.New("no playlist items in response")
+			log.Error(err.Error(), "resp", resp)
 			return
 		}
 
 		ids = []string{}
 
 	resultsloop:
-		for _, item := range data.Items {
+		for _, item := range playlistItems {
 			d := item.Snippet.PublishedAt
 
 			// check aspect ratio, filter out vertical videos
@@ -125,7 +83,7 @@ func (c *Client) GetPlaylistVideosForDate(ctx context.Context, playlistId string
 				return
 			}
 
-			nextPageToken = data.NextPageToken
+			nextPageToken = resp.NextPageToken
 			currentPage++
 
 		}
@@ -133,13 +91,13 @@ func (c *Client) GetPlaylistVideosForDate(ctx context.Context, playlistId string
 
 }
 
-func getVideoIdsForPlaylist(ctx context.Context, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
-	q := make(url.Values)
-	q.Set("part", "snippet,contentDetails,status")
-	q.Set("playlistId", playlistId)
-	q.Set("maxResults", strconv.Itoa(50)) // this is the max allowed
-	if pageToken != "" {
-		q.Set("pageToken", pageToken)
-	}
+// func getVideoIdsForPlaylist(ctx context.Context, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
+// 	q := make(url.Values)
+// 	q.Set("part", "snippet,contentDetails,status")
+// 	q.Set("playlistId", playlistId)
+// 	q.Set("maxResults", strconv.Itoa(50)) // this is the max allowed
+// 	if pageToken != "" {
+// 		q.Set("pageToken", pageToken)
+// 	}
 
-}
+// }
