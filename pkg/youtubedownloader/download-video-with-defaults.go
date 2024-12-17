@@ -12,7 +12,7 @@ func (d *Downloader) DownloadVideoWithDefaults(ctx context.Context, url string, 
 
 	options := shellargs.
 		New().
-		AddKeyedSingleQuoted("--format", "bv[ext=mp4][height<=1280]").
+		AddKeyedSingleQuoted("--format", "bv[ext=mp4][height<=1280][width>1280]").
 		Add("--write-auto-subs").
 		AddKeyed("--sub-format", "vtt").
 		AddKeyedSingleQuoted("--output", filepath.Join(outputDir, "%(id)s.%(ext)s")).
