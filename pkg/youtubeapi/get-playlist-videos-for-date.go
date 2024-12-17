@@ -16,44 +16,44 @@ import (
 // we are requesting a large result so we can iterate and filter by date
 const getPlaylistVideosForDateMaxPages = 5
 
-type thumbnailData struct {
-	URL    string `json:"url"`
-	Width  int    `json:"width"`
-	Height int    `json:"height"`
-}
+// type thumbnailData struct {
+// 	URL    string `json:"url"`
+// 	Width  int    `json:"width"`
+// 	Height int    `json:"height"`
+// }
 
-type resourceID struct {
-	VideoID string `json:"videoId"`
-}
+// type resourceID struct {
+// 	VideoID string `json:"videoId"`
+// }
 
-type pageInfo struct {
-	TotalResults   int `json:"totalResults"`
-	ResultsPerPage int `json:"resultsPerPage"`
-}
+// type pageInfo struct {
+// 	TotalResults   int `json:"totalResults"`
+// 	ResultsPerPage int `json:"resultsPerPage"`
+// }
 
-type snippet struct {
-	PublishedAt time.Time                `json:"publishedAt"`
-	ResourceID  resourceID               `json:"resourceId"`
-	Thumbnails  map[string]thumbnailData `json:"thumbnails"`
-}
+// type snippet struct {
+// 	PublishedAt time.Time                `json:"publishedAt"`
+// 	ResourceID  resourceID               `json:"resourceId"`
+// 	Thumbnails  map[string]thumbnailData `json:"thumbnails"`
+// }
 
-type getPlaylistVideosForDateRespItem struct {
-	Kind    string  `json:"kind"`
-	Snippet snippet `json:"snippet"`
-}
+// type getPlaylistVideosForDateRespItem struct {
+// 	Kind    string  `json:"kind"`
+// 	Snippet snippet `json:"snippet"`
+// }
 
-type getPlaylistVideosForDateResp struct {
-	Kind          string                             `json:"kind"`
-	Etag          string                             `json:"etag"`
-	NextPageToken string                             `json:"nextPageToken"`
-	PrevPageToken string                             `json:"prevPageToken"`
-	Items         []getPlaylistVideosForDateRespItem `json:"items"`
-	PageInfo      pageInfo                           `json:"pageInfo"`
-}
+// type getPlaylistVideosForDateResp struct {
+// 	Kind          string                             `json:"kind"`
+// 	Etag          string                             `json:"etag"`
+// 	NextPageToken string                             `json:"nextPageToken"`
+// 	PrevPageToken string                             `json:"prevPageToken"`
+// 	Items         []getPlaylistVideosForDateRespItem `json:"items"`
+// 	PageInfo      pageInfo                           `json:"pageInfo"`
+// }
 
 func (c *Client) GetPlaylistVideosForDate(ctx context.Context, playlistId string, date time.Time, maxResults int) (ids []string, err error) {
 	q := make(url.Values)
-	q.Add("part", "snippet")
+	q.Add("part", "snippet,contentDetails,status")
 	q.Add("playlistId", playlistId)
 	q.Add("maxResults", strconv.Itoa(50)) // this is the max allowed
 
@@ -101,13 +101,14 @@ func (c *Client) GetPlaylistVideosForDate(ctx context.Context, playlistId string
 			d := item.Snippet.PublishedAt
 
 			// check aspect ratio, filter out vertical videos
-			thumb, ok := item.Snippet.Thumbnails["default"]
+			thumb, ok := item.Snippet.Thumbnails["standard"]
 
 			if !ok {
-				log.Error("no default thumbnail found", "video", item)
+				log.Error("no standard thumbnail found", "video", item)
 				continue resultsloop
 			}
 
+			log.Debug("checking video size", "width", thumb.Width, "height", thumb.Height)
 			if thumb.Height > thumb.Width {
 				log.Debug("portrait video found, skipping")
 				continue resultsloop
@@ -128,6 +129,17 @@ func (c *Client) GetPlaylistVideosForDate(ctx context.Context, playlistId string
 			currentPage++
 
 		}
+	}
+
+}
+
+func getVideoIdsForPlaylist(ctx context.Context, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
+	q := make(url.Values)
+	q.Set("part", "snippet,contentDetails,status")
+	q.Set("playlistId", playlistId)
+	q.Set("maxResults", strconv.Itoa(50)) // this is the max allowed
+	if pageToken != "" {
+		q.Set("pageToken", pageToken)
 	}
 
 }

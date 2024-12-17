@@ -3,7 +3,9 @@ package youtubeapi
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -17,7 +19,7 @@ type requestParams struct {
 	Body        []byte
 }
 
-func (c *Client) doGetRequest(ctx context.Context, endpoint string, q url.Values) (*http.Response, error) {
+func (c *Client) doGetRequest(ctx context.Context, endpoint string, q url.Values) (*successResponse, error) {
 	req, err := c.newRequest(ctx, requestParams{
 		Endpoint:    endpoint,
 		Method:      http.MethodGet,
@@ -37,7 +39,21 @@ func (c *Client) doGetRequest(ctx context.Context, endpoint string, q url.Values
 		return nil, fmt.Errorf("recieved non-200 status: %s", resp.Status)
 	}
 
-	return resp, nil
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Debug(string(body))
+
+	data := successResponse{}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return nil, err
+	}
+
+	return &data, nil
 }
 
 func (c *Client) newRequest(ctx context.Context, params requestParams) (*http.Request, error) {

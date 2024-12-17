@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"net/http"
 	"net/url"
 
 	"github.com/charmbracelet/log"
@@ -35,7 +34,7 @@ func (c *Client) GetUploadsPlaylistIdForUser(ctx context.Context, userName strin
 	q.Add("part", "contentDetails")
 	q.Add("forHandle", userName)
 
-	var resp *http.Response
+	var resp *successResponse
 	resp, err = c.doGetRequest(ctx, "channels", q)
 	if err != nil {
 		return

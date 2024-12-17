@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/log"
 )
 
+// would it be better to do this with a single yt-dlp shell and a list of ids?
 func (d *Downloader) DownloadVideoListWithDefaults(ctx context.Context, urls []string, outputDir string) error {
 	var err error
 

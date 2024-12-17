@@ -35,25 +35,25 @@ output/clips/foxnews: output/downloads/foxnews
 
 # combined subtitle text
 
-output/corpus/cnn.txt: corpus output/downloads/cnn
+output/corpus/cnn.txt: corpus output/downloads/cnn/manifest.json
 	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/cnn/*.vtt' > $@
 
-output/corpus/msnbc.txt: corpus output/downloads/msnbc
+output/corpus/msnbc.txt: corpus output/downloads/msnbc/manifest.json
 	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/msnbc/*.vtt' > $@
 
-output/corpus/foxnews.txt: corpus output/downloads/foxnews
+output/corpus/foxnews.txt: corpus output/downloads/foxnews/manifest.json
 	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/foxnews/*.vtt' > $@
 
 # video and subtitle downloads
 
-output/downloads/cnn: output/cnn.txt
-	go run ./cmd/download-multiple/main.go -v -f output/cnn.txt -o $@
+output/downloads/cnn/manifest.json: output/cnn.txt
+	go run ./cmd/download-multiple/main.go -v -f output/cnn.txt -o output/downloads/cnn
 
-output/downloads/msnbc: output/msnbc.txt
-	go run ./cmd/download-multiple/main.go -v -f output/msnbc.txt -o $@
+output/downloads/msnbc/manifest.json: output/msnbc.txt
+	go run ./cmd/download-multiple/main.go -v -f output/msnbc.txt -o output/downloads/msnbc
 
-output/downloads/foxnews: output/foxnews.txt
-	go run ./cmd/download-multiple/main.go -v -f output/foxnews.txt -o $@
+output/downloads/foxnews/manifest.json: output/foxnews.txt
+	go run ./cmd/download-multiple/main.go -v -f output/foxnews.txt -o output/downloads/foxnews
 
 # video download lists
 
