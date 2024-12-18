@@ -8,7 +8,7 @@ import (
 func TestGetVideoInfo(t *testing.T) {
 	t.Skip()
 
-	id := "0osPNgiwc1E"
+	id := "8N5yiQ1SABE"
 
 	client := New("")
 

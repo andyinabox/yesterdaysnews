@@ -17,6 +17,8 @@ func (d *Downloader) GetPlaylistVideosForDate(ctx context.Context, playlistId st
 	currentPage := 0
 	nextPageToken := ""
 
+	// var mu sync.Mutex
+
 	for {
 
 		if currentPage >= getPlaylistVideosForDateMaxPages {
@@ -27,7 +29,7 @@ func (d *Downloader) GetPlaylistVideosForDate(ctx context.Context, playlistId st
 		var resp *response.PlaylistItemsListResponse
 		resp, err = d.ytapi.PlaylistItemsList(ctx, youtubeapi.PlaylistItemsListRequest{
 			PlaylistId: playlistId,
-			Part:       []string{"snippet", " contentDetails", "status"},
+			Part:       []string{"snippet"},
 			MaxResults: 50,
 			PageToken:  nextPageToken,
 		})
@@ -46,27 +48,52 @@ func (d *Downloader) GetPlaylistVideosForDate(ctx context.Context, playlistId st
 
 	resultsloop:
 		for _, item := range resp.Items {
-			d := item.Snippet.PublishedAt
+			videoDate := item.Snippet.PublishedAt
+			videoID := item.Snippet.ResourceID.VideoID
 
-			// check aspect ratio, filter out vertical videos
-			thumb, ok := item.Snippet.Thumbnails["standard"]
+			// // check aspect ratio, filter out vertical videos
+			// thumb, ok := item.Snippet.Thumbnails["standard"]
 
-			if !ok {
-				log.Error("no standard thumbnail found", "video", item)
+			// if !ok {
+			// 	log.Error("no standard thumbnail found", "video", item)
+			// 	continue resultsloop
+			// }
+
+			// log.Debug("checking video size", "width", thumb.Width, "height", thumb.Height)
+			// if thumb.Height > thumb.Width {
+			// 	log.Debug("portrait video found, skipping")
+			// 	continue resultsloop
+			// }
+
+			// first filter by date (todo: better way to do date comparison)
+			if videoDate.Year() != date.Year() || videoDate.Month() != date.Month() || videoDate.Day() != date.Day() {
+				log.Debugf("skipping video %q because of date %s", videoID, videoDate)
 				continue resultsloop
 			}
 
-			log.Debug("checking video size", "width", thumb.Width, "height", thumb.Height)
-			if thumb.Height > thumb.Width {
-				log.Debug("portrait video found, skipping")
+			// get info using yt-dlp and filter based on that
+			log.Debug("fetching video info using yt-dlp")
+			var getVideoErr error
+			videoInfo, getVideoErr := d.ytdl.GetVideoInfo(ctx, videoID, VideoFormatString)
+			if getVideoErr != nil {
+				log.Error("error getting video info", "error", getVideoErr, "videoID", videoID)
 				continue resultsloop
 			}
 
-			// log.Debugf("\n%s\n%s\n", date, d)
-			if d.Year() == date.Year() && d.Month() == date.Month() && d.Day() == date.Day() {
-				// log.Debug("found an video", "id", item.ID)
-				ids = append(ids, item.Snippet.ResourceID.VideoID)
+			if videoInfo.AspectRatio <= 1 {
+				log.Debugf("skipping video %q because of aspect ratio %f", videoID, videoInfo.AspectRatio)
+				continue resultsloop
 			}
+
+			if c, ok := videoInfo.AutomaticCaptions["en"]; !ok || len(c) == 0 {
+				log.Debugf("skipping video %q because of lack of english subtitles", videoID)
+				continue resultsloop
+			}
+
+			// mu.Lock()
+			ids = append(ids, videoID)
+			log.Debugf("Adding video %s, found %d videos", videoID, len(ids))
+			// mu.Unlock()
 
 			// finally return results
 			if len(ids) >= maxResults {
@@ -79,105 +106,3 @@ func (d *Downloader) GetPlaylistVideosForDate(ctx context.Context, playlistId st
 	}
 
 }
-
-// import (
-// 	"context"
-// 	"errors"
-// 	"net/url"
-// 	"strconv"
-// 	"time"
-
-// 	"github.com/charmbracelet/log"
-// 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubeapi/response"
-// )
-
-// // we are requesting a large result so we can iterate and filter by date
-// const getPlaylistVideosForDateMaxPages = 5
-
-// func (c *Client) GetPlaylistVideosForDate(ctx context.Context, playlistId string, date time.Time, maxResults int) (ids []string, err error) {
-// 	q := make(url.Values)
-// 	q.Add("part", "snippet,contentDetails,status")
-// 	q.Add("playlistId", playlistId)
-// 	q.Add("maxResults", strconv.Itoa(50)) // this is the max allowed
-
-// 	currentPage := 0
-// 	nextPageToken := ""
-
-// 	for {
-
-// 		if currentPage >= getPlaylistVideosForDateMaxPages {
-// 			log.Debug("reached max result pages, finishing")
-// 			return
-// 		}
-
-// 		if nextPageToken != "" {
-// 			q.Set("pageToken", nextPageToken)
-// 		}
-
-// 		var resp *response.Success
-// 		resp, err = c.doGetRequest(ctx, "playlistItems", q)
-// 		if err != nil {
-// 			return
-// 		}
-
-// 		var playlistItems []response.PlaylistItem
-// 		playlistItems, err = resp.PlaylistItems()
-// 		if err != nil {
-// 			return
-// 		}
-
-// 		if len(playlistItems) == 0 {
-// 			err = errors.New("no playlist items in response")
-// 			log.Error(err.Error(), "resp", resp)
-// 			return
-// 		}
-
-// 		ids = []string{}
-
-// 	resultsloop:
-// 		for _, item := range playlistItems {
-// 			d := item.Snippet.PublishedAt
-
-// 			// check aspect ratio, filter out vertical videos
-// 			thumb, ok := item.Snippet.Thumbnails["standard"]
-
-// 			if !ok {
-// 				log.Error("no standard thumbnail found", "video", item)
-// 				continue resultsloop
-// 			}
-
-// 			log.Debug("checking video size", "width", thumb.Width, "height", thumb.Height)
-// 			if thumb.Height > thumb.Width {
-// 				log.Debug("portrait video found, skipping")
-// 				continue resultsloop
-// 			}
-
-// 			// log.Debugf("\n%s\n%s\n", date, d)
-// 			if d.Year() == date.Year() && d.Month() == date.Month() && d.Day() == date.Day() {
-// 				// log.Debug("found an video", "id", item.ID)
-// 				ids = append(ids, item.Snippet.ResourceID.VideoID)
-// 			}
-
-// 			// finally return results
-// 			if len(ids) >= maxResults {
-// 				return
-// 			}
-
-// 			nextPageToken = resp.NextPageToken
-// 			currentPage++
-
-// 		}
-// 	}
-
-// }
-
-// // func getVideoIdsForPlaylist(ctx context.Context, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
-// // 	q := make(url.Values)
-// // 	q.Set("part", "snippet,contentDetails,status")
-// // 	q.Set("playlistId", playlistId)
-// // 	q.Set("maxResults", strconv.Itoa(50)) // this is the max allowed
-// // 	if pageToken != "" {
-// // 		q.Set("pageToken", pageToken)
-// // 	}
-
-// // }

@@ -29,6 +29,7 @@ func init() {
 
 	if verbose {
 		log.SetLevel(log.DebugLevel)
+		log.SetReportCaller(true)
 	}
 }
 

@@ -5,6 +5,8 @@ import (
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubedownloader"
 )
 
+const VideoFormatString = "bv[ext=mp4][aspect_ratio>1]"
+
 type Config struct {
 	GoogleAPIKey string
 	BinPathYTDLP string
