@@ -1,5 +1,5 @@
 .PHONY: build
-build: dist/yesterdays-news.mp4
+build: dist/manifest.json
 
 .PHONY: clean
 clean:
@@ -14,8 +14,11 @@ clobber: clean
 # non-phony targets
 #
 
+dist/manifest.json: dist/yesterdays-news.mp4
+	go run ./cmd/create-dist-manifest/main.go
+
 dist/yesterdays-news.mp4: dist/clips/manifest.json
-	go run ./cmd/combine-clips/main.go -v -i 'dist/clips/*.webm' -o 'dist/yeterdays-news.mp4'
+	go run ./cmd/combine-clips/main.go -v -i 'dist/clips/*.webm' -o 'dist/yesterdays-news.mp4'
 
 # video clips
 
