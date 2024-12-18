@@ -7,44 +7,56 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"strings"
+	"unicode"
+
+	"github.com/charmbracelet/log"
 )
 
 type BasicChain struct {
-	chain        map[string][]string
+	// main chain, keys are prefixes, values are tokens
+	chain map[string][]string
+	// prefixes is just a duplicate of the chain keys
+	prefixes []string
+	// startPrefixes are prefixes that can be used to start a sentence
+	startPrefixes []string
+	// a subset of the chain that only includes ending words
+	endChain map[string][]string
+
 	prefixLength int
 }
 
 // NewChain returns a new Chain with prefixes of prefixLen words.
 func NewBasicChain(prefixLength int) *BasicChain {
 	return &BasicChain{
-		chain:        make(map[string][]string),
+		chain:         make(map[string][]string),
+		prefixes:      []string{},
+		startPrefixes: []string{},
+		endChain:      make(map[string][]string),
+
 		prefixLength: prefixLength,
 	}
 }
 
-func (c *BasicChain) Next(p Prefix) (s string, err error) {
+func (c *BasicChain) Next(p Prefix) string {
 
 	// validate length
 	if p.Length() != c.prefixLength {
-		err = ErrPrefixWrongLength
-		return
+		log.Fatal(ErrPrefixWrongLength)
 	}
 
 	options, ok := c.chain[p.String()]
 	if !ok {
-		err = ErrNoOptionsFound
-		return
+		return ""
 	}
-
-	s = options[rand.Intn(len(options))]
-	return
+	return options[rand.Intn(len(options))]
 }
 
 func (c *BasicChain) PrefixLength() int {
 	return c.prefixLength
 }
 
-func (c *BasicChain) Build(r io.Reader) error {
+func (c *BasicChain) Build(r io.Reader) {
 	br := bufio.NewReader(r)
 	p := make(BasicPrefix, c.prefixLength)
 
@@ -52,9 +64,8 @@ func (c *BasicChain) Build(r io.Reader) error {
 		var s string
 
 		// scan next word into string
-		_, err := fmt.Fscan(br, &s)
-		if err != nil {
-			return err
+		if _, err := fmt.Fscan(br, &s); err != nil {
+			break
 		}
 
 		// get prefix key
@@ -63,46 +74,107 @@ func (c *BasicChain) Build(r io.Reader) error {
 		// add to main chain
 		c.chain[key] = append(c.chain[key], s)
 
+		// populate endings chain
+		if c.isEndToken(s) {
+			c.endChain[key] = append(c.endChain[key], s)
+		}
+
 		// shift the prefix
 		p.Shift(s)
 	}
 
-}
-
-func (c *BasicChain) Prefixes() []string {
-	prefixes := make([]string, len(c.chain))
+	c.prefixes = make([]string, len(c.chain))
 	var i int
 	for k := range c.chain {
-		prefixes[i] = k
+
+		// populate start prefixes
+		if c.isStartPrefix(k) {
+			c.startPrefixes = append(c.startPrefixes, k)
+		}
+
+		// populate prefixes
+		c.prefixes[i] = k
 		i++
 	}
-	return prefixes
 }
 
-func (c *BasicChain) MarshalJSON() ([]byte, error) {
+func (c *BasicChain) Start() Prefix {
+	return NewBasicPrefix(c.prefixes[rand.Intn(len(c.prefixes))])
+}
+
+func (c *BasicChain) End(p Prefix) string {
+	// validate length
+	if p.Length() != c.prefixLength {
+		log.Fatal(ErrPrefixWrongLength)
+	}
+
+	options, ok := c.endChain[p.String()]
+	if !ok {
+		return ""
+	}
+
+	return options[rand.Intn(len(options))]
+}
+
+func (c *BasicChain) Save() ([]byte, error) {
 	return json.Marshal(c.chain)
 }
 
-func (c *BasicChain) UnmarshalJSON(data []byte) error {
+func (c *BasicChain) Load(data []byte) error {
 
-	err := json.Unmarshal(data, c.chain)
+	// import chain
+	err := json.Unmarshal(data, &c.chain)
 	if err != nil {
 		return err
 	}
 
-	for k := range c.chain {
-		p := NewBasicPrefix(k)
+	// re-initializing these to be safe
+	c.prefixes = make([]string, len(c.chain))
+	c.startPrefixes = []string{}
+	c.endChain = make(map[string][]string)
+
+	var i int
+	for key, options := range c.chain {
+
+		p := NewBasicPrefix(key)
 
 		// assume if length is 0, prefix length hasn't been set yet
 		if c.prefixLength == 0 {
 			c.prefixLength = p.Length()
-			continue
 		}
 
+		// validate prefix length
 		if c.prefixLength != p.Length() {
 			return errors.New("inconsistent prefix lengths in model")
 		}
+
+		// populate start prefixes
+		if c.isStartPrefix(key) {
+			c.startPrefixes = append(c.startPrefixes, key)
+		}
+
+		// build up end tokens
+		for _, tok := range options {
+			if c.isEndToken(tok) {
+				c.endChain[key] = append(c.endChain[key], tok)
+			}
+		}
+
+		// populate prefixes
+		c.prefixes[i] = key
+		i++
 	}
 
 	return nil
+}
+
+func (c *BasicChain) isStartPrefix(s string) bool {
+	if len(s) == 0 {
+		return false
+	}
+	return unicode.IsUpper([]rune(s)[0])
+}
+
+func (c *BasicChain) isEndToken(s string) bool {
+	return strings.HasSuffix(s, ".")
 }

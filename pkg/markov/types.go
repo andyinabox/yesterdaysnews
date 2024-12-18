@@ -1,7 +1,6 @@
 package markov
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -21,17 +20,18 @@ type Prefix interface {
 }
 
 type Chain interface {
-	json.Marshaler
-	json.Unmarshaler
-	Prefixes() []string
-	Next(Prefix) (string, error)
-	Build(r io.Reader) error
+	Start() Prefix
+	Next(Prefix) string
+	End(Prefix) string
+	Build(r io.Reader)
 	PrefixLength() int
+	Save() ([]byte, error)
+	Load([]byte) error
 }
 
 type Model interface {
-	Sentence(Prefix) (string, error)
-	Build(r io.Reader) error
+	Sentence(Prefix) string
+	Build(r io.Reader)
 	Save() ([]byte, error)
 	Load([]byte) error
 }
