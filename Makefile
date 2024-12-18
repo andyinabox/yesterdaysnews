@@ -27,13 +27,16 @@ dist/clips/manifest.json: download/cnn/manifest.json download/msnbc/manifest.jso
 
 # combined subtitle text
 
-dist/txt/cnn.txt: corpus download/cnn/manifest.json
+dist/txt/cnn.txt: download/cnn/manifest.json
+	-mkdir -p dist/txt
 	go run ./cmd/vtt-to-corpus/main.go -f 'download/cnn/*.vtt' > $@
 
-dist/txt/msnbc.txt: corpus download/msnbc/manifest.json
+dist/txt/msnbc.txt: download/msnbc/manifest.json
+	-mkdir -p dist/txt
 	go run ./cmd/vtt-to-corpus/main.go -f 'download/msnbc/*.vtt' > $@
 
-dist/txt/foxnews.txt: corpus download/foxnews/manifest.json
+dist/txt/foxnews.txt: download/foxnews/manifest.json
+	-mkdir -p dist/txt
 	go run ./cmd/vtt-to-corpus/main.go -f 'download/foxnews/*.vtt' > $@
 
 # video and subtitle downloads
