@@ -2,17 +2,20 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"os"
-	"strings"
+	"path/filepath"
+	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubedownloader"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/downloader"
 )
 
-var verbose bool
-var listFilePath, outputDir string
+var verbose, outputManifest bool
+var channelName, outputDir string
+var maxResults int
 
 func init() {
 	err := godotenv.Load()
@@ -20,41 +23,55 @@ func init() {
 		log.Fatal(err)
 	}
 
-	flag.StringVar(&listFilePath, "f", "", "path to file with list of video ids")
-	flag.StringVar(&outputDir, "o", "output/downloads", "where to download files")
+	flag.StringVar(&channelName, "n", "@CNN", "username/handle for channel")
+	flag.StringVar(&outputDir, "o", "output/downloads/cnn", "where to download files")
+	flag.IntVar(&maxResults, "c", 10, "max number of videos to download")
 	flag.BoolVar(&verbose, "v", false, "verbose output")
+	flag.BoolVar(&outputManifest, "m", true, "output manifest file")
 	flag.Parse()
-
-	if listFilePath == "" {
-		log.Fatal("no list file path provided")
-	}
 
 	if verbose {
 		log.SetLevel(log.DebugLevel)
+		log.SetReportCaller(true)
 	}
+
 }
 
 func main() {
-	dl := youtubedownloader.New(os.Getenv("YT_DLP_PATH"))
+	dl := downloader.New(&downloader.Config{
+		GoogleAPIKey: os.Getenv("GOOGLE_API_KEY"),
+		BinPathYTDLP: os.Getenv("YT_DLP_PATH"),
+	})
 
 	err := os.MkdirAll(outputDir, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	data, err := os.ReadFile(listFilePath)
+	result, err := dl.DownloadVideosForChannel(context.Background(), downloader.DownloadRequest{
+		ChannelUsername: channelName,
+		Date:            time.Now().AddDate(0, 0, -1),
+		MaxResults:      maxResults,
+		OutputDir:       outputDir,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ids := strings.Split(strings.TrimSpace(string(data)), "\n")
+	if outputManifest {
+		outFile := filepath.Join(outputDir, "manifest.json")
 
-	log.Debug(ids)
+		b, err := json.Marshal(result)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	log.Info("download videos", "listFilePath", listFilePath, "outputDir", outputDir)
-
-	err = dl.DownloadVideoListWithDefaults(context.Background(), ids, outputDir)
-	if err != nil {
-		log.Fatal(err)
+		log.Info("outputting manifest file", "file", outFile)
+		err = os.WriteFile(outFile, b, os.ModePerm)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+
+	log.Infof("finished downloading %d videos", len(result.Files))
 }

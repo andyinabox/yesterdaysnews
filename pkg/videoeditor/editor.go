@@ -17,12 +17,21 @@ type Editor struct {
 
 func New(ffmpegPath string, ffprobePath string) *Editor {
 
-	log.Debug("create new video editor", "ffmpegPath", ffmpegPath, "ffprobePath", ffprobePath)
+	sh := shell.New()
 
+	if ffmpegPath == "" {
+		ffmpegPath = sh.MustGetBinaryPath("ffmpeg")
+	}
+
+	if ffprobePath == "" {
+		ffprobePath = sh.MustGetBinaryPath("ffprobe")
+	}
+
+	log.Debug("create new video editor", "ffmpegPath", ffmpegPath, "ffprobePath", ffprobePath)
 	return &Editor{
 		ffmpegPath:  ffmpegPath,
 		ffprobePath: ffprobePath,
-		shell:       shell.New(),
+		shell:       sh,
 	}
 }
 
