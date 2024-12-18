@@ -11,13 +11,13 @@ clean:
 
 # video clips
 
-output/clips/cnn: output/downloads/cnn
+output/clips/cnn: output/downloads/cnn/manifest.json
 	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/cnn/*.mp4' -o $@
 
-output/clips/msnbc: output/downloads/msnbc
+output/clips/msnbc: output/downloads/msnbc/manifest.json
 	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/msnbc/*.mp4' -o $@
 
-output/clips/foxnews: output/downloads/foxnews
+output/clips/foxnews: output/downloads/foxnews/manifest.json
 	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/foxnews/*.mp4' -o $@
 
 
@@ -46,25 +46,25 @@ output/corpus/foxnews.txt: corpus output/downloads/foxnews/manifest.json
 
 # video and subtitle downloads
 
-output/downloads/cnn/manifest.json: output/cnn.txt
-	go run ./cmd/download-multiple/main.go -v -f output/cnn.txt -o output/downloads/cnn
+output/downloads/cnn/manifest.json:
+	go run ./cmd/download-multiple/main.go -n '@cnn' -o output/downloads/cnn
 
-output/downloads/msnbc/manifest.json: output/msnbc.txt
-	go run ./cmd/download-multiple/main.go -v -f output/msnbc.txt -o output/downloads/msnbc
+output/downloads/msnbc/manifest.json:
+	go run ./cmd/download-multiple/main.go -n '@msnbc' -o output/downloads/msnbc
 
-output/downloads/foxnews/manifest.json: output/foxnews.txt
-	go run ./cmd/download-multiple/main.go -v -f output/foxnews.txt -o output/downloads/foxnews
+output/downloads/foxnews/manifest.json:
+	go run ./cmd/download-multiple/main.go -n '@msnbc' -o output/downloads/foxnews
 
 # video download lists
 
-output/cnn.txt: output
-	go run ./cmd/get-vid-ids/main.go -u @CNN -c 10 > $@
+# output/cnn.txt: output
+# 	go run ./cmd/get-vid-ids/main.go -u @CNN -c 10 > $@
 
-output/msnbc.txt: output
-	go run ./cmd/get-vid-ids/main.go -u @msnbc -c 10 > $@
+# output/msnbc.txt: output
+# 	go run ./cmd/get-vid-ids/main.go -u @msnbc -c 10 > $@
 
-output/foxnews.txt: output
-	go run ./cmd/get-vid-ids/main.go -u @FoxNews -c 10 > $@
+# output/foxnews.txt: output
+# 	go run ./cmd/get-vid-ids/main.go -u @FoxNews -c 10 > $@
 
 # build dirs
 

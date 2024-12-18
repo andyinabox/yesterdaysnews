@@ -36,10 +36,10 @@ func main() {
 
 	dl := downloader.New(&downloader.Config{
 		GoogleAPIKey: os.Getenv("GOOGLE_API_KEY"),
-		YTDLPBinPath: os.Getenv("YT_DLP_PATH"),
+		BinPathYTDLP: os.Getenv("YT_DLP_PATH"),
 	})
 
-	id, err := dl.GetUploadsPlaylistIdForUser(context.Background(), userName)
+	id, err := dl.GetUploadsPlaylistIdForChannel(context.Background(), userName)
 	if err != nil {
 		log.Fatal(err)
 	}

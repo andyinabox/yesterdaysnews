@@ -8,7 +8,6 @@ import (
 type Config struct {
 	GoogleAPIKey string
 	BinPathYTDLP string
-	OutputDir    string
 }
 
 type Downloader struct {

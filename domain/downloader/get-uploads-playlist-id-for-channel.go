@@ -8,7 +8,7 @@ import (
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubeapi"
 )
 
-func (d *Downloader) GetUploadsPlaylistIdForUser(ctx context.Context, userName string) (id string, err error) {
+func (d *Downloader) GetUploadsPlaylistIdForChannel(ctx context.Context, userName string) (id string, err error) {
 
 	resp, err := d.ytapi.ChannelsList(ctx, youtubeapi.ChannelsListRequest{
 		ForHandle: userName,
