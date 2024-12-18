@@ -3,7 +3,6 @@ package downloader
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -59,24 +58,23 @@ func (d *Downloader) DownloadVideosForChannel(ctx context.Context, req DownloadR
 	for _, id := range ids {
 		wg.Add(1)
 
-		// expected files
-		videoFile := filepath.Join(req.OutputDir, fmt.Sprintf("%s.mp4", id))
-		subsFile := filepath.Join(req.OutputDir, fmt.Sprintf("%s.en.vtt", id))
-
 		// download video in goroutine
 		go func() {
 			defer wg.Done()
 
-			log.Infof("downloading video %s", videoFile)
-			_, err := d.ytdl.DownloadVideo(ctx, id, youtubedownloader.Request{
-				Format:        "bv[ext=mp4][height<=1280]",
+			log.Infof("downloading video %s", id)
+			video, err := d.ytdl.DownloadVideo(ctx, id, youtubedownloader.Request{
+				Format:        VideoFormatString,
 				WriteAutoSubs: true,
-				SubFormat:     "vtt",
-				Output:        videoFile,
+				SubFormat:     VideoSubFormat,
+				Output:        filepath.Join(req.OutputDir, "%(id)s.%(ext)s"),
 			})
 			if err != nil {
 				log.Error("error downloading video", "error", err, "id", id)
 			}
+
+			videoFile := video.Filename
+			subsFile := strings.Replace(videoFile, filepath.Ext(videoFile), ".en."+VideoSubFormat, 1)
 
 			drf := DownloadResultFile{}
 

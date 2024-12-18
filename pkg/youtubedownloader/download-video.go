@@ -10,7 +10,7 @@ import (
 func (c *Client) DownloadVideo(ctx context.Context, url string, req Request) (*YouTubeVideo, error) {
 
 	req.DumpJSON = true
-	req.NoSimulate = false
+	req.NoSimulate = true
 
 	result, err := c.Execute(ctx, url, req)
 	if err != nil {

@@ -5,7 +5,8 @@ import (
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubedownloader"
 )
 
-const VideoFormatString = "bv[ext=mp4][aspect_ratio>1]"
+const VideoFormatString = "bv[ext=webm][width<=1280][aspect_ratio>1]"
+const VideoSubFormat = "vtt"
 
 type Config struct {
 	GoogleAPIKey string

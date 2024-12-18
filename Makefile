@@ -12,13 +12,13 @@ clean:
 # video clips
 
 output/clips/cnn: output/downloads/cnn/manifest.json
-	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/cnn/*.mp4' -o $@
+	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/cnn/*.webm' -o $@
 
 output/clips/msnbc: output/downloads/msnbc/manifest.json
-	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/msnbc/*.mp4' -o $@
+	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/msnbc/*.webm' -o $@
 
 output/clips/foxnews: output/downloads/foxnews/manifest.json
-	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/foxnews/*.mp4' -o $@
+	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/foxnews/*.webm' -o $@
 
 
 # markov models
