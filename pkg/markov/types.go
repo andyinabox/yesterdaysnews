@@ -3,7 +3,6 @@ package markov
 import (
 	"errors"
 	"fmt"
-	"io"
 )
 
 var (
@@ -23,15 +22,11 @@ type Chain interface {
 	Start() Prefix
 	Next(Prefix) string
 	End(Prefix) string
-	Build(r io.Reader)
 	PrefixLength() int
 	Save() ([]byte, error)
 	Load([]byte) error
 }
 
-type Model interface {
+type Generator interface {
 	Sentence(Prefix) string
-	Build(r io.Reader)
-	Save() ([]byte, error)
-	Load([]byte) error
 }
