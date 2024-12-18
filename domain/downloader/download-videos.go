@@ -68,8 +68,7 @@ func (d *Downloader) DownloadVideosForChannel(ctx context.Context, req DownloadR
 			defer wg.Done()
 
 			log.Infof("downloading video %s", videoFile)
-			err := d.ytdl.DownloadVideo(ctx, youtubedownloader.DownloadVideoRequest{
-				VideoID:       id,
+			_, err := d.ytdl.DownloadVideo(ctx, id, youtubedownloader.Request{
 				Format:        "bv[ext=mp4][height<=1280]",
 				WriteAutoSubs: true,
 				SubFormat:     "vtt",
