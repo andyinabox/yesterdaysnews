@@ -1,6 +1,8 @@
 package videoprocessor
 
-import "gitlab.com/andyinabox/yesterdays-news-downloader/pkg/mediatool"
+import (
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/mediatool"
+)
 
 type Config struct {
 	FFMpegBinPath  string
@@ -13,7 +15,9 @@ type Processor struct {
 }
 
 func New(cfg *Config) *Processor {
+
 	return &Processor{
-		mt: mediatool.New(cfg.FFMpegBinPath, cfg.FFProbeBinPath),
+		mt:  mediatool.New(cfg.FFMpegBinPath, cfg.FFProbeBinPath),
+		cfg: cfg,
 	}
 }

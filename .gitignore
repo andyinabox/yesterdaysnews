@@ -1,6 +1,4 @@
-test/output/*
-output
-corpus
 dist
+download
 .env
 .DS_Store

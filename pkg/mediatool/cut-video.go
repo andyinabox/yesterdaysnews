@@ -18,7 +18,7 @@ func (t *Tool) CutVideo(ctx context.Context, input, output string, start, durati
 
 	result, err := t.executeFfmpeg(ctx, options)
 
-	log.Debug(result)
+	log.Debug(string(result))
 
 	return err
 }

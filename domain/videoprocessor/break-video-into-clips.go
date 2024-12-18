@@ -15,7 +15,15 @@ import (
 	"golang.org/x/exp/rand"
 )
 
-func (p *Processor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir string, minLength, maxLength int) error {
+type BreakVideoIntoClipsResult struct {
+	Files []string `json:"files"`
+}
+
+func (p *Processor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir string, minLength, maxLength int) (result *BreakVideoIntoClipsResult, err error) {
+
+	result = &BreakVideoIntoClipsResult{
+		Files: []string{},
+	}
 
 	maxShells := runtime.NumCPU()
 	totalShells := 0
@@ -23,7 +31,7 @@ func (p *Processor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir s
 	// get length of input video
 	totalDuration, err := p.mt.GetVideoLength(ctx, inputPath)
 	if err != nil {
-		return err
+		return
 	}
 	log.Debugf("Duration: %s", totalDuration)
 
@@ -33,6 +41,7 @@ func (p *Processor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir s
 	var i int
 	var playhead mediatool.Duration
 	var wg sync.WaitGroup
+	var mu sync.Mutex
 
 	// chop into pieces
 	for {
@@ -73,6 +82,9 @@ func (p *Processor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir s
 			}
 
 			log.Info("finished video segment", "outFile", outFile)
+			mu.Lock()
+			result.Files = append(result.Files, outFile)
+			mu.Unlock()
 		}()
 
 		if totalShells >= maxShells {
@@ -87,9 +99,9 @@ func (p *Processor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir s
 
 	wg.Wait()
 
-	log.Info("done cutting files", "time")
+	log.Info("done cutting files")
 
-	return nil
+	return
 }
 
 func getFnParts(path string) (base, ext string) {

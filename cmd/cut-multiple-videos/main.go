@@ -2,27 +2,23 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"os"
 	"path/filepath"
 
 	"github.com/charmbracelet/log"
-	"github.com/joho/godotenv"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/videoeditor"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/videoprocessor"
 )
 
-var verbose bool
+var verbose, outputManifest bool
 var inputGlob, outputDir string
 var minLength, maxLength int
 
 func init() {
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	flag.BoolVar(&verbose, "v", false, "verbose output")
+	flag.BoolVar(&outputManifest, "m", true, "output manifest json")
 	flag.StringVar(&inputGlob, "i", "", "glob to get input videos")
 	flag.StringVar(&outputDir, "o", "", "path to output dir")
 	flag.IntVar(&minLength, "min", 5, "minimum clip length")
@@ -38,6 +34,9 @@ func init() {
 	}
 }
 func main() {
+
+	vp := videoprocessor.New(&videoprocessor.Config{})
+
 	files, err := filepath.Glob(inputGlob)
 	if err != nil {
 		log.Fatal(err)
@@ -48,16 +47,37 @@ func main() {
 		log.Fatal(err)
 	}
 
-	editor := videoeditor.New(os.Getenv("FFMPEG_PATH"), os.Getenv("FFPROBE_PATH"))
-
-	log.Debug("parse glob", "glob", inputGlob, "files", files)
+	result := videoprocessor.BreakVideoIntoClipsResult{
+		Files: []string{},
+	}
 
 	for _, f := range files {
-		err = editor.BreakVideoIntoClips(context.Background(), f, outputDir, minLength, maxLength)
+		log.Infof("cutting up video %s", f)
+
+		r, err := vp.BreakVideoIntoClips(context.Background(), f, outputDir, minLength, maxLength)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+
+		result.Files = append(result.Files, r.Files...)
+	}
+
+	if outputManifest {
+		outFile := filepath.Join(outputDir, "manifest.json")
+
+		b, err := json.Marshal(result)
 		if err != nil {
 			log.Fatal(err)
-			return
+		}
+
+		log.Info("outputting manifest file", "file", outFile)
+		err = os.WriteFile(outFile, b, os.ModePerm)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
+
+	log.Infof("finished outputting %d videos", len(result.Files))
 
 }
