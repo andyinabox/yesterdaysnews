@@ -1,4 +1,4 @@
-package videoeditor
+package mediatool
 
 import (
 	"context"
@@ -19,7 +19,7 @@ type ffprobeVideLengthResp struct {
 	Format ffprobeFormat `json:"format"`
 }
 
-func (e *Editor) GetVideoLength(ctx context.Context, inputPath string) (Duration, error) {
+func (t *Tool) GetVideoLength(ctx context.Context, inputPath string) (Duration, error) {
 
 	options := shellargs.New().
 		Add("-show_format").
@@ -27,7 +27,7 @@ func (e *Editor) GetVideoLength(ctx context.Context, inputPath string) (Duration
 		AddKeyed("-v", "error").
 		Add(inputPath)
 
-	result, err := e.executeFfprobe(ctx, options)
+	result, err := t.executeFfprobe(ctx, options)
 
 	log.Debug(string(result))
 

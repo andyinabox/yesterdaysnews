@@ -1,79 +1,46 @@
 .PHONY: build
-build: output/clips/cnn output/clips/msnbc output/clips/foxnews
+build: dist/yesterdays-news.mp4
 
 .PHONY: clean
 clean:
-	rm -rf output
+	-rm -rf dist
+	-rm -rf downloads
+
+.PHONY: clobber
+clobber: clean
+	-rm -rf downloads
 
 #
 # non-phony targets
 #
 
+dist/yesterdays-news.mp4: dist/clips/manifest.json
+	go run ./cmd/combine-clips/main.go -v -i 'dist/clips/*.webm' -o 'dist/yeterdays-news.mp4'
+
 # video clips
 
-output/clips/cnn: output/downloads/cnn/manifest.json
-	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/cnn/*.webm' -o $@
-
-output/clips/msnbc: output/downloads/msnbc/manifest.json
-	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/msnbc/*.webm' -o $@
-
-output/clips/foxnews: output/downloads/foxnews/manifest.json
-	go run ./cmd/cut-multiple-videos/main.go -i 'output/downloads/foxnews/*.webm' -o $@
-
-
-# markov models
-
-# output/models/cnn.json: models output/corpus/cnn.txt
-# 	go run ./cmd/build-model/main.go -f output/corpus/cnn.txt > $@
-
-# output/models/msnbc.json: models output/corpus/msnbc.txt
-# 	go run ./cmd/build-model/main.go -f output/corpus/msnbc.txt > $@
-
-# output/models/foxnews.json: models output/corpus/foxnews.txt
-# 	go run ./cmd/build-model/main.go -f output/corpus/foxnews.txt > $@
-
+dist/clips/manifest.json: download/cnn/manifest.json download/msnbc/manifest.json download/foxnews/manifest.json
+	go run ./cmd/cut-multiple-videos/main.go -i 'download/*/*.webm' -o dist/clips
 
 # combined subtitle text
 
-output/corpus/cnn.txt: corpus output/downloads/cnn/manifest.json
-	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/cnn/*.vtt' > $@
+dist/txt/cnn.txt: corpus download/cnn/manifest.json
+	go run ./cmd/vtt-to-corpus/main.go -f 'download/cnn/*.vtt' > $@
 
-output/corpus/msnbc.txt: corpus output/downloads/msnbc/manifest.json
-	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/msnbc/*.vtt' > $@
+dist/txt/msnbc.txt: corpus download/msnbc/manifest.json
+	go run ./cmd/vtt-to-corpus/main.go -f 'download/msnbc/*.vtt' > $@
 
-output/corpus/foxnews.txt: corpus output/downloads/foxnews/manifest.json
-	go run ./cmd/vtt-to-corpus/main.go -f 'output/downloads/foxnews/*.vtt' > $@
+dist/txt/foxnews.txt: corpus download/foxnews/manifest.json
+	go run ./cmd/vtt-to-corpus/main.go -f 'download/foxnews/*.vtt' > $@
 
 # video and subtitle downloads
 
-output/downloads/cnn/manifest.json:
-	go run ./cmd/download-multiple/main.go -n '@cnn' -o output/downloads/cnn
+download/cnn/manifest.json:
+	go run ./cmd/download-multiple/main.go -n '@cnn' -o download/cnn
 
-output/downloads/msnbc/manifest.json:
-	go run ./cmd/download-multiple/main.go -n '@msnbc' -o output/downloads/msnbc
+download/msnbc/manifest.json:
+	go run ./cmd/download-multiple/main.go -n '@msnbc' -o download/msnbc
 
-output/downloads/foxnews/manifest.json:
-	go run ./cmd/download-multiple/main.go -n '@msnbc' -o output/downloads/foxnews
-
-# video download lists
-
-# output/cnn.txt: output
-# 	go run ./cmd/get-vid-ids/main.go -u @CNN -c 10 > $@
-
-# output/msnbc.txt: output
-# 	go run ./cmd/get-vid-ids/main.go -u @msnbc -c 10 > $@
-
-# output/foxnews.txt: output
-# 	go run ./cmd/get-vid-ids/main.go -u @FoxNews -c 10 > $@
-
-# build dirs
-
-output:
-	-mkdir -p output
-
-corpus:
-	-mkdir -p output/corpus
-
-models:
-	-mkdir -p output/models
+download/foxnews/manifest.json:
+	go run ./cmd/download-multiple/main.go -n '@msnbc' -o download/foxnews
 
