@@ -1,4 +1,4 @@
-package videoeditor
+package videoprocessor
 
 import (
 	"context"
@@ -11,16 +11,17 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/mediatool"
 	"golang.org/x/exp/rand"
 )
 
-func (e *Editor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir string, minLength, maxLength int) error {
+func (p *Processor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir string, minLength, maxLength int) error {
 
 	maxShells := runtime.NumCPU()
 	totalShells := 0
 
 	// get length of input video
-	totalDuration, err := e.GetVideoLength(ctx, inputPath)
+	totalDuration, err := p.mt.GetVideoLength(ctx, inputPath)
 	if err != nil {
 		return err
 	}
@@ -30,7 +31,7 @@ func (e *Editor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir stri
 	base, ext := getFnParts(inputPath)
 
 	var i int
-	var playhead Duration
+	var playhead mediatool.Duration
 	var wg sync.WaitGroup
 
 	// chop into pieces
@@ -59,7 +60,7 @@ func (e *Editor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir stri
 		go func() {
 			defer wg.Done()
 			// cut the video and output
-			err := e.CutVideo(ctx, inputPath, progressFile, start, duration)
+			err := p.mt.CutVideo(ctx, inputPath, progressFile, start, duration)
 			if err != nil {
 				log.Error("error cutting video segment", "error", err, "outFile", outFile)
 				return
@@ -98,7 +99,7 @@ func getFnParts(path string) (base, ext string) {
 	return
 }
 
-func getRandDuration(minLength, maxLength int) Duration {
+func getRandDuration(minLength, maxLength int) mediatool.Duration {
 	seconds := rand.Intn(maxLength-minLength) + minLength
-	return Duration(time.Second * time.Duration(seconds))
+	return mediatool.Duration(time.Second * time.Duration(seconds))
 }

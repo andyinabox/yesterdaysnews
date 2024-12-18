@@ -1,4 +1,4 @@
-package videoeditor
+package mediatool
 
 import (
 	"context"
@@ -11,9 +11,9 @@ func TestGetVideoLength(t *testing.T) {
 	expected := "00:00:11"
 
 	// TODO: find out why godotenv isn't working here
-	e := New("", "")
+	tool := New("", "")
 
-	result, err := e.GetVideoLength(context.Background(), path)
+	result, err := tool.GetVideoLength(context.Background(), path)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,4 +1,4 @@
-package videoeditor
+package mediatool
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/shellargs"
 )
 
-func (c *Editor) CutVideo(ctx context.Context, input, output string, start, duration Duration) error {
+func (t *Tool) CutVideo(ctx context.Context, input, output string, start, duration Duration) error {
 
 	options := shellargs.New().
 		AddKeyed("-i", input).
@@ -16,7 +16,7 @@ func (c *Editor) CutVideo(ctx context.Context, input, output string, start, dura
 		AddKeyed("-c", "copy").
 		Add(output)
 
-	result, err := c.executeFfmpeg(ctx, options)
+	result, err := t.executeFfmpeg(ctx, options)
 
 	log.Debug(result)
 

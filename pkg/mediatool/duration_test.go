@@ -1,4 +1,4 @@
-package videoeditor
+package mediatool
 
 import (
 	"testing"
