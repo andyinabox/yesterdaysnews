@@ -26,6 +26,13 @@ func init() {
 	}
 }
 
+func cors(fs http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		fs.ServeHTTP(w, r)
+	}
+}
+
 func main() {
 
 	// Check if the directory exists
@@ -39,7 +46,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
-		Handler: fileServer,
+		Handler: cors(fileServer),
 	}
 
 	// configure cert

@@ -14,6 +14,11 @@ clobber: clean
 objectstoremock: .cert/localhost.crt
 	go run ./cmd/objectstoremock/main.go
 
+.PHONY: serve
+serve:
+	npx servor public --reload --secure
+
+
 #
 # non-phony targets
 #
