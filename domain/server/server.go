@@ -1,48 +1,62 @@
 package server
 
 import (
-	"embed"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"text/template"
+	"time"
+
+	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/assetshandler"
 )
 
-type TextGenerator interface {
-	Sentence() string
+type CaptionGenerator interface {
+	Caption() string
 }
 
 type Config struct {
-	ObjectStoreUrl string
-	PublicFiles    embed.FS
-	Templates      *template.Template
-	Port           int
+	ObjectStoreUrl  string
+	Templates       *template.Template
+	Assets          fs.FS
+	Port            int
+	MinCaptionDelay time.Duration
+	MaxCaptionDelay time.Duration
 }
 
 type Server struct {
-	tg  TextGenerator
+	cg  CaptionGenerator
 	srv *http.Server
 	cfg *Config
 }
 
-func New(tg TextGenerator, cfg *Config) *Server {
+func New(cg CaptionGenerator, cfg *Config) *Server {
 
 	s := &Server{
-		tg:  tg,
+		cg:  cg,
 		cfg: cfg,
 	}
 
-	mux := http.NewServeMux()
-	mux.Handle("/captions", s.Captions())
-	mux.Handle("/", s.Index())
+	handler := assetshandler.New(
+		&assetshandler.Config{
+			AssetsUrlPath:     "/assets",
+			AssetsFS:          cfg.Assets,
+			StripAssetsPrefix: true,
+		},
+	)
+
+	handler.AddRoute("/captions", s.Captions())
+	handler.AddRoute("/", s.Index())
 
 	s.srv = &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Port),
-		Handler: mux,
+		Handler: handler,
 	}
 
 	return s
 }
 
-func (s *Server) Start() error {
+func (s *Server) ListenAndServe() error {
+	log.Infof("starting server at http://localhost:%d", s.cfg.Port)
 	return s.srv.ListenAndServe()
 }

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>yesterday's news</title>
+
+    <meta name="description" content="yesterday's news" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    
+    <script>
+      {{ .JSVars }}
+    </script>
+  </head>
+  <body class="index">
+    <main>
+      <canvas id="canvas"></canvas>
+      <video id="video">
+        <source id="video-src-webm" type="video/webm" />
+      </video>
+      <div id="caption">...</div>
+    </main>
+    <script src="/assets/script.js"></script>
+  </body>
+</html>
