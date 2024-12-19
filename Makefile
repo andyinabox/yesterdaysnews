@@ -10,6 +10,15 @@ clean:
 clobber: clean
 	-rm -rf downloads
 
+.PHONY: objectstoremock
+objectstoremock: .cert/localhost.crt
+	go run ./cmd/objectstoremock/main.go
+
+.PHONY: serve
+serve:
+	npx servor public --reload --secure
+
+
 #
 # non-phony targets
 #
@@ -53,3 +62,5 @@ download/msnbc/manifest.json:
 download/foxnews/manifest.json:
 	go run ./cmd/download-multiple/main.go -n '@msnbc' -o download/foxnews
 
+.cert/localhost.crt:
+	./script/cert.sh
