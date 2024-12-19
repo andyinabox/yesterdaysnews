@@ -46,7 +46,7 @@ func (u *Uploader) CreateManifest(ctx context.Context, dir string) (*Manifest, e
 	if checkFileExists(filepath.Join(dir, u.cfg.ModelFileName)) {
 		manifest.Files.ModelFile = u.cfg.ModelFileName
 	} else {
-		// return nil, fmt.Errorf("video file %q missing", u.cfg.ModelFileName)
+		return nil, fmt.Errorf("video file %q missing", u.cfg.ModelFileName)
 	}
 
 	entries, err := os.ReadDir(filepath.Join(dir, u.cfg.ClipsDirName))
