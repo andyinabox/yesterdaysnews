@@ -88,8 +88,8 @@ type multiChainData struct {
 }
 
 type multiChainDataSub struct {
-	Chain  string  `json:"chain"`
-	Weight float32 `json:"weight"`
+	Chain  json.RawMessage `json:"chain"`
+	Weight float32         `json:"weight"`
 }
 
 func (c *MultiChain) Save() ([]byte, error) {
@@ -104,7 +104,7 @@ func (c *MultiChain) Save() ([]byte, error) {
 			return nil, fmt.Errorf("error exporting sub-chain: %w", err)
 		}
 		data.Chains[i] = multiChainDataSub{
-			Chain:  string(b),
+			Chain:  b,
 			Weight: sub.Weight,
 		}
 	}
