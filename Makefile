@@ -14,11 +14,14 @@ clobber: clean
 # non-phony targets
 #
 
-dist/manifest.json: dist/yesterdays-news.mp4
+dist/manifest.json: dist/yesterdays-news.mp4 dist/yesterdays-news.model.json
 	go run ./cmd/create-dist-manifest/main.go
 
 dist/yesterdays-news.mp4: dist/clips/manifest.json
 	go run ./cmd/combine-clips/main.go -v -i 'dist/clips/*.webm' -o 'dist/yesterdays-news.mp4'
+
+dist/yesterdays-news.model.json: download/cnn/manifest.json download/msnbc/manifest.json download/foxnews/manifest.json
+	go run ./cmd/output-markov-model/main.go
 
 # video clips
 

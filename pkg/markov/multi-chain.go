@@ -7,7 +7,7 @@ import (
 )
 
 type MultiChainSub struct {
-	Chain  BasicChain
+	Chain  *BasicChain
 	Weight float32
 }
 
@@ -16,30 +16,32 @@ type MultiChain struct {
 	prefixLength int
 }
 
-func NewMultiChain(chains []MultiChainSub) *MultiChain {
-	var prefixLength int
+func NewMultiChain(prefixLength int) *MultiChain {
+	return &MultiChain{
+		chains:       []MultiChainSub{},
+		prefixLength: prefixLength,
+	}
+}
+
+func (c *MultiChain) Build(chains []MultiChainSub) error {
+
 	for _, sub := range chains {
-
-		// set initial value
-		if prefixLength == 0 {
-			prefixLength = sub.Chain.PrefixLength()
-			continue
-		}
-
 		// detect inconsistencies
-		if prefixLength != sub.Chain.PrefixLength() {
-			panic("incompatible prefix lengths")
+		if c.prefixLength != sub.Chain.PrefixLength() {
+			return fmt.Errorf("incompatible prefix lengths: %d, %d", c.prefixLength, sub.Chain.prefixLength)
 		}
 	}
 
-	return &MultiChain{chains, prefixLength}
+	c.chains = chains
+
+	return nil
 }
 
 func (c *MultiChain) getOrderedChains() []Chain {
 	chains := make([]Chain, len(c.chains))
 
 	for i, sub := range c.chains {
-		chains[i] = &sub.Chain
+		chains[i] = sub.Chain
 	}
 
 	// TODO: some psuedorandom sorting based on weight
@@ -86,7 +88,7 @@ type multiChainData struct {
 }
 
 type multiChainDataSub struct {
-	Chain  []byte  `json:"chain"`
+	Chain  string  `json:"chain"`
 	Weight float32 `json:"weight"`
 }
 
@@ -102,7 +104,7 @@ func (c *MultiChain) Save() ([]byte, error) {
 			return nil, fmt.Errorf("error exporting sub-chain: %w", err)
 		}
 		data.Chains[i] = multiChainDataSub{
-			Chain:  b,
+			Chain:  string(b),
 			Weight: sub.Weight,
 		}
 	}
@@ -121,18 +123,18 @@ func (c *MultiChain) Load(b []byte) error {
 
 	for i, sub := range data.Chains {
 		chain := NewBasicChain(data.PrefixLength)
-		err = chain.Load(sub.Chain)
+		err = chain.Load([]byte(sub.Chain))
 		if err != nil {
 			return err
 		}
 
 		chains[i] = MultiChainSub{
-			Chain:  *chain,
+			Chain:  chain,
 			Weight: sub.Weight,
 		}
 	}
 
-	c = NewMultiChain(chains)
+	c = NewMultiChain(data.PrefixLength)
 
-	return nil
+	return c.Build(chains)
 }
