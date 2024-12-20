@@ -40,6 +40,8 @@ func (g *BasicGenerator) Sentence(p Prefix) string {
 			break
 		}
 		words = append(words, next)
+
+		p.Shift(next)
 	}
 
 	return strings.Join(words, " ")

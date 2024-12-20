@@ -1,26 +1,33 @@
 package textprocessor
 
-import "gitlab.com/andyinabox/yesterdays-news-downloader/pkg/markov"
+import (
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/markov"
+)
 
 const DefaultPrefixLength = 2
 
 type Config struct {
-	PrefixLength int
+	MinCaptionLength int
+	MaxCaptionLength int
 }
 
 type Processor struct {
-	chain *markov.MultiChain
+	chain markov.Chain
 	cfg   *Config
 }
 
-func New(cfg *Config) *Processor {
-
-	if cfg.PrefixLength == 0 {
-		cfg.PrefixLength = DefaultPrefixLength
-	}
+func New(chain markov.Chain, cfg *Config) *Processor {
 
 	return &Processor{
-		chain: markov.NewMultiChain(cfg.PrefixLength),
+		chain: chain,
 		cfg:   cfg,
 	}
+}
+
+func (p *Processor) MinCaptionLength() int {
+	return p.cfg.MinCaptionLength
+}
+
+func (p *Processor) MaxCaptionLength() int {
+	return p.cfg.MaxCaptionLength
 }

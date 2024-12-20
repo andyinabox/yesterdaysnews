@@ -16,7 +16,7 @@ objectstoremock: .cert/localhost.crt
 
 .PHONY: serve
 serve:
-	npx servor public --reload --secure
+	go run . -a -v
 
 
 #
