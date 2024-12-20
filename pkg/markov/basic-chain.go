@@ -56,6 +56,17 @@ func (c *BasicChain) PrefixLength() int {
 	return c.prefixLength
 }
 
+func (c *BasicChain) NewPrefix(s string) Prefix {
+
+	p := NewBasicPrefix(s)
+
+	if p.Length() != c.PrefixLength() {
+		log.Fatal(ErrPrefixWrongLength)
+	}
+
+	return p
+}
+
 func (c *BasicChain) Build(r io.Reader) {
 	br := bufio.NewReader(r)
 	p := make(BasicPrefix, c.prefixLength)

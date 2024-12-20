@@ -2,8 +2,8 @@ package server
 
 import (
 	"fmt"
-	"math/rand/v2"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -22,19 +22,43 @@ func (s *Server) Captions() http.HandlerFunc {
 		w.Header().Set("Cache-Control", "no-cache")
 		w.Header().Set("Connection", "keep-alive")
 
+		var caption string
+
+		minDelay := s.cfg.MinCaptionDelay
+		maxDelay := s.cfg.MaxCaptionDelay
+		minLength := s.cg.MinCaptionLength()
+		maxLength := s.cg.MaxCaptionLength()
+
 		for {
 			select {
-
 			case <-ctx.Done():
 				return
 			default:
-				delay := time.Duration(1.0+(3.0*rand.Float32())) * time.Second
-				time.Sleep(delay)
-				caption := s.cg.Caption()
+				caption = s.cg.Caption(caption)
 				log.Debug(caption)
 				fmt.Fprintf(w, "data: %s\n\n", caption)
 				w.(http.Flusher).Flush()
+
+				time.Sleep(mapCaptionToDelay(
+					caption,
+					minLength,
+					maxLength,
+					minDelay,
+					maxDelay,
+				))
+
 			}
 		}
 	}
+}
+
+func mapCaptionToDelay(cap string, minLength, maxLength int, minDelay, maxDelay float64) time.Duration {
+	tokens := strings.Split(cap, " ")
+	percent := float64(len(tokens)-minLength) / float64(maxLength-minLength)
+	seconds := ((maxDelay - minDelay) * percent) + minDelay
+	duration := time.Duration(seconds * float64(time.Second))
+
+	log.Debug("caption delay", "duration", duration, "percent", percent, "seconds", seconds)
+
+	return duration
 }

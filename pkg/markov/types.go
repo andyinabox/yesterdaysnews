@@ -23,6 +23,7 @@ type Chain interface {
 	Next(Prefix) string
 	End(Prefix) string
 	PrefixLength() int
+	NewPrefix(string) Prefix
 	Save() ([]byte, error)
 	Load([]byte) error
 }

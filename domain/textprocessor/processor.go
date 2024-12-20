@@ -23,3 +23,11 @@ func New(chain markov.Chain, cfg *Config) *Processor {
 		cfg:   cfg,
 	}
 }
+
+func (p *Processor) MinCaptionLength() int {
+	return p.cfg.MinCaptionLength
+}
+
+func (p *Processor) MaxCaptionLength() int {
+	return p.cfg.MaxCaptionLength
+}

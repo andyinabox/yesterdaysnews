@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/textprocessor"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/captionschain"
 )
 
 var verbose bool
@@ -27,30 +27,28 @@ func init() {
 
 func main() {
 
-	p := textprocessor.New(&textprocessor.Config{
-		PrefixLength: prefixLength,
-	})
+	c := captionschain.New(prefixLength)
 
-	err := p.Build([]textprocessor.Corpus{
+	err := c.BuildFromMultiple([]captionschain.Corpus{
 		{
-			Type:     textprocessor.CorpusTypeVTT,
+			Type:     captionschain.CorpusTypeVTT,
 			FileGlob: "download/cnn/*.vtt",
-			Weight:   1.0,
+			Weight:   1,
 		},
 		{
-			Type:     textprocessor.CorpusTypeVTT,
+			Type:     captionschain.CorpusTypeVTT,
 			FileGlob: "download/msnbc/*.vtt",
-			Weight:   1.0,
+			Weight:   1,
 		},
 		{
-			Type:     textprocessor.CorpusTypeVTT,
+			Type:     captionschain.CorpusTypeVTT,
 			FileGlob: "download/foxnews/*.vtt",
-			Weight:   1.0,
+			Weight:   1,
 		},
 		{
-			Type:     textprocessor.CorpusTypeText,
+			Type:     captionschain.CorpusTypeText,
 			FileGlob: "data/hospital.txt",
-			Weight:   1.0,
+			Weight:   3,
 		},
 	})
 
@@ -58,7 +56,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	modelJSON, err := p.ExportModel()
+	modelJSON, err := c.Save()
 	if err != nil {
 		log.Fatal(err)
 	}

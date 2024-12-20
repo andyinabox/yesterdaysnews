@@ -5,14 +5,15 @@ import (
 	"io/fs"
 	"net/http"
 	"text/template"
-	"time"
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/assetshandler"
 )
 
 type CaptionGenerator interface {
-	Caption() string
+	Caption(string) string
+	MinCaptionLength() int
+	MaxCaptionLength() int
 }
 
 type Config struct {
@@ -20,8 +21,8 @@ type Config struct {
 	Templates       *template.Template
 	Assets          fs.FS
 	Port            int
-	MinCaptionDelay time.Duration
-	MaxCaptionDelay time.Duration
+	MinCaptionDelay float64
+	MaxCaptionDelay float64
 }
 
 type Server struct {

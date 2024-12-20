@@ -6,12 +6,11 @@ import (
 	"io/fs"
 	"os"
 	"text/template"
-	"time"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/captionschain"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/server"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/textprocessor"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/markov"
 )
 
 //go:embed tmpl/*
@@ -21,17 +20,20 @@ var templates embed.FS
 var assets embed.FS
 
 var verbose, loadAssetsFromFs bool
-var port, prefixLength, maxCaptionDelay, minCaptionDelay int
+var port, prefixLength, minCaptionLength, maxCaptionLength int
+var maxCaptionDelay, minCaptionDelay float64
 var objectStoreUrl string
 
 func init() {
 	flag.BoolVar(&verbose, "v", false, "verbose logging")
 	flag.BoolVar(&loadAssetsFromFs, "a", false, "load assets from filesystem (for easier frontend development)")
 	flag.IntVar(&prefixLength, "p", 2, "markov chain prefix length")
-	flag.IntVar(&minCaptionDelay, "min", 1, "min caption delay")
-	flag.IntVar(&maxCaptionDelay, "max", 6, "max caption delay")
+	flag.IntVar(&minCaptionLength, "minl", 5, "min caption length in words")
+	flag.IntVar(&maxCaptionLength, "maxl", 15, "max caption length in words")
+	flag.Float64Var(&minCaptionDelay, "mind", 1.5, "min caption delay in seconds")
+	flag.Float64Var(&maxCaptionDelay, "maxd", 5.0, "max caption delay in seconds")
 	flag.IntVar(&port, "port", 8080, "server port")
-	flag.StringVar(&objectStoreUrl, "o", "https://localhost:9000", "url of object storage")
+	flag.StringVar(&objectStoreUrl, "url", "https://localhost:9000", "url of object storage")
 	flag.Parse()
 
 	if verbose {
@@ -56,18 +58,20 @@ func main() {
 		}
 	}
 
-	file, err := os.Open("data/hospital.txt")
+	data, err := os.ReadFile("dist/yesterdays-news.model.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	chain := markov.NewBasicChain(prefixLength)
-	chain.Build(file)
+	chain := captionschain.New(prefixLength)
+	err = chain.Load(data)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	tp := textprocessor.New(chain, &textprocessor.Config{
-		// PrefixLength:     prefixLength,
-		MinCaptionLength: 5,
-		MaxCaptionLength: 10,
+		MinCaptionLength: minCaptionLength,
+		MaxCaptionLength: maxCaptionLength,
 	})
 
 	s := server.New(tp, &server.Config{
@@ -75,8 +79,8 @@ func main() {
 		Templates:       template.Must(template.New("").ParseFS(templates, "tmpl/*.tmpl")),
 		Assets:          assetsFs,
 		Port:            port,
-		MinCaptionDelay: time.Duration(minCaptionDelay) * time.Second,
-		MaxCaptionDelay: time.Duration(maxCaptionDelay) * time.Second,
+		MinCaptionDelay: minCaptionDelay,
+		MaxCaptionDelay: maxCaptionDelay,
 	})
 
 	log.Fatal(s.ListenAndServe())

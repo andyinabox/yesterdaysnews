@@ -20,6 +20,7 @@ async function run() {
   const caption = document.getElementById('caption')
   const es = new EventSource('/captions')
   es.addEventListener('message', (evt) => {
+    // console.log(evt.data)
     caption.innerText = evt.data
   })
 
@@ -41,29 +42,32 @@ async function run() {
   const videoEl = document.getElementById('video')
   const webmSourceEl = document.getElementById('video-src-webm')
 
-  // webmSourceEl.setAttribute('type', 'video/webm')
-  // webmSourceEl.setAttribute('src', getNextVideoURL())
-
-  // videoEl.load()
-  // videoEl.play()
-
   function loadNewVideo() {
-    videoEl.pause()
+    try {
+      videoEl.pause()
 
-    webmSourceEl.setAttribute('type', 'video/webm')
-    webmSourceEl.setAttribute('src', getNextVideoURL())
+      const url = getNextVideoURL()
 
-    videoEl.load()
-    videoEl.play()
+      webmSourceEl.setAttribute('type', 'video/webm')
+      webmSourceEl.setAttribute('src', url)
 
-    console.log({
-      src: webmSourceEl.getAttribute('src'),
-      type: webmSourceEl.getAttribute('type'),
-    })
+      videoEl.load()
+      videoEl.play()
+    } catch (err) {
+      console.log(`error loading video ${url}`, err)
+      loadNewVideo()
+    }
   }
 
-  videoEl.addEventListener('ended', loadNewVideo)
-  videoEl.addEventListener('error', loadNewVideo)
+  videoEl.addEventListener('ended', (evt) => {
+    // console.log('video ended', evt)
+    loadNewVideo()
+  })
+  videoEl.addEventListener('error', (evt) => {
+    console.log('video error', evt)
+    loadNewVideo()
+  })
+
   loadNewVideo()
 }
 

@@ -1,12 +1,16 @@
 package textprocessor
 
-import "strings"
+import (
+	"strings"
 
-func (p *Processor) Caption() string {
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/markov"
+)
 
-	prefix := p.chain.Start()
+func (p *Processor) Caption(prevSentence string) string {
 
-	words := prefix.Tokens()
+	prefix := p.getPrefixFromSentence(prevSentence)
+
+	words := []string{}
 
 	prefixLen := p.chain.PrefixLength()
 	minLen := p.cfg.MinCaptionLength
@@ -35,4 +39,19 @@ func (p *Processor) Caption() string {
 	}
 
 	return strings.Join(words, " ")
+}
+
+func (p *Processor) getPrefixFromSentence(s string) markov.Prefix {
+	if s == "" {
+		return p.chain.Start()
+	}
+
+	tokens := strings.Split(s, " ")
+	if len(tokens) < p.chain.PrefixLength() {
+		return p.chain.Start()
+	}
+
+	str := tokens[len(tokens)-p.chain.PrefixLength():]
+
+	return p.chain.NewPrefix(strings.Join(str, " "))
 }
