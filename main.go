@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"os"
 	"text/template"
+	"time"
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/server"
@@ -21,7 +22,7 @@ var assets embed.FS
 var verbose, loadAssetsFromFs bool //, loadObjectsFromFs bool
 var port, prefixLength, minCaptionLength, maxCaptionLength int
 var maxCaptionDelay, minCaptionDelay float64
-var objectStoreUrl string
+var objectStoreUrl, manifestCheckIntervalStr string
 
 func init() {
 	flag.BoolVar(&verbose, "v", false, "verbose logging")
@@ -34,6 +35,7 @@ func init() {
 	flag.Float64Var(&maxCaptionDelay, "maxd", 5.0, "max caption delay in seconds")
 	flag.IntVar(&port, "port", 8080, "server port")
 	flag.StringVar(&objectStoreUrl, "url", "http://localhost:9000", "url of object storage")
+	flag.StringVar(&manifestCheckIntervalStr, "m", "1h", "manifest check interval")
 	flag.Parse()
 
 	if verbose {
@@ -59,16 +61,26 @@ func main() {
 		}
 	}
 
-	s := server.New(&server.Config{
-		ObjectStoreUrl:   objectStoreUrl,
-		Templates:        template.Must(template.New("").ParseFS(templates, "tmpl/*.tmpl")),
-		Assets:           assetsFs,
-		Port:             port,
-		MinCaptionDelay:  minCaptionDelay,
-		MaxCaptionDelay:  maxCaptionDelay,
-		MinCaptionLength: minCaptionLength,
-		MaxCaptionLength: maxCaptionLength,
-	})
+	manifestCheckInterval, err := time.ParseDuration(manifestCheckIntervalStr)
+	if err != nil {
+		log.Fatalf("error paring manifest interval %s: %s", manifestCheckIntervalStr, err)
+	}
+
+	cfg := &server.Config{
+		ObjectStoreUrl:        objectStoreUrl,
+		Templates:             template.Must(template.New("").ParseFS(templates, "tmpl/*.tmpl")),
+		Assets:                assetsFs,
+		Port:                  port,
+		MinCaptionDelay:       minCaptionDelay,
+		MaxCaptionDelay:       maxCaptionDelay,
+		MinCaptionLength:      minCaptionLength,
+		MaxCaptionLength:      maxCaptionLength,
+		ManifestCheckInterval: manifestCheckInterval,
+	}
+
+	log.Info("creating new server", "config", cfg)
+
+	s := server.New(cfg)
 
 	log.Fatal(s.Start(context.Background()))
 }

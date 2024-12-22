@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"sync"
 	"text/template"
+	"time"
 
 	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/textprocessor"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/uploader"
@@ -13,14 +14,15 @@ import (
 )
 
 type Config struct {
-	ObjectStoreUrl   string
-	Templates        *template.Template
-	Assets           fs.FS
-	Port             int
-	MinCaptionDelay  float64
-	MaxCaptionDelay  float64
-	MinCaptionLength int
-	MaxCaptionLength int
+	ObjectStoreUrl        string
+	Templates             *template.Template
+	Assets                fs.FS
+	Port                  int
+	MinCaptionDelay       float64
+	MaxCaptionDelay       float64
+	MinCaptionLength      int
+	MaxCaptionLength      int
+	ManifestCheckInterval time.Duration
 }
 
 type Server struct {

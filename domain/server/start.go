@@ -13,8 +13,6 @@ import (
 	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/uploader"
 )
 
-const ManifestCheckInterval = 5 * time.Second
-
 func (s *Server) Start(ctx context.Context) error {
 	var err error
 
@@ -44,7 +42,7 @@ func (s *Server) Start(ctx context.Context) error {
 			case <-ctx.Done():
 				return
 			default:
-				time.Sleep(ManifestCheckInterval)
+				time.Sleep(s.cfg.ManifestCheckInterval)
 				log.Debug("checking manifest")
 
 				manifest, err := s.getManifest(ctx)
