@@ -1,23 +1,28 @@
 package server
 
 import (
-	"html/template"
+	"fmt"
+	"math/rand"
 	"net/http"
 )
 
 type IndexRenderContext struct {
-	JSVars template.JS
+	InitialClipURL string
+	InitialCaption string
 }
 
 func (s *Server) Index() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		jsVars := JSVars{
-			ObjectStoreUrl: s.cfg.ObjectStoreUrl,
-		}
+		clipUrl := fmt.Sprintf(
+			"%s/%s",
+			s.cfg.ObjectStoreUrl,
+			s.manifest.Files.Clips[rand.Intn(len(s.manifest.Files.Clips))],
+		)
 
 		data := IndexRenderContext{
-			JSVars: jsVars.ToJS(),
+			InitialClipURL: clipUrl,
+			InitialCaption: s.tp.Caption(""),
 		}
 
 		s.cfg.Templates.ExecuteTemplate(w, "index.html.tmpl", data)

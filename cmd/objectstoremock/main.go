@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"flag"
 	"fmt"
 	"net/http"
@@ -49,18 +48,21 @@ func main() {
 		Handler: cors(fileServer),
 	}
 
-	// configure cert
-	serverTLSCert, err := tls.LoadX509KeyPair(".cert/localhost.crt", ".cert/localhost.key")
-	if err != nil {
-		log.Fatalf("Error loading certificate and key file: %v", err)
-	}
+	// // configure cert
+	// serverTLSCert, err := tls.LoadX509KeyPair(".cert/localhost.crt", ".cert/localhost.key")
+	// if err != nil {
+	// 	log.Fatalf("Error loading certificate and key file: %v", err)
+	// }
 
-	// configure server
-	srv.TLSConfig = &tls.Config{
-		Certificates: []tls.Certificate{serverTLSCert},
-	}
+	// // configure server
+	// srv.TLSConfig = &tls.Config{
+	// 	Certificates: []tls.Certificate{serverTLSCert},
+	// }
 
-	// Start the server on port 8080
-	fmt.Printf("tls fileserver started at https://localhost:%d\n", port)
-	log.Fatal(srv.ListenAndServeTLS("", ""))
+	// // Start the server on port 8080
+	// fmt.Printf("tls fileserver started at https://localhost:%d\n", port)
+	// log.Fatal(srv.ListenAndServeTLS("", ""))
+
+	fmt.Printf("fileserver started at http://localhost:%d\n", port)
+	log.Fatal(srv.ListenAndServe())
 }

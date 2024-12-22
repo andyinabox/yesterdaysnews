@@ -26,15 +26,15 @@ func (s *Server) Captions() http.HandlerFunc {
 
 		minDelay := s.cfg.MinCaptionDelay
 		maxDelay := s.cfg.MaxCaptionDelay
-		minLength := s.cg.MinCaptionLength()
-		maxLength := s.cg.MaxCaptionLength()
+		minLength := s.tp.MinCaptionLength()
+		maxLength := s.tp.MaxCaptionLength()
 
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			default:
-				caption = s.cg.Caption(caption)
+				caption = s.tp.Caption(caption)
 				log.Debug(caption)
 				fmt.Fprintf(w, "data: %s\n\n", caption)
 				w.(http.Flusher).Flush()
