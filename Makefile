@@ -16,7 +16,7 @@ objectstoremock: .cert/localhost.crt
 
 .PHONY: serve
 serve:
-	go run . -a -v -m 5s
+	go run . -a -v -m 20s
 
 
 #
