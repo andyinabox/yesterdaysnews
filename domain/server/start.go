@@ -53,9 +53,9 @@ func (s *Server) Start(ctx context.Context) error {
 					continue
 				}
 
-				log.Debug("comparing manifest date", "current", s.manifest.Date, "new", manifest.Date)
+				// log.Debug("comparing manifest date", "current", s.manifest.Date, "new", manifest.Date)
 				if manifest.Date != s.manifest.Date {
-					log.Debug("manifest is updated, resetting...")
+					log.Info("manifest is updated, reloading...")
 
 					s.mu.Lock()
 					s.manifest = manifest
@@ -121,19 +121,19 @@ func (s *Server) getModel(ctx context.Context) ([]byte, error) {
 func (s *Server) getManifest(ctx context.Context) (*uploader.Manifest, error) {
 	url := s.cfg.ObjectStoreUrl + "/manifest.json"
 
-	log.Debug("create manifest request: " + url)
+	// log.Debug("create manifest request: " + url)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Debug("do manifest request")
+	// log.Debug("do manifest request")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Debug("read manifest response")
+	// log.Debug("read manifest response")
 	defer resp.Body.Close()
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -142,7 +142,7 @@ func (s *Server) getManifest(ctx context.Context) (*uploader.Manifest, error) {
 
 	// log.Debug(string(data))
 
-	log.Debug("unmarshal manifest data")
+	// log.Debug("unmarshal manifest data")
 	manifest := uploader.Manifest{}
 	err = json.Unmarshal(data, &manifest)
 	if err != nil {
