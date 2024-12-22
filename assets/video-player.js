@@ -6,7 +6,7 @@ class VideoPlayer extends HTMLElement {
     this.video = document.createElement('video')
     this.video.setAttribute('muted', true)
     this.video.addEventListener('ended', this.onVideoEnded.bind(this))
-    this.video.addEventListener('error', this.onVideoEnded.bind(this))
+    this.video.addEventListener('error', this.onVideoError.bind(this))
 
     // create source element
     this.videoSource = document.createElement('source')
@@ -17,18 +17,21 @@ class VideoPlayer extends HTMLElement {
   }
   connectedCallback() {
     this.resourceUrl = this.getAttribute('resource-url')
+
+    // load the list of clips
     this.clipsLoading = this.loadClips()
 
-    const initialClip = this.getAttribute('initial-clip')
-
+    // append the main video player
     this.appendChild(this.video)
 
-    this.loadNewVideo(initialClip)
+    // load and play the initial clip
+    this.loadNewVideo(this.getAttribute('initial-clip'))
   }
 
   async loadClips() {
     try {
       const resp = await fetch(this.resourceUrl)
+
       if (!resp.ok) {
         throw new Error(`Response status: ${resp.status}`)
       }
@@ -36,10 +39,14 @@ class VideoPlayer extends HTMLElement {
       const data = await resp.json()
 
       this.clips = data.clips
-      console.log('clips loaded', this.clips)
     } catch (err) {
       console.error(err)
     }
+  }
+
+  onVideoError(err) {
+    console.error(err)
+    this.loadNewVideo(this.getNextClip())
   }
 
   onVideoEnded() {
@@ -47,11 +54,18 @@ class VideoPlayer extends HTMLElement {
   }
 
   getNextClip() {
-    return this.clips.pop()
+    if (this.clips.length < 10) {
+      this.loadClips()
+    }
+
+    const next = this.clips.pop()
+
+    // preload next video somehow?
+
+    return next
   }
 
   loadNewVideo(url) {
-    console.log('loadNewVideo', url)
     try {
       this.video.pause()
 
@@ -66,7 +80,7 @@ class VideoPlayer extends HTMLElement {
 
   disconnectedCallback() {
     this.video.removeEventListener('ended', this.onVideoEnded.bind(this))
-    this.video.removeEventListener('error', this.onVideoEnded.bind(this))
+    this.video.removeEventListener('error', this.onVideoError.bind(this))
   }
 }
 customElements.define('video-player', VideoPlayer)

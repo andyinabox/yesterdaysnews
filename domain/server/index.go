@@ -8,7 +8,6 @@ import (
 
 type IndexRenderContext struct {
 	InitialClipURL string
-	InitialCaption string
 }
 
 func (s *Server) Index() http.HandlerFunc {
@@ -22,7 +21,6 @@ func (s *Server) Index() http.HandlerFunc {
 
 		data := IndexRenderContext{
 			InitialClipURL: clipUrl,
-			InitialCaption: s.tp.Caption(""),
 		}
 
 		s.cfg.Templates.ExecuteTemplate(w, "index.html.tmpl", data)
