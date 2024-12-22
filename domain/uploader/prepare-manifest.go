@@ -23,7 +23,9 @@ type ManifestFiles struct {
 }
 
 func (u *Uploader) CreateManifest(ctx context.Context, dir string) (*Manifest, error) {
-	manifest := &Manifest{}
+	manifest := &Manifest{
+		Date: time.Now(),
+	}
 
 	if checkFileExists(filepath.Join(dir, u.cfg.VideoFileName)) {
 		manifest.Files.VideoFile = u.cfg.VideoFileName
