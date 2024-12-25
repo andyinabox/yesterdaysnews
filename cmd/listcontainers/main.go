@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
@@ -20,11 +21,16 @@ func init() {
 }
 
 func main() {
-	region := "us-east-1"
 	endpoint := os.Getenv("YN_S3_ENDPOINT")
+	accessKey := os.Getenv("YN_S3_ACCESS_KEY")
+	secretKey := os.Getenv("YN_S3_SECRET_ACCESS_KEY")
 
 	// Load the Shared AWS Configuration (~/.aws/config)
-	cfg, err := config.LoadDefaultConfig(context.Background(), config.WithRegion(region))
+	cfg, err := config.LoadDefaultConfig(
+		context.Background(),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
+		config.WithRegion("us-east-1"),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,14 +42,14 @@ func main() {
 		o.BaseEndpoint = &endpoint
 	})
 
-	result, err := client.ListBuckets(context.Background(), &s3.ListBucketsInput{
-		BucketRegion: &region,
-	})
+	result, err := client.ListBuckets(context.Background(), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Debugf("%#v", result)
+	for _, b := range result.Buckets {
+		log.Info(*b.Name)
+	}
 
 	// Get the first page of results for ListObjectsV2 for a bucket
 	// output, err := client.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{
