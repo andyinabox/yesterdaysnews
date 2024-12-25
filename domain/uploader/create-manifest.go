@@ -6,25 +6,31 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 )
 
 type Manifest struct {
 	Date  time.Time     `json:"date"`
+	ID    string        `json:"id"`
 	Files ManifestFiles `json:"files"`
 }
 
 type ManifestFiles struct {
-	VideoFile    string   `json:"video"`
-	SubsFile     string   `json:"subs"`
-	CombinedFile string   `json:"combined"`
-	ModelFile    string   `json:"model"`
-	Clips        []string `json:"clips"`
+	VideoFile string `json:"video"`
+	// SubsFile     string   `json:"subs"`
+	// CombinedFile string   `json:"combined"`
+	ModelFile string   `json:"model"`
+	Clips     []string `json:"clips"`
 }
 
 func (u *Uploader) CreateManifest(ctx context.Context, dir string) (*Manifest, error) {
+
+	now := time.Now()
+
 	manifest := &Manifest{
-		Date: time.Now(),
+		ID:   strconv.FormatInt(now.Unix(), 10),
+		Date: now,
 	}
 
 	if checkFileExists(filepath.Join(dir, u.cfg.VideoFileName)) {
@@ -33,17 +39,17 @@ func (u *Uploader) CreateManifest(ctx context.Context, dir string) (*Manifest, e
 		return nil, fmt.Errorf("video file %q missing", u.cfg.VideoFileName)
 	}
 
-	if checkFileExists(filepath.Join(dir, u.cfg.SubsFileName)) {
-		manifest.Files.SubsFile = u.cfg.SubsFileName
-	} else {
-		// return nil, fmt.Errorf("video file %q missing", u.cfg.SubsFileName)
-	}
+	// if checkFileExists(filepath.Join(dir, u.cfg.SubsFileName)) {
+	// 	manifest.Files.SubsFile = u.cfg.SubsFileName
+	// } else {
+	// 	return nil, fmt.Errorf("video file %q missing", u.cfg.SubsFileName)
+	// }
 
-	if checkFileExists(filepath.Join(dir, u.cfg.CombinedFileName)) {
-		manifest.Files.CombinedFile = u.cfg.CombinedFileName
-	} else {
-		// return nil, fmt.Errorf("video file %q missing", u.cfg.CombinedFileName)
-	}
+	// if checkFileExists(filepath.Join(dir, u.cfg.CombinedFileName)) {
+	// 	manifest.Files.CombinedFile = u.cfg.CombinedFileName
+	// } else {
+	// 	return nil, fmt.Errorf("video file %q missing", u.cfg.CombinedFileName)
+	// }
 
 	if checkFileExists(filepath.Join(dir, u.cfg.ModelFileName)) {
 		manifest.Files.ModelFile = u.cfg.ModelFileName
