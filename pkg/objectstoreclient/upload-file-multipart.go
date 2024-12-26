@@ -2,18 +2,13 @@ package objectstoreclient
 
 import (
 	"context"
-	"fmt"
-	"os"
+	"io"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-func (c *Client) UploadFileMultipart(ctx context.Context, bucketName, fileKey, inFilepath string) (string, error) {
-
-	file, err := os.Open(inFilepath)
-	if err != nil {
-		return "", fmt.Errorf("unable to open file %q: %w", inFilepath, err)
-	}
+func (c *Client) UploadFileMultipart(ctx context.Context, bucketName, fileKey string, reader io.Reader, contentType string) (string, error) {
 
 	uploader, err := c.getUploader(ctx)
 	if err != nil {
@@ -21,9 +16,10 @@ func (c *Client) UploadFileMultipart(ctx context.Context, bucketName, fileKey, i
 	}
 
 	_, err = uploader.Upload(ctx, &s3.PutObjectInput{
-		Bucket: &bucketName,
-		Key:    &fileKey,
-		Body:   file,
+		Bucket:      aws.String(bucketName),
+		Key:         aws.String(fileKey),
+		Body:        reader,
+		ContentType: aws.String(contentType),
 	})
 
 	return fileKey, nil

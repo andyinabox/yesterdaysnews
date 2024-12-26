@@ -15,11 +15,11 @@ func main() {
 	outputDir := "dist"
 
 	u := uploader.New(&uploader.Config{
-		VideoFileName:    "yesterdays-news.mp4",
-		SubsFileName:     "yesterdays-news.srt",
-		CombinedFileName: "yesterdays-news-cc.mp4",
-		ModelFileName:    "yesterdays-news.model.json",
-		ClipsDirName:     "clips",
+		VideoFileName: "yesterdays-news.mp4",
+		// SubsFileName:     "yesterdays-news.srt",
+		// CombinedFileName: "yesterdays-news-cc.mp4",
+		ModelFileName: "yesterdays-news.model.json",
+		ClipsDirName:  "clips",
 	})
 
 	manifest, err := u.CreateManifest(context.Background(), outputDir)

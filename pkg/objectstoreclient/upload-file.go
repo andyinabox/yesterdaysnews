@@ -3,16 +3,13 @@ package objectstoreclient
 import (
 	"context"
 	"fmt"
-	"os"
+	"io"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-func (c *Client) UploadFile(ctx context.Context, bucketName, fileKey, inFilepath string) (string, error) {
-	file, err := os.Open(inFilepath)
-	if err != nil {
-		return "", fmt.Errorf("unable to open file %q: %w", inFilepath, err)
-	}
+func (c *Client) UploadFile(ctx context.Context, bucketName, fileKey string, reader io.Reader, contentType string) (string, error) {
 
 	client, err := c.getClient(ctx)
 	if err != nil {
@@ -20,9 +17,10 @@ func (c *Client) UploadFile(ctx context.Context, bucketName, fileKey, inFilepath
 	}
 
 	_, err = client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: &bucketName,
-		Key:    &fileKey,
-		Body:   file,
+		Bucket:      aws.String(bucketName),
+		Key:         aws.String(fileKey),
+		Body:        reader,
+		ContentType: aws.String(contentType),
 	})
 	if err != nil {
 		return "", fmt.Errorf("error putting file %q: %w", fileKey, err)

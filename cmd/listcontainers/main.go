@@ -26,7 +26,7 @@ func main() {
 		SecretKey: os.Getenv("YN_S3_SECRET_ACCESS_KEY"),
 	})
 
-	buckets, err := client.ListBuckets(context.Background())
+	buckets, err := client.ListBuckets(context.Background(), nil)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,31 +1,38 @@
 package uploader
 
-import "context"
-
-type ObjectStoreClient interface {
-	CreateBucket(ctx context.Context, bucketName string) error
-	ListBuckets(ctx context.Context, prefix string) ([]string, error)
-	UploadFile(ctx context.Context, bucketName, fileKey, inFilepath string) (string, error)
-	UploadFileMultipart(ctx context.Context, bucketName, fileKey, inFilepath string) (string, error)
-}
+import (
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/objectstoreclient"
+)
 
 type Config struct {
+	// client config
+	S3Endpoint  string
+	S3AccessKey string
+	S3SecretKey string
+
 	// upload config
 	BucketNameBase string
 
 	// manifest config
-	VideoFileName    string
-	SubsFileName     string
-	CombinedFileName string
-	ModelFileName    string
-	ClipsDirName     string
+	VideoFileName string
+	// SubsFileName     string
+	// CombinedFileName string
+	ModelFileName string
+	ClipsDirName  string
 }
 
 type Uploader struct {
-	osclient ObjectStoreClient
+	osclient *objectstoreclient.Client
 	cfg      *Config
 }
 
-func New(osclient ObjectStoreClient, cfg *Config) *Uploader {
-	return &Uploader{osclient, cfg}
+func New(cfg *Config) *Uploader {
+	return &Uploader{
+		osclient: objectstoreclient.New(&objectstoreclient.Config{
+			Endpoint:  cfg.S3Endpoint,
+			AccessKey: cfg.S3AccessKey,
+			SecretKey: cfg.S3SecretKey,
+		}),
+		cfg: cfg,
+	}
 }
