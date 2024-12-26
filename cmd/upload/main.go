@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"os"
 
 	"github.com/charmbracelet/log"
@@ -9,12 +10,20 @@ import (
 	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/uploader"
 )
 
+var verbose bool
+
 func init() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.SetLevel(log.DebugLevel)
+
+	flag.BoolVar(&verbose, "v", true, "verbose output")
+	flag.Parse()
+
+	if verbose {
+		log.SetLevel(log.DebugLevel)
+	}
 }
 
 func main() {
@@ -24,7 +33,7 @@ func main() {
 		S3AccessKey: os.Getenv("YN_S3_ACCESS_KEY"),
 		S3SecretKey: os.Getenv("YN_S3_SECRET_ACCESS_KEY"),
 
-		BucketNameBase: "yesterdaysnews",
+		BucketNameBase: os.Getenv("YN_S3_BUCKET_NAME"),
 
 		VideoFileName: "yesterdays-news.mp4",
 		ModelFileName: "yesterdays-news.model.json",

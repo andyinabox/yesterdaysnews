@@ -29,7 +29,7 @@ func (u *Uploader) Upload(ctx context.Context, dir string) (containerName string
 	}
 
 	// upload file func
-	uploadFile := func(ctx context.Context, bucketName, fileKey, filePath, contentType string, multipart bool) {
+	uploadFile := func(fileKey, filePath, contentType string, multipart bool) {
 		defer wg.Done()
 
 		log.Debugf("begin uploading file %q as %q", filePath, fileKey)
@@ -51,29 +51,18 @@ func (u *Uploader) Upload(ctx context.Context, dir string) (containerName string
 		log.Debugf("finished uploading %q", fileKey)
 	}
 
-	// limiting the number of concurrent uploads
-	// maxConcurrent := 20 // runtime.NumCPU()
-	// totalConcurrent := 0
-
 	// upload model file
 	wg.Add(1)
-	// totalConcurrent++
-	go uploadFile(ctx, bucketName, manifest.Files.ModelFile, filepath.Join(dir, manifest.Files.ModelFile), "application/json", false)
+	go uploadFile(manifest.Files.ModelFile, filepath.Join(dir, manifest.Files.ModelFile), "application/json", false)
 
 	// upload video file
 	wg.Add(1)
-	// totalConcurrent++
-	go uploadFile(ctx, bucketName, manifest.Files.VideoFile, filepath.Join(dir, manifest.Files.VideoFile), "video/mp4", true)
+	go uploadFile(manifest.Files.VideoFile, filepath.Join(dir, manifest.Files.VideoFile), "video/mp4", true)
 
 	// upload individual clips
 	for _, clipPath := range manifest.Files.Clips {
 		wg.Add(1)
-		// totalConcurrent++
-		go uploadFile(ctx, bucketName, clipPath, filepath.Join(dir, clipPath), "video/webm", false)
-		// if totalConcurrent >= maxConcurrent {
-		// 	wg.Wait()
-		// 	totalConcurrent = 0
-		// }
+		go uploadFile(clipPath, filepath.Join(dir, clipPath), "video/webm", false)
 	}
 
 	wg.Wait()

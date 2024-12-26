@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -17,28 +16,27 @@ func (c *Client) DeleteBucket(ctx context.Context, bucketName string, force bool
 		return err
 	}
 
-	objectKeys, err := c.ListObjects(ctx, bucketName)
-	if err != nil {
-		return err
-	}
+	// we are looping through the list command because sometimes
+	// the delete command is failing with a "bucket not empty" error
+	for {
+		objectKeys, err := c.ListObjects(ctx, bucketName)
+		if err != nil {
+			return err
+		}
 
-	// handle non-empty bucket
-	if len(objectKeys) != 0 {
+		// break out of loop when there are no more objects left
+		if len(objectKeys) == 0 {
+			break
+		}
 
-		// if force = true, delete bucket contents
-		if force {
-			log.Debugf("deleting %d objects from bucket %q prior to bucket deletion", len(objectKeys), bucketName)
-			c.deleteBucketObjects(ctx, bucketName, objectKeys)
-
-			// otherwise return an error
-		} else {
+		// if force is not true, return error
+		if !force {
 			return fmt.Errorf("cannot delete non-empty bucket %q, use 'force=true'", bucketName)
 		}
-	}
 
-	// this is hacky, but without it sometimes we get a
-	// "bucket not empty" error when trying to delete
-	time.Sleep(time.Second)
+		log.Debugf("deleting %d objects from bucket %q prior to bucket deletion", len(objectKeys), bucketName)
+		c.deleteBucketObjects(ctx, bucketName, objectKeys)
+	}
 
 	log.Debugf("deleting bucket %q", bucketName)
 	_, err = client.DeleteBucket(ctx, &s3.DeleteBucketInput{
@@ -50,12 +48,9 @@ func (c *Client) DeleteBucket(ctx context.Context, bucketName string, force bool
 
 func (c *Client) deleteBucketObjects(ctx context.Context, bucketName string, keys []string) {
 	var wg sync.WaitGroup
-	// maxConcurrent := 20
-	// totalConcurrent := 0
 
 	for _, key := range keys {
 		wg.Add(1)
-		// totalConcurrent++
 
 		go func() {
 			defer wg.Done()
@@ -68,10 +63,6 @@ func (c *Client) deleteBucketObjects(ctx context.Context, bucketName string, key
 			log.Debugf("successfully deleted %q", key)
 		}()
 
-		// if totalConcurrent >= maxConcurrent {
-		// 	wg.Wait()
-		// 	totalConcurrent = 0
-		// }
 	}
 
 	wg.Wait()

@@ -19,6 +19,10 @@ serve:
 	go run . -a -v -m 20s
 
 
+.PHONY: upload
+upload:
+	go run ./cmd/upload/main.go -v
+
 #
 # non-phony targets
 #
