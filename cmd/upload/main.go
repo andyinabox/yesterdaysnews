@@ -18,7 +18,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	flag.BoolVar(&verbose, "v", true, "verbose output")
+	flag.BoolVar(&verbose, "v", false, "verbose output")
 	flag.Parse()
 
 	if verbose {
@@ -33,32 +33,35 @@ func main() {
 		S3AccessKey: os.Getenv("YN_S3_ACCESS_KEY"),
 		S3SecretKey: os.Getenv("YN_S3_SECRET_ACCESS_KEY"),
 
-		BucketNameBase: os.Getenv("YN_S3_BUCKET_NAME"),
+		ContainerName: os.Getenv("YN_S3_BUCKET_NAME"),
+		PrimaryDir:    "current",
 
 		VideoFileName: "yesterdays-news.mp4",
 		ModelFileName: "yesterdays-news.model.json",
 		ClipsDirName:  "clips",
 	})
 
-	containerName, err := u.Upload(context.Background(), "dist")
+	log.Info("uploading assets...")
+
+	prefix, err := u.Upload(context.Background(), "dist")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Infof("successfully deployed container %q", containerName)
+	log.Infof("successfully deployed objects to %q", prefix)
 
-	demotedContainer, err := u.PromoteContainer(context.Background(), containerName)
+	demotedPrefix, err := u.PromoteObjects(context.Background(), prefix)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Infof("successfully promoted container %q", containerName)
+	log.Infof("successfully promoted objects with prefix %q and demoted %q", prefix, demotedPrefix)
 
-	deletedContainers, err := u.PruneContainers(context.Background(), demotedContainer)
+	deletedObjects, err := u.PruneObjects(context.Background(), demotedPrefix)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Infof("successfully pruned %d containers", len(deletedContainers))
+	log.Infof("successfully pruned %d objects", len(deletedObjects))
 
 }

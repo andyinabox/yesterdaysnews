@@ -21,7 +21,7 @@ serve:
 
 .PHONY: upload
 upload:
-	go run ./cmd/upload/main.go -v
+	go run ./cmd/upload/main.go
 
 #
 # non-phony targets

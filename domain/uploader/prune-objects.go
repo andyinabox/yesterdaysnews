@@ -2,38 +2,43 @@ package uploader
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/objectstoreclient"
 )
 
-func (u *Uploader) PruneObjects(ctx context.Context, containerToKeep string) ([]string, error) {
+func (u *Uploader) PruneObjects(ctx context.Context, prefixToKeep string) ([]string, error) {
 
-	// containers, err := u.osclient.ListBuckets(ctx, &objectstoreclient.ListBucketsRequest{
-	// 	Prefix: fmt.Sprintf("%s-", u.cfg.BucketName),
-	// })
-	// if err != nil {
-	// 	return nil, err
-	// }
+	prefixes, err := u.osclient.ListPrefixes(ctx, u.cfg.ContainerName)
+	if err != nil {
+		return nil, err
+	}
 
-	// var removed []string
+	allDeleted := []string{}
 
-	// for _, containerName := range containers {
-	// 	if containerName != containerToKeep {
-	// 		log.Debugf("deleting container %q", containerName)
-	// 		err = u.osclient.DeleteBucket(ctx, containerName, true)
-	// 		if err != nil {
-	// 			return removed, fmt.Errorf("error deleting container %q: %w", containerName, err)
-	// 		}
-	// 		removed = append(removed, containerName)
-	// 	}
-	// }
+	for _, prefix := range prefixes {
+		// skip primary dir
+		if strings.HasPrefix(prefix, u.cfg.PrimaryDir) {
+			continue
+		}
+		// skip keep prefix
+		if prefixToKeep != "" && strings.HasPrefix(prefix, prefixToKeep) {
+			continue
+		}
 
-	// return removed, nil
-	return nil, errors.New("not implemented")
+		deleted, err := u.deleteObjectsWithPrefix(ctx, prefix)
+		if err != nil {
+			log.Errorf("error deleting objects with prefix %q", prefix)
+			continue
+		}
+		log.Debugf("succesfully deleted %d objects with prefix %s", len(deleted), prefix)
+		allDeleted = append(allDeleted, deleted...)
+	}
+
+	return allDeleted, nil
 }
 
 func (u *Uploader) deleteObjectsWithPrefix(ctx context.Context, prefix string) ([]string, error) {

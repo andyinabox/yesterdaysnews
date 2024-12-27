@@ -2,50 +2,101 @@ package uploader
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
+	"fmt"
+	"path/filepath"
+	"strings"
+	"sync"
+
+	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/objectstoreclient"
 )
 
 func (u *Uploader) PromoteObjects(ctx context.Context, prefix string) (string, error) {
 
-	// baseName := u.cfg.BucketNameBase
-	// newBucketName := ""
+	currentObjects, err := u.osclient.ListObjects(ctx, u.cfg.ContainerName, &objectstoreclient.ListObjectsRequest{
+		Prefix: u.cfg.PrimaryDir,
+	})
+	if err != nil {
+		return "", err
+	}
 
-	// baseExists, err := u.osclient.BucketExists(ctx, baseName)
-	// if err != nil {
-	// 	return "", err
-	// }
+	var demotedDir string
 
-	// // we need to rename the base bucket back to a suffixed one
-	// if baseExists {
-	// 	// fetching the manifest.json to get deployment ID
-	// 	data, err := u.osclient.GetObject(ctx, baseName, "manifest.json")
-	// 	if err != nil {
-	// 		newBucketName = fmt.Sprintf("%s-%s", baseName, strconv.FormatInt(time.Now().Unix(), 10))
-	// 		log.Errorf("no manifest found in base bucket, using name %q: %s", newBucketName, err)
-	// 	} else {
-	// 		manifest := Manifest{}
-	// 		err = json.Unmarshal(data, &manifest)
-	// 		if err != nil {
-	// 			return "", fmt.Errorf("error unmarshaling manifest: %w", err)
-	// 		}
+	if len(currentObjects) != 0 {
+		demotedDir = u.getDemotedDirName(ctx)
+		err = u.moveObjects(ctx, u.cfg.PrimaryDir, demotedDir)
+		if err != nil {
+			return "", fmt.Errorf("error demoting current object: %w", err)
+		}
+	}
 
-	// 		newBucketName = fmt.Sprintf("%s-%s", baseName, manifest.ID)
-	// 	}
+	return demotedDir, u.moveObjects(ctx, prefix, u.cfg.PrimaryDir)
+}
 
-	// 	log.Debugf("moving bucket %q to %q", baseName, newBucketName)
-	// 	err = u.osclient.RenameBucket(ctx, baseName, newBucketName)
-	// 	if err != nil {
-	// 		return "", fmt.Errorf("error demoting base bucket to %q: %w", newBucketName, err)
-	// 	}
-	// }
+func (u *Uploader) getDemotedDirName(ctx context.Context) (dir string) {
+	dir = timestamp()
 
-	// log.Debugf("moving bucket %q to %q", containerName, baseName)
-	// err = u.osclient.RenameBucket(ctx, containerName, baseName)
-	// if err != nil {
-	// 	return "", fmt.Errorf("error promoting bucket %s: %w", containerName, err)
-	// }
+	data, err := u.osclient.GetObject(ctx, u.cfg.ContainerName, filepath.Join(u.cfg.PrimaryDir, "manifest.json"))
+	if err != nil {
+		log.Errorf("error fetching current manifest: %s", err)
+		return
+	}
 
-	// return newBucketName, nil
+	manifest := Manifest{}
+	err = json.Unmarshal(data, &manifest)
+	if err != nil {
+		log.Errorf("error unmarshaling current manifest: %s", err)
+		return
+	}
 
-	return "", errors.New("not implemented")
+	if manifest.ID != "" {
+		dir = manifest.ID
+	}
+
+	return
+}
+
+func (u *Uploader) moveObjects(ctx context.Context, sourcePrefix, destPrefix string) error {
+	toMove, err := u.osclient.ListObjects(ctx, u.cfg.ContainerName, &objectstoreclient.ListObjectsRequest{
+		Prefix: sourcePrefix,
+	})
+	if err != nil {
+		return err
+	}
+
+	var wg sync.WaitGroup
+
+	for _, key := range toMove {
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			source := key
+			dest := strings.Replace(key, sourcePrefix, destPrefix, 1)
+
+			log.Debugf("copying %q to %q", source, dest)
+			err := u.osclient.CopyObject(
+				ctx,
+				u.cfg.ContainerName,
+				u.cfg.ContainerName,
+				source,
+				dest,
+			)
+			if err != nil {
+				log.Errorf("error moving %q to %q", source, dest)
+				return
+			}
+			err = u.osclient.DeleteObject(ctx, u.cfg.ContainerName, source)
+			if err != nil {
+				log.Errorf("error deleting object %q", source)
+				return
+			}
+		}()
+
+	}
+
+	wg.Wait()
+
+	return nil
 }

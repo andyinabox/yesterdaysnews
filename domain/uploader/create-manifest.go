@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"time"
 )
 
@@ -29,7 +28,7 @@ func (u *Uploader) CreateManifest(ctx context.Context, dir string) (*Manifest, e
 	now := time.Now()
 
 	manifest := &Manifest{
-		ID:   strconv.FormatInt(now.Unix(), 10),
+		ID:   timestampFromTime(now),
 		Date: now,
 	}
 

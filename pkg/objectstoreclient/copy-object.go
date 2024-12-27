@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 )
 
-func (c *Client) CopyObjectToBucket(ctx context.Context, sourceBucket, destBucket, sourceKey, destKey string) error {
+func (c *Client) CopyObject(ctx context.Context, sourceBucket, destBucket, sourceKey, destKey string) error {
 	client, err := c.getClient(ctx)
 	if err != nil {
 		return err

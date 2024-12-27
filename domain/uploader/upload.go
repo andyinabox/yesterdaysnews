@@ -86,7 +86,7 @@ func (u *Uploader) Upload(ctx context.Context, dir string) (string, error) {
 	}
 
 	log.Info("uploading manifest")
-	_, err = u.osclient.UploadFile(ctx, u.cfg.ContainerName, "manifest.json", bytes.NewReader(data), "application/json", false)
+	_, err = u.osclient.UploadFile(ctx, u.cfg.ContainerName, filepath.Join(deployDir, "manifest.json"), bytes.NewReader(data), "application/json", false)
 	if err != nil {
 		return "", fmt.Errorf("error uploading manifest file: %w", err)
 	}

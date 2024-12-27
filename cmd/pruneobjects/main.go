@@ -20,17 +20,17 @@ func init() {
 func main() {
 
 	u := uploader.New(&uploader.Config{
-		S3Endpoint:     os.Getenv("YN_S3_ENDPOINT"),
-		S3AccessKey:    os.Getenv("YN_S3_ACCESS_KEY"),
-		S3SecretKey:    os.Getenv("YN_S3_SECRET_ACCESS_KEY"),
-		BucketNameBase: os.Getenv("YN_S3_BUCKET_NAME"),
+		S3Endpoint:    os.Getenv("YN_S3_ENDPOINT"),
+		S3AccessKey:   os.Getenv("YN_S3_ACCESS_KEY"),
+		S3SecretKey:   os.Getenv("YN_S3_SECRET_ACCESS_KEY"),
+		ContainerName: os.Getenv("YN_S3_BUCKET_NAME"),
 	})
 
-	deleted, err := u.PruneContainers(context.Background(), "")
+	deleted, err := u.PruneObjects(context.Background(), "")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Infof("deleted %d containers", len(deleted))
+	log.Infof("deleted %d objects", len(deleted))
 
 }

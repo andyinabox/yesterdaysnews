@@ -23,6 +23,7 @@ type Config struct {
 
 	// upload config
 	ContainerName string
+	PrimaryDir    string
 
 	// manifest config
 	VideoFileName string
