@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -56,15 +57,15 @@ func (u *Uploader) CreateManifest(ctx context.Context, dir string) (*Manifest, e
 		return nil, fmt.Errorf("video file %q missing", u.cfg.ModelFileName)
 	}
 
-	entries, err := os.ReadDir(filepath.Join(dir, u.cfg.ClipsDirName))
+	entries, err := filepath.Glob(filepath.Join(dir, u.cfg.ClipsDirName, "*.webm"))
 	if err != nil {
 		return nil, err
 	}
 
 	manifest.Files.Clips = make([]string, len(entries))
 
-	for i, f := range entries {
-		manifest.Files.Clips[i] = filepath.Join(u.cfg.ClipsDirName, f.Name())
+	for i, path := range entries {
+		manifest.Files.Clips[i] = strings.Replace(path, dir+"/", "", 1)
 	}
 
 	return manifest, nil

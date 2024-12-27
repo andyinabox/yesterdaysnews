@@ -58,6 +58,7 @@ func (c *Client) getConfig(ctx context.Context) (*aws.Config, error) {
 					o.RetryCost = 1
 					o.RetryTimeoutCost = 3
 					o.NoRetryIncrement = 10
+					o.MaxAttempts = 5
 				})
 
 			}),

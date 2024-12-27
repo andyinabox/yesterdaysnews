@@ -1,5 +1,6 @@
-.PHONY: build
+.PHONY: upload
 build: dist/manifest.json
+	go run ./cmd/upload/main.go -v
 
 .PHONY: clean
 clean:
@@ -17,7 +18,6 @@ objectstoremock: .cert/localhost.crt
 .PHONY: serve
 serve:
 	go run . -a -v -m 20s
-
 
 .PHONY: upload
 upload:
