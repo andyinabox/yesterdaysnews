@@ -1,16 +1,17 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"flag"
 	"io/fs"
 	"os"
 	"text/template"
+	"time"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/captionschain"
+	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/server"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/textprocessor"
 )
 
 //go:embed tmpl/*
@@ -22,23 +23,31 @@ var assets embed.FS
 var verbose, loadAssetsFromFs bool
 var port, prefixLength, minCaptionLength, maxCaptionLength int
 var maxCaptionDelay, minCaptionDelay float64
-var objectStoreUrl string
+var manifestCheckIntervalStr string
 
 func init() {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	flag.BoolVar(&verbose, "v", false, "verbose logging")
 	flag.BoolVar(&loadAssetsFromFs, "a", false, "load assets from filesystem (for easier frontend development)")
+	// flag.BoolVar(&loadObjectsFromFs, "o", true, "load objects from filesystem")
 	flag.IntVar(&prefixLength, "p", 2, "markov chain prefix length")
 	flag.IntVar(&minCaptionLength, "minl", 5, "min caption length in words")
 	flag.IntVar(&maxCaptionLength, "maxl", 15, "max caption length in words")
 	flag.Float64Var(&minCaptionDelay, "mind", 1.5, "min caption delay in seconds")
 	flag.Float64Var(&maxCaptionDelay, "maxd", 5.0, "max caption delay in seconds")
 	flag.IntVar(&port, "port", 8080, "server port")
-	flag.StringVar(&objectStoreUrl, "url", "https://localhost:9000", "url of object storage")
+	flag.StringVar(&manifestCheckIntervalStr, "m", "1h", "manifest check interval")
 	flag.Parse()
 
 	if verbose {
 		log.SetLevel(log.DebugLevel)
 		log.SetReportTimestamp(false)
+		log.SetReportCaller(true)
 	}
 
 }
@@ -58,30 +67,26 @@ func main() {
 		}
 	}
 
-	data, err := os.ReadFile("dist/yesterdays-news.model.json")
+	manifestCheckInterval, err := time.ParseDuration(manifestCheckIntervalStr)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error paring manifest interval %s: %s", manifestCheckIntervalStr, err)
 	}
 
-	chain := captionschain.New(prefixLength)
-	err = chain.Load(data)
-	if err != nil {
-		log.Fatal(err)
+	cfg := &server.Config{
+		ObjectStoreUrl:        os.Getenv("YN_OBJECTSTORE_URL"),
+		Templates:             template.Must(template.New("").ParseFS(templates, "tmpl/*.tmpl")),
+		Assets:                assetsFs,
+		Port:                  port,
+		MinCaptionDelay:       minCaptionDelay,
+		MaxCaptionDelay:       maxCaptionDelay,
+		MinCaptionLength:      minCaptionLength,
+		MaxCaptionLength:      maxCaptionLength,
+		ManifestCheckInterval: manifestCheckInterval,
 	}
 
-	tp := textprocessor.New(chain, &textprocessor.Config{
-		MinCaptionLength: minCaptionLength,
-		MaxCaptionLength: maxCaptionLength,
-	})
+	log.Info("creating new server", "config", cfg)
 
-	s := server.New(tp, &server.Config{
-		ObjectStoreUrl:  objectStoreUrl,
-		Templates:       template.Must(template.New("").ParseFS(templates, "tmpl/*.tmpl")),
-		Assets:          assetsFs,
-		Port:            port,
-		MinCaptionDelay: minCaptionDelay,
-		MaxCaptionDelay: maxCaptionDelay,
-	})
+	s := server.New(cfg)
 
-	log.Fatal(s.ListenAndServe())
+	log.Fatal(s.Start(context.Background()))
 }

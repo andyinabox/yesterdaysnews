@@ -13,7 +13,7 @@ func (s *Server) Captions() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		log.Debug("got livereload handshake from client")
+		log.Debug("captions sse connected")
 
 		// Set CORS headers to allow all origins. You may want to restrict this to specific origins in a production environment.
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -26,15 +26,15 @@ func (s *Server) Captions() http.HandlerFunc {
 
 		minDelay := s.cfg.MinCaptionDelay
 		maxDelay := s.cfg.MaxCaptionDelay
-		minLength := s.cg.MinCaptionLength()
-		maxLength := s.cg.MaxCaptionLength()
+		minLength := s.tp.MinCaptionLength()
+		maxLength := s.tp.MaxCaptionLength()
 
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			default:
-				caption = s.cg.Caption(caption)
+				caption = s.tp.Caption(caption)
 				log.Debug(caption)
 				fmt.Fprintf(w, "data: %s\n\n", caption)
 				w.(http.Flusher).Flush()

@@ -16,8 +16,12 @@ objectstoremock: .cert/localhost.crt
 
 .PHONY: serve
 serve:
-	go run . -a -v
+	go run . -a -v -m 20s
 
+
+.PHONY: upload
+upload:
+	go run ./cmd/upload/main.go
 
 #
 # non-phony targets

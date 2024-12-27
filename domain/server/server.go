@@ -4,37 +4,39 @@ import (
 	"fmt"
 	"io/fs"
 	"net/http"
+	"sync"
 	"text/template"
+	"time"
 
-	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/textprocessor"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/uploader"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/assetshandler"
 )
 
-type CaptionGenerator interface {
-	Caption(string) string
-	MinCaptionLength() int
-	MaxCaptionLength() int
-}
-
 type Config struct {
-	ObjectStoreUrl  string
-	Templates       *template.Template
-	Assets          fs.FS
-	Port            int
-	MinCaptionDelay float64
-	MaxCaptionDelay float64
+	ObjectStoreUrl        string
+	Templates             *template.Template
+	Assets                fs.FS
+	Port                  int
+	MinCaptionDelay       float64
+	MaxCaptionDelay       float64
+	MinCaptionLength      int
+	MaxCaptionLength      int
+	ManifestCheckInterval time.Duration
 }
 
 type Server struct {
-	cg  CaptionGenerator
-	srv *http.Server
-	cfg *Config
+	tp       *textprocessor.Processor
+	srv      *http.Server
+	manifest *uploader.Manifest
+	cfg      *Config
+	reload   <-chan struct{}
+	mu       sync.Mutex
 }
 
-func New(cg CaptionGenerator, cfg *Config) *Server {
+func New(cfg *Config) *Server {
 
 	s := &Server{
-		cg:  cg,
 		cfg: cfg,
 	}
 
@@ -47,6 +49,8 @@ func New(cg CaptionGenerator, cfg *Config) *Server {
 	)
 
 	handler.AddRoute("/captions", s.Captions())
+	handler.AddRoute("/reload", s.Reload())
+	handler.AddRoute("/clips", s.Clips())
 	handler.AddRoute("/", s.Index())
 
 	s.srv = &http.Server{
@@ -55,9 +59,4 @@ func New(cg CaptionGenerator, cfg *Config) *Server {
 	}
 
 	return s
-}
-
-func (s *Server) ListenAndServe() error {
-	log.Infof("starting server at http://localhost:%d", s.cfg.Port)
-	return s.srv.ListenAndServe()
 }

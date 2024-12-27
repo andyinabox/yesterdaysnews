@@ -9,19 +9,20 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="stylesheet" href="/assets/styles.css" />
-    
+    <script src="/assets/video-player.js"></script>
+    <script src="/assets/caption-display.js"></script>
+    <script src="/assets/reloader.js"></script>
+
   </head>
-  <body class="index">
+  <body data-resource-url="/reload">
     <main>
-      <canvas id="canvas"></canvas>
-      <video id="video">
-        <source id="video-src-webm" type="video/webm" />
-      </video>
-      <div id="caption">...</div>
+      <video-player resource-url="/clips" initial-clip="{{ .InitialClipURL }}"></video-player>
+      <caption-display resource-url="/captions"></caption-display>
     </main>
     <script>
-      {{ .JSVars }}
+      ;(function(){
+        const reloader = new Reloader("/reload")
+      })()
     </script>
-    <script src="/assets/script.js"></script>
   </body>
 </html>
