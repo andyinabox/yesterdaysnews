@@ -12,7 +12,7 @@ import (
 	"github.com/charmbracelet/log"
 )
 
-func (u *Uploader) Upload(ctx context.Context, dir string) (containerName string, err error) {
+func (u *Uploader) Upload(ctx context.Context, dir string) (string, error) {
 
 	var wg sync.WaitGroup
 
@@ -21,48 +21,61 @@ func (u *Uploader) Upload(ctx context.Context, dir string) (containerName string
 		return "", fmt.Errorf("error creating manifest: %w", err)
 	}
 
-	bucketName := u.cfg.BucketNameBase + "-" + manifest.ID
-	log.Debugf("creating bucket %q", bucketName)
-	err = u.osclient.CreateBucket(ctx, bucketName)
+	deployDir := manifest.ID
+
+	exists, err := u.osclient.ContainerExists(ctx, u.cfg.ContainerName)
 	if err != nil {
-		return "", fmt.Errorf("error creating bucket %q: %w", bucketName, err)
+		return "", err
+	}
+
+	if !exists {
+		err = u.osclient.CreatePublicContainer(ctx, u.cfg.ContainerName)
+		if err != nil {
+			return "", fmt.Errorf("error creating container: %w", err)
+		}
 	}
 
 	// upload file func
-	uploadFile := func(fileKey, filePath, contentType string, multipart bool) {
+	uploadFile := func(path, contentType string, multipart bool) {
 		defer wg.Done()
 
-		log.Debugf("begin uploading file %q as %q", filePath, fileKey)
+		key := filepath.Join(deployDir, path)
+		filePath := filepath.Join(dir, path)
+
+		log.Debugf("begin uploading file %q as %q", filePath, key)
 
 		file, err := os.Open(filePath)
 		if err != nil {
 			log.Errorf("error opening file %q: %s", filePath, err)
 		}
 
-		if multipart {
-			_, err = u.osclient.UploadFileMultipart(ctx, bucketName, fileKey, file, contentType)
-		} else {
-			_, err = u.osclient.UploadFile(ctx, bucketName, fileKey, file, contentType)
-		}
+		_, err = u.osclient.UploadFile(
+			ctx,
+			u.cfg.ContainerName,
+			key,
+			file,
+			contentType,
+			multipart,
+		)
 		if err != nil {
-			log.Errorf("error uploading file %q: %s", fileKey, err)
+			log.Errorf("error uploading file %q: %s", key, err)
 		}
 
-		log.Debugf("finished uploading %q", fileKey)
+		log.Debugf("finished uploading %q", key)
 	}
 
 	// upload model file
 	wg.Add(1)
-	go uploadFile(manifest.Files.ModelFile, filepath.Join(dir, manifest.Files.ModelFile), "application/json", false)
+	go uploadFile(manifest.Files.ModelFile, "application/json", false)
 
 	// upload video file
 	wg.Add(1)
-	go uploadFile(manifest.Files.VideoFile, filepath.Join(dir, manifest.Files.VideoFile), "video/mp4", true)
+	go uploadFile(manifest.Files.VideoFile, "video/mp4", true)
 
 	// upload individual clips
 	for _, clipPath := range manifest.Files.Clips {
 		wg.Add(1)
-		go uploadFile(clipPath, filepath.Join(dir, clipPath), "video/webm", false)
+		go uploadFile(clipPath, "video/webm", false)
 	}
 
 	wg.Wait()
@@ -73,10 +86,10 @@ func (u *Uploader) Upload(ctx context.Context, dir string) (containerName string
 	}
 
 	log.Info("uploading manifest")
-	_, err = u.osclient.UploadFile(ctx, bucketName, "manifest.json", bytes.NewReader(data), "application/json")
+	_, err = u.osclient.UploadFile(ctx, u.cfg.ContainerName, "manifest.json", bytes.NewReader(data), "application/json", false)
 	if err != nil {
 		return "", fmt.Errorf("error uploading manifest file: %w", err)
 	}
 
-	return bucketName, nil
+	return deployDir, nil
 }

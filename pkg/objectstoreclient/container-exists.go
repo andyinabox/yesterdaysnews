@@ -10,7 +10,7 @@ import (
 	"github.com/aws/smithy-go"
 )
 
-func (c *Client) BucketExists(ctx context.Context, name string) (bool, error) {
+func (c *Client) ContainerExists(ctx context.Context, name string) (bool, error) {
 	client, err := c.getClient(ctx)
 	if err != nil {
 		return false, err
@@ -27,7 +27,7 @@ func (c *Client) BucketExists(ctx context.Context, name string) (bool, error) {
 			case *types.NotFound:
 				return false, nil
 			default:
-				return false, fmt.Errorf("error checjing if bucket exists: %w", err)
+				return false, fmt.Errorf("error checking if bucket exists: %w", err)
 			}
 		}
 	}

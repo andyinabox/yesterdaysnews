@@ -12,7 +12,11 @@ import (
 
 var ErrBucketDoesNotExist = fmt.Errorf("bucket does not exist")
 
-func (c *Client) ListObjects(ctx context.Context, bucketName string) (fileKeys []string, err error) {
+type ListObjectsRequest struct {
+	Prefix string
+}
+
+func (c *Client) ListObjects(ctx context.Context, containerName string, req *ListObjectsRequest) (fileKeys []string, err error) {
 	var output *s3.ListObjectsV2Output
 	var objects []types.Object
 
@@ -21,9 +25,15 @@ func (c *Client) ListObjects(ctx context.Context, bucketName string) (fileKeys [
 		return
 	}
 
-	paginator := s3.NewListObjectsV2Paginator(client, &s3.ListObjectsV2Input{
-		Bucket: aws.String(bucketName),
-	})
+	input := &s3.ListObjectsV2Input{
+		Bucket: aws.String(containerName),
+	}
+
+	if req.Prefix != "" {
+		input.Prefix = aws.String(req.Prefix)
+	}
+
+	paginator := s3.NewListObjectsV2Paginator(client, input)
 
 	for paginator.HasMorePages() {
 

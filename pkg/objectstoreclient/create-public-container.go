@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
-func (c *Client) CreateBucket(ctx context.Context, name string) error {
+func (c *Client) CreatePublicContainer(ctx context.Context, name string) error {
 	client, err := c.getClient(ctx)
 	if err != nil {
 		return err

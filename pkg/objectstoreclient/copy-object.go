@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 )
 
-func (c *Client) CopyObjectToBucket(ctx context.Context, sourceBucket, destBucket string, fileKey string) error {
+func (c *Client) CopyObjectToBucket(ctx context.Context, sourceBucket, destBucket, sourceKey, destKey string) error {
 	client, err := c.getClient(ctx)
 	if err != nil {
 		return err
@@ -16,8 +16,8 @@ func (c *Client) CopyObjectToBucket(ctx context.Context, sourceBucket, destBucke
 
 	_, err = client.CopyObject(ctx, &s3.CopyObjectInput{
 		Bucket:     aws.String(destBucket),
-		CopySource: aws.String(fmt.Sprintf("%s/%s", sourceBucket, fileKey)),
-		Key:        aws.String(fileKey),
+		CopySource: aws.String(fmt.Sprintf("%s/%s", sourceBucket, sourceKey)),
+		Key:        aws.String(destKey),
 	})
 
 	return err

@@ -4,6 +4,17 @@ import (
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/objectstoreclient"
 )
 
+// type ObjectStoreClient interface {
+// 	ContainerExists(ctx context.Context, containerName string) (bool, error)
+// 	CreatePublicContainer(ctx context.Context, containerName string) error
+// 	UploadObject(ctx context.Context, containerName, key string, reader io.Reader, contentType string, multipart bool) error
+// 	CopyObject(ctx context.Context, sourceContainer, destContainer, sourceKey, destKey string) error
+// 	DeleteObject(ctx context.Context, containerName, key string) error
+// 	GetObject(ctx context.Context, containerName, key string) ([]byte, error)
+// 	ListObjects(ctx context.Context, containerName string) ([]string, error)
+// 	ListObjectsWithPrefix(ctx context.Context, containerName string) ([]string, error)
+// }
+
 type Config struct {
 	// client config
 	S3Endpoint  string
@@ -11,7 +22,7 @@ type Config struct {
 	S3SecretKey string
 
 	// upload config
-	BucketNameBase string
+	ContainerName string
 
 	// manifest config
 	VideoFileName string
