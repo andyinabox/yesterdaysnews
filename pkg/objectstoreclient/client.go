@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
@@ -47,6 +49,18 @@ func (c *Client) getConfig(ctx context.Context) (*aws.Config, error) {
 				"",
 			)),
 			config.WithRegion(c.cfg.Region),
+			// retryer should help when running into rate limiting
+			config.WithRetryer(func() aws.Retryer {
+				return retry.NewStandard(func(o *retry.StandardOptions) {
+					// https://aws.github.io/aws-sdk-go-v2/docs/configuring-sdk/retries-timeouts/#example-modified-rate-limiter
+					// Don't totally understand what these values mean, but they seem to work better than the defaults
+					o.RateLimiter = ratelimit.NewTokenRateLimit(1000)
+					o.RetryCost = 1
+					o.RetryTimeoutCost = 3
+					o.NoRetryIncrement = 10
+				})
+
+			}),
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error loading config: %w", err)

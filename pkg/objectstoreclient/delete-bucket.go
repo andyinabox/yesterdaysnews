@@ -23,6 +23,7 @@ func (c *Client) DeleteBucket(ctx context.Context, bucketName string, force bool
 		if err != nil {
 			return err
 		}
+		log.Debugf("found %d objects in bucket %q", len(objectKeys), bucketName)
 
 		// break out of loop when there are no more objects left
 		if len(objectKeys) == 0 {

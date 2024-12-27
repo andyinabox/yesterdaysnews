@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
+	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/server"
 )
 
@@ -19,12 +20,18 @@ var templates embed.FS
 //go:embed assets/*
 var assets embed.FS
 
-var verbose, loadAssetsFromFs bool //, loadObjectsFromFs bool
+var verbose, loadAssetsFromFs bool
 var port, prefixLength, minCaptionLength, maxCaptionLength int
 var maxCaptionDelay, minCaptionDelay float64
-var objectStoreUrl, manifestCheckIntervalStr string
+var manifestCheckIntervalStr string
 
 func init() {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	flag.BoolVar(&verbose, "v", false, "verbose logging")
 	flag.BoolVar(&loadAssetsFromFs, "a", false, "load assets from filesystem (for easier frontend development)")
 	// flag.BoolVar(&loadObjectsFromFs, "o", true, "load objects from filesystem")
@@ -34,7 +41,6 @@ func init() {
 	flag.Float64Var(&minCaptionDelay, "mind", 1.5, "min caption delay in seconds")
 	flag.Float64Var(&maxCaptionDelay, "maxd", 5.0, "max caption delay in seconds")
 	flag.IntVar(&port, "port", 8080, "server port")
-	flag.StringVar(&objectStoreUrl, "url", "http://localhost:9000", "url of object storage")
 	flag.StringVar(&manifestCheckIntervalStr, "m", "1h", "manifest check interval")
 	flag.Parse()
 
@@ -67,7 +73,7 @@ func main() {
 	}
 
 	cfg := &server.Config{
-		ObjectStoreUrl:        objectStoreUrl,
+		ObjectStoreUrl:        os.Getenv("YN_OBJECTSTORE_URL"),
 		Templates:             template.Must(template.New("").ParseFS(templates, "tmpl/*.tmpl")),
 		Assets:                assetsFs,
 		Port:                  port,
