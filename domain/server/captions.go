@@ -35,7 +35,7 @@ func (s *Server) Captions() http.HandlerFunc {
 				return
 			default:
 				caption = s.tp.Caption(caption)
-				log.Debug(caption)
+				// log.Debug(caption)
 				fmt.Fprintf(w, "data: %s\n\n", caption)
 				w.(http.Flusher).Flush()
 
@@ -58,7 +58,7 @@ func mapCaptionToDelay(cap string, minLength, maxLength int, minDelay, maxDelay 
 	seconds := ((maxDelay - minDelay) * percent) + minDelay
 	duration := time.Duration(seconds * float64(time.Second))
 
-	log.Debug("caption delay", "duration", duration, "percent", percent, "seconds", seconds)
+	// log.Debug("caption delay", "duration", duration, "percent", percent, "seconds", seconds)
 
 	return duration
 }
