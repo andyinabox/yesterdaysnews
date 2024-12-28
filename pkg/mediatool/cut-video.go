@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/shellargs"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
 )
 
 func (t *Tool) CutVideo(ctx context.Context, input, output string, start, duration Duration) error {

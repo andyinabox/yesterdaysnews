@@ -1,7 +1,7 @@
 package uploader
 
 import (
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/objectstoreclient"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
 )
 
 // type ObjectStoreClient interface {
@@ -24,13 +24,6 @@ type Config struct {
 	// upload config
 	ContainerName string
 	PrimaryDir    string
-
-	// manifest config
-	VideoFileName string
-	// SubsFileName     string
-	// CombinedFileName string
-	ModelFileName string
-	ClipsDirName  string
 }
 
 type Uploader struct {

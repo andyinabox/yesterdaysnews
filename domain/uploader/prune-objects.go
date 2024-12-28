@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/objectstoreclient"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
 )
 
 func (u *Uploader) PruneObjects(ctx context.Context, prefixToKeep string) ([]string, error) {

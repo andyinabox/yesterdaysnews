@@ -1,6 +1,6 @@
 package captionschain
 
-import "gitlab.com/andyinabox/yesterdays-news-downloader/pkg/markov"
+import "gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
 
 type Chain struct {
 	markov.BasicChain

@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/mediatool"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
 	"golang.org/x/exp/rand"
 )
 

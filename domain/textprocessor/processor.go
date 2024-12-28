@@ -1,7 +1,7 @@
 package textprocessor
 
 import (
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/markov"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
 )
 
 const DefaultPrefixLength = 2

@@ -7,7 +7,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/uploader"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/uploader"
 )
 
 var verbose bool
@@ -35,10 +35,6 @@ func main() {
 
 		ContainerName: os.Getenv("YN_S3_BUCKET_NAME"),
 		PrimaryDir:    "current",
-
-		VideoFileName: "yesterdays-news.mp4",
-		ModelFileName: "yesterdays-news.model.json",
-		ClipsDirName:  "clips",
 	})
 
 	log.Info("uploading assets...")

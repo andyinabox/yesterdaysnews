@@ -8,9 +8,9 @@ import (
 	"text/template"
 	"time"
 
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/textprocessor"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/uploader"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/assetshandler"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/manifest"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/textprocessor"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/assetshandler"
 )
 
 type Config struct {
@@ -28,7 +28,7 @@ type Config struct {
 type Server struct {
 	tp       *textprocessor.Processor
 	srv      *http.Server
-	manifest *uploader.Manifest
+	manifest *manifest.Manifest
 	cfg      *Config
 	reload   <-chan struct{}
 	mu       sync.Mutex

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubedownloader"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
 )
 
 type DownloadRequest struct {

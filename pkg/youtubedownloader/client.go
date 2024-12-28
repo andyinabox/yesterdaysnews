@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/shell"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/shell"
 )
 
 var ErrNoURLProvided = errors.New("no url provided")

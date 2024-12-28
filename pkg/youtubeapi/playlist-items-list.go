@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubeapi/response"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi/response"
 )
 
 const playlistItemsListEndpoint = "playlistItems"

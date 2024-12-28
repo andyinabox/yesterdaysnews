@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/shellargs"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
 )
 
 type Request struct {

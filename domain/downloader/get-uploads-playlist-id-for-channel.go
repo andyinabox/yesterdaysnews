@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubeapi"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
 )
 
 func (d *Downloader) GetUploadsPlaylistIdForChannel(ctx context.Context, userName string) (id string, err error) {
@@ -38,7 +38,7 @@ func (d *Downloader) GetUploadsPlaylistIdForChannel(ctx context.Context, userNam
 // 	"net/url"
 
 // 	"github.com/charmbracelet/log"
-// 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubeapi/response"
+// 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi/response"
 // )
 
 // func (c *Client) GetUploadsPlaylistIdForUser(ctx context.Context, userName string) (id string, err error) {

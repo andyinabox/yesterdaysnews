@@ -11,7 +11,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/server"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/server"
 )
 
 //go:embed tmpl/*

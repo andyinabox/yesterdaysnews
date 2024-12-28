@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/manifest"
 )
 
 func (u *Uploader) Upload(ctx context.Context, dir string) (string, error) {
@@ -21,7 +22,7 @@ func (u *Uploader) Upload(ctx context.Context, dir string) (string, error) {
 		return "", fmt.Errorf("error reading manifest: %w", err)
 	}
 
-	manifest := Manifest{}
+	manifest := manifest.Manifest{}
 	err = json.Unmarshal(manifestBytes, &manifest)
 	if err != nil {
 		return "", fmt.Errorf("error decoding manifest: %w", err)

@@ -10,7 +10,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/downloader"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/downloader"
 )
 
 var verbose, outputManifest bool
