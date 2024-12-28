@@ -1,7 +1,7 @@
 package uploader
 
 import (
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/objectstoreclient"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
 )
 
 // type ObjectStoreClient interface {

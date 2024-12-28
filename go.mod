@@ -1,4 +1,4 @@
-module gitlab.com/andyinabox/yesterdays-news-downloader
+module gitlab.com/andyinabox/yesterdaysnews
 
 go 1.22.1
 

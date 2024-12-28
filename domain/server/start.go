@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/captionschain"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/manifest"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/textprocessor"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/manifest"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/textprocessor"
 )
 
 func (s *Server) Start(ctx context.Context) error {

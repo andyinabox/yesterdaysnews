@@ -9,8 +9,8 @@ import (
 	"sync"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/manifest"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/objectstoreclient"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/manifest"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
 )
 
 func (u *Uploader) PromoteObjects(ctx context.Context, prefix string) (string, error) {

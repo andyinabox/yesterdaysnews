@@ -1,8 +1,8 @@
 package downloader
 
 import (
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubeapi"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubedownloader"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
 )
 
 const VideoFormatString = "bv[ext=webm][width<=1280][aspect_ratio>1]"

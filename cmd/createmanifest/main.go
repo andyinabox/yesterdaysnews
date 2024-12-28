@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/manifest"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/manifest"
 )
 
 func main() {

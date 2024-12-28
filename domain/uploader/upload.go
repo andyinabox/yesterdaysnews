@@ -10,7 +10,7 @@ import (
 	"sync"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/manifest"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/manifest"
 )
 
 func (u *Uploader) Upload(ctx context.Context, dir string) (string, error) {

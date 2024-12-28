@@ -8,9 +8,9 @@ import (
 	"text/template"
 	"time"
 
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/manifest"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/textprocessor"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/assetshandler"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/manifest"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/textprocessor"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/assetshandler"
 )
 
 type Config struct {

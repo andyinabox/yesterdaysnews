@@ -10,7 +10,7 @@ package textprocessor
 // 	"unicode"
 
 // 	"github.com/charmbracelet/log"
-// 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/markov"
+// 	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
 // )
 
 // type CorpusType string

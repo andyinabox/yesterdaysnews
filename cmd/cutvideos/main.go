@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/videoprocessor"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/videoprocessor"
 )
 
 var verbose, outputManifest bool

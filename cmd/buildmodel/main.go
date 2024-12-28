@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/captionschain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
 )
 
 var verbose bool

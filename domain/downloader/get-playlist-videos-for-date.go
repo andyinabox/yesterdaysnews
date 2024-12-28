@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubeapi"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/youtubeapi/response"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi/response"
 )
 
 // we are requesting a large result so we can iterate and filter by date
