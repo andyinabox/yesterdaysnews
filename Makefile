@@ -9,7 +9,6 @@ clean:
 .PHONY: clobber
 clobber: clean
 	-rm -rf downloads
-	-rm -rf bin
 
 .PHONY: objectstoremock
 objectstoremock: .cert/localhost.crt
