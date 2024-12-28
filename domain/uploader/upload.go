@@ -1,10 +1,10 @@
 package uploader
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"sync"
@@ -16,19 +16,13 @@ func (u *Uploader) Upload(ctx context.Context, dir string) (string, error) {
 
 	var wg sync.WaitGroup
 
-	manifestFile, err := os.Open(filepath.Join(dir, "manifest.json"))
-	if err != nil {
-		return "", fmt.Errorf("error opening manifest file: %w", err)
-	}
-
-	defer manifestFile.Close()
-	data, err := io.ReadAll(manifestFile)
+	manifestBytes, err := os.ReadFile(filepath.Join(dir, "manifest.json"))
 	if err != nil {
 		return "", fmt.Errorf("error reading manifest: %w", err)
 	}
 
 	manifest := Manifest{}
-	err = json.Unmarshal(data, &manifest)
+	err = json.Unmarshal(manifestBytes, &manifest)
 	if err != nil {
 		return "", fmt.Errorf("error decoding manifest: %w", err)
 	}
@@ -92,8 +86,9 @@ func (u *Uploader) Upload(ctx context.Context, dir string) (string, error) {
 
 	wg.Wait()
 
-	log.Info("uploading manifest")
-	_, err = u.osclient.UploadFile(ctx, u.cfg.ContainerName, filepath.Join(deployDir, "manifest.json"), manifestFile, "application/json", false)
+	manifestPath := filepath.Join(deployDir, "manifest.json")
+	log.Infof("uploading manifest to %s", manifestPath)
+	_, err = u.osclient.UploadFile(ctx, u.cfg.ContainerName, manifestPath, bytes.NewReader(manifestBytes), "application/json", false)
 	if err != nil {
 		return "", fmt.Errorf("error uploading manifest file: %w", err)
 	}
