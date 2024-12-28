@@ -24,13 +24,6 @@ type Config struct {
 	// upload config
 	ContainerName string
 	PrimaryDir    string
-
-	// manifest config
-	VideoFileName string
-	// SubsFileName     string
-	// CombinedFileName string
-	ModelFileName string
-	ClipsDirName  string
 }
 
 type Uploader struct {

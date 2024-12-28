@@ -9,8 +9,8 @@ import (
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/captionschain"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/manifest"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/textprocessor"
-	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/uploader"
 )
 
 func (s *Server) Start(ctx context.Context) error {
@@ -116,7 +116,7 @@ func (s *Server) getModel(ctx context.Context) ([]byte, error) {
 	return io.ReadAll(resp.Body)
 }
 
-func (s *Server) getManifest(ctx context.Context) (*uploader.Manifest, error) {
+func (s *Server) getManifest(ctx context.Context) (*manifest.Manifest, error) {
 	url := s.cfg.ObjectStoreUrl + "/manifest.json"
 
 	// log.Debug("create manifest request: " + url)
@@ -141,7 +141,7 @@ func (s *Server) getManifest(ctx context.Context) (*uploader.Manifest, error) {
 	// log.Debug(string(data))
 
 	// log.Debug("unmarshal manifest data")
-	manifest := uploader.Manifest{}
+	manifest := manifest.Manifest{}
 	err = json.Unmarshal(data, &manifest)
 	if err != nil {
 		return nil, err

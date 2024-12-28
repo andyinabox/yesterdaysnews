@@ -1,6 +1,5 @@
 dist
 download
-openrc
-.cert
+bin
 .env
 .DS_Store

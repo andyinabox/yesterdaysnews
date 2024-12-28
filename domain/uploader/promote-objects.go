@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdays-news-downloader/domain/manifest"
 	"gitlab.com/andyinabox/yesterdays-news-downloader/pkg/objectstoreclient"
 )
 
@@ -43,7 +44,7 @@ func (u *Uploader) getDemotedDirName(ctx context.Context) (dir string) {
 		return
 	}
 
-	manifest := Manifest{}
+	manifest := manifest.Manifest{}
 	err = json.Unmarshal(data, &manifest)
 	if err != nil {
 		log.Errorf("error unmarshaling current manifest: %s", err)

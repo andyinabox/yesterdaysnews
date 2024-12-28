@@ -35,10 +35,6 @@ func main() {
 
 		ContainerName: os.Getenv("YN_S3_BUCKET_NAME"),
 		PrimaryDir:    "current",
-
-		VideoFileName: "yesterdays-news.mp4",
-		ModelFileName: "yesterdays-news.model.json",
-		ClipsDirName:  "clips",
 	})
 
 	log.Info("uploading assets...")
