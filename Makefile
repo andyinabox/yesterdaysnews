@@ -11,7 +11,7 @@ clobber: clean
 	-rm -rf downloads
 
 .PHONY: objectstoremock
-objectstoremock: .cert/localhost.crt
+objectstoremock:
 	go run ./cmd/objectstoremock/main.go
 
 .PHONY: serve
