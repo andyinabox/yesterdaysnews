@@ -1,0 +1,10 @@
+test
+dist
+download
+docker
+.git
+.env*
+.DS_Store
+*.txt
+*.md
+Makefile

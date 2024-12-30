@@ -20,7 +20,7 @@ serve:
 
 .PHONY: docker-build-server
 docker-build-server:
-	docker build -f docker/Dockerfile.server -t andyinabox/yesterdaysnews-server .
+	docker build -f docker/server.Dockerfile -t andyinabox/yesterdaysnews-server .
 
 .PHONY: docker-run-server
 docker-run-server:
