@@ -38,10 +38,10 @@ class VideoPlayer extends HTMLElement {
     const resp = await fetch(url)
     // get the video data as array buffer
     const data = await resp.arrayBuffer()
-    // create an ObjectURL from teh array buffer
-    const objectURL = URL.createObjectURL(data)
     // add to array of preloaded videos
-    this.preloaded.push(objectURL)
+    this.preloaded.push(
+      URL.createObjectURL(new Blob([data], { type: 'video/webm' }))
+    )
   }
 
   async loadClips() {
@@ -77,10 +77,10 @@ class VideoPlayer extends HTMLElement {
 
     let next
     if (this.preloaded.length) {
-      console.log('getting preloaded ObjectURL')
+      // console.log('getting preloaded ObjectURL')
       next = this.preloaded.pop()
     } else {
-      console.log('get next clip URL')
+      // console.log('get next clip URL')
       next = this.clips.pop()
     }
 
