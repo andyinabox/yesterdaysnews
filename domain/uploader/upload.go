@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,6 +13,8 @@ import (
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/manifest"
 )
+
+var ErrContainerDoesNotExist = errors.New("container does not exist")
 
 func (u *Uploader) Upload(ctx context.Context, dir string) (string, error) {
 
@@ -34,12 +37,8 @@ func (u *Uploader) Upload(ctx context.Context, dir string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	if !exists {
-		err = u.osclient.CreatePublicContainer(ctx, u.cfg.ContainerName)
-		if err != nil {
-			return "", fmt.Errorf("error creating container: %w", err)
-		}
+		return "", ErrContainerDoesNotExist
 	}
 
 	// upload file func
