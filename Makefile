@@ -18,6 +18,18 @@ objectstoremock:
 serve:
 	go run . -a -v -m 20s
 
+.PHONY: docker-build-server
+docker-build-server:
+	docker build -f docker/Dockerfile.server -t andyinabox/yesterdaysnews-server .
+
+.PHONY: docker-run-server
+docker-run-server:
+	docker run --env-file .env -p 8080:8080 andyinabox/yesterdaysnews-server
+
+.PHONY: docker-push-server
+docker-push-server:
+	docker push andyinabox/yesterdaysnews-server
+
 #
 # non-phony targets
 #
