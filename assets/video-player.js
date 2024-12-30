@@ -1,4 +1,7 @@
 class VideoPlayer extends HTMLElement {
+  clips = []
+  preloaded = []
+
   constructor() {
     super()
 
@@ -28,6 +31,19 @@ class VideoPlayer extends HTMLElement {
     this.loadNewVideo(this.getAttribute('initial-clip'))
   }
 
+  async preloadNextClip() {
+    // get the next url
+    const url = this.clips.pop()
+    // fetch the video
+    const resp = await fetch(url)
+    // get the video data as array buffer
+    const data = await resp.arrayBuffer()
+    // add to array of preloaded videos
+    this.preloaded.push(
+      URL.createObjectURL(new Blob([data], { type: 'video/webm' }))
+    )
+  }
+
   async loadClips() {
     try {
       const resp = await fetch(this.resourceUrl)
@@ -39,6 +55,7 @@ class VideoPlayer extends HTMLElement {
       const data = await resp.json()
 
       this.clips = data.clips
+      this.preloadNextClip()
     } catch (err) {
       console.error(err)
     }
@@ -58,9 +75,16 @@ class VideoPlayer extends HTMLElement {
       this.loadClips()
     }
 
-    const next = this.clips.pop()
+    let next
+    if (this.preloaded.length) {
+      // console.log('getting preloaded ObjectURL')
+      next = this.preloaded.pop()
+    } else {
+      // console.log('get next clip URL')
+      next = this.clips.pop()
+    }
 
-    // preload next video somehow?
+    this.preloadNextClip()
 
     return next
   }

@@ -47,7 +47,7 @@ func main() {
 		},
 		{
 			Type:     captionschain.CorpusTypeText,
-			FileGlob: "data/hospital.txt",
+			FileGlob: "hospital.txt",
 			Weight:   3,
 		},
 	})

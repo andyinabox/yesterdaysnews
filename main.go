@@ -14,8 +14,8 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain/server"
 )
 
-//go:embed tmpl/*
-var templates embed.FS
+//go:embed index.html.tmpl
+var indexTemplate string
 
 //go:embed assets/*
 var assets embed.FS
@@ -34,7 +34,6 @@ func init() {
 
 	flag.BoolVar(&verbose, "v", false, "verbose logging")
 	flag.BoolVar(&loadAssetsFromFs, "a", false, "load assets from filesystem (for easier frontend development)")
-	// flag.BoolVar(&loadObjectsFromFs, "o", true, "load objects from filesystem")
 	flag.IntVar(&prefixLength, "p", 2, "markov chain prefix length")
 	flag.IntVar(&minCaptionLength, "minl", 5, "min caption length in words")
 	flag.IntVar(&maxCaptionLength, "maxl", 15, "max caption length in words")
@@ -69,12 +68,12 @@ func main() {
 
 	manifestCheckInterval, err := time.ParseDuration(manifestCheckIntervalStr)
 	if err != nil {
-		log.Fatalf("error paring manifest interval %s: %s", manifestCheckIntervalStr, err)
+		log.Fatalf("error parsing manifest interval %s: %s", manifestCheckIntervalStr, err)
 	}
 
 	cfg := &server.Config{
 		ObjectStoreUrl:        os.Getenv("YN_OBJECTSTORE_URL"),
-		Templates:             template.Must(template.New("").ParseFS(templates, "tmpl/*.tmpl")),
+		Templates:             template.Must(template.New("index.html.tmpl").Parse(indexTemplate)),
 		Assets:                assetsFs,
 		Port:                  port,
 		MinCaptionDelay:       minCaptionDelay,
