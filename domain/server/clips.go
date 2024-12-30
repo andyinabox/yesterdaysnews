@@ -27,6 +27,5 @@ func (s *Server) Clips() http.HandlerFunc {
 		json.NewEncoder(w).Encode(clipsResponse{
 			Clips: clips,
 		})
-		w.WriteHeader(http.StatusOK)
 	}
 }
