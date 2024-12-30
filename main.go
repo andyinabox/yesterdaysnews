@@ -29,7 +29,7 @@ func init() {
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal(err)
+		log.Warn("error loading .env file: %s", err)
 	}
 
 	flag.BoolVar(&verbose, "v", false, "verbose logging")
