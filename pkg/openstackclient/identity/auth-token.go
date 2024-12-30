@@ -1,4 +1,4 @@
-package osidentityclient
+package identity
 
 import (
 	"bytes"

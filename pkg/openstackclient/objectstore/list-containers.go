@@ -1,4 +1,4 @@
-package osobjectstoreclient
+package objectstore
 
 import (
 	"context"

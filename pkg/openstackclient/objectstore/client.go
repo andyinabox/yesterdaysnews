@@ -1,10 +1,10 @@
-package osobjectstoreclient
+package objectstore
 
-import "context"
+import (
+	"context"
 
-type OSIdentityClient interface {
-	AuthToken(context.Context) (string, error)
-}
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/openstackclient"
+)
 
 type Config struct {
 	Endpoint   string
@@ -13,11 +13,11 @@ type Config struct {
 }
 
 type Client struct {
-	auth OSIdentityClient
+	auth openstackclient.IdentityClient
 	cfg  *Config
 }
 
-func New(auth OSIdentityClient, cfg *Config) *Client {
+func New(auth openstackclient.IdentityClient, cfg *Config) *Client {
 	return &Client{auth, cfg}
 }
 

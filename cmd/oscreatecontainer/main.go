@@ -7,8 +7,8 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/osidentityclient"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/osobjectstoreclient"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/openstackclient/identity"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/openstackclient/objectstore"
 )
 
 var verbose bool
@@ -29,14 +29,14 @@ func init() {
 
 func main() {
 
-	identityClient := osidentityclient.New(&osidentityclient.Config{
+	identityClient := identity.New(&identity.Config{
 		IdentityEndpoint: os.Getenv("OS_AUTH_URL"),
 		UserDomainName:   os.Getenv("OS_USER_DOMAIN_NAME"),
 		Username:         os.Getenv("OS_USERNAME"),
 		Password:         os.Getenv("OS_PASSWORD"),
 	})
 
-	swiftClient := osobjectstoreclient.New(identityClient, &osobjectstoreclient.Config{
+	swiftClient := objectstore.New(identityClient, &objectstore.Config{
 		Endpoint:   os.Getenv("OS_OBJECTSTORE_URL"),
 		ProjectID:  os.Getenv("OS_PROJECT_ID"),
 		RegionName: os.Getenv("OS_REGION_NAME"),

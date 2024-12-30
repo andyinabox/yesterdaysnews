@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/osidentityclient"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/openstackclient/identity"
 )
 
 func init() {
@@ -19,7 +19,7 @@ func init() {
 
 func main() {
 
-	identityClient := osidentityclient.New(&osidentityclient.Config{
+	identityClient := identity.New(&identity.Config{
 		IdentityEndpoint: os.Getenv("OS_AUTH_URL"),
 		UserDomainName:   os.Getenv("OS_USER_DOMAIN_NAME"),
 		Username:         os.Getenv("OS_USERNAME"),

@@ -1,4 +1,4 @@
-package osidentityclient
+package identity
 
 type Config struct {
 	IdentityEndpoint string
