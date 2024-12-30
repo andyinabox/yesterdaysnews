@@ -8,7 +8,7 @@ This is really two projects in one
 ## Todo
 
  - [ ] Handle video loading/encoding errors in frontend
- - [ ] Set CORS on object store so videos can be preloaded using `fetch`  - I think I can do this by hitting the OpenStack API, but having some issues getting that to work (see `openstack` branch)
+ - [ ] Set CORS on object store so videos can be preloaded using `fetch`  - I think I can do this by hitting the OpenStack API, but having some issues getting that to work (see `openstackclient`)
  - [ ] Containerize both projects
  - [ ] Deploy builder remotely
    - [ ] Set up cron process
