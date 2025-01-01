@@ -2,34 +2,17 @@ package downloader
 
 import (
 	"context"
-	"errors"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
 )
 
-type DownloadRequest struct {
-	ChannelUsername string
-	Date            time.Time
-	MaxResults      int
-	OutputDir       string
-}
-
-type DownloadResult struct {
-	Files []DownloadResultFile `json:"files"`
-}
-
-type DownloadResultFile struct {
-	Video string `json:"video"`
-	Subs  string `json:"subs"`
-}
-
-func (d *Downloader) DownloadVideosForChannel(ctx context.Context, req DownloadRequest) (result *DownloadResult, err error) {
+func (d *Downloader) DownloadVideosForChannel(ctx context.Context, req domain.DownloadRequest) (result *domain.DownloadResult, err error) {
 
 	log.Infof("getting playlistId for channel %q", req.ChannelUsername)
 	var playlistId string
@@ -51,8 +34,8 @@ func (d *Downloader) DownloadVideosForChannel(ctx context.Context, req DownloadR
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 
-	result = &DownloadResult{
-		Files: make([]DownloadResultFile, 0),
+	result = &domain.DownloadResult{
+		Files: make([]domain.DownloadResultFile, 0),
 	}
 
 	for _, id := range ids {
@@ -76,11 +59,11 @@ func (d *Downloader) DownloadVideosForChannel(ctx context.Context, req DownloadR
 			videoFile := video.Filename
 			subsFile := strings.Replace(videoFile, filepath.Ext(videoFile), ".en."+VideoSubFormat, 1)
 
-			drf := DownloadResultFile{}
+			drf := domain.DownloadResultFile{}
 
 			// check to see if expected files were written
-			videoExists := checkFileExists(videoFile)
-			subsExists := checkFileExists(subsFile)
+			videoExists := util.DoesFileExist(videoFile)
+			subsExists := util.DoesFileExist(subsFile)
 
 			if videoExists {
 				drf.Video = videoFile
@@ -105,9 +88,4 @@ func (d *Downloader) DownloadVideosForChannel(ctx context.Context, req DownloadR
 	wg.Wait()
 
 	return
-}
-
-func checkFileExists(filePath string) bool {
-	_, error := os.Stat(filePath)
-	return !errors.Is(error, os.ErrNotExist)
 }

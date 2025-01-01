@@ -11,17 +11,14 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
 	"golang.org/x/exp/rand"
 )
 
-type BreakVideoIntoClipsResult struct {
-	Files []string `json:"files"`
-}
+func (p *Processor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir string, minLength, maxLength int) (result *domain.BreakVideoIntoClipsResult, err error) {
 
-func (p *Processor) BreakVideoIntoClips(ctx context.Context, inputPath, outDir string, minLength, maxLength int) (result *BreakVideoIntoClipsResult, err error) {
-
-	result = &BreakVideoIntoClipsResult{
+	result = &domain.BreakVideoIntoClipsResult{
 		Files: []string{},
 	}
 

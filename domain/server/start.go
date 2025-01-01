@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/captiongenerator"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/manifest"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/textprocessor"
 )
 
 func (s *Server) Start(ctx context.Context) error {
@@ -30,7 +30,7 @@ func (s *Server) Start(ctx context.Context) error {
 		return err
 	}
 
-	s.tp, err = s.makeTextProcesor(ctx)
+	s.cg, err = s.makeCaptionGenerator(ctx)
 	if err != nil {
 		return err
 	}
@@ -59,14 +59,14 @@ func (s *Server) Start(ctx context.Context) error {
 					s.manifest = manifest
 					s.mu.Unlock()
 
-					tp, err := s.makeTextProcesor(ctx)
+					cg, err := s.makeCaptionGenerator(ctx)
 					if err != nil {
 						log.Errorf("error making new text processor: %s", err)
 						continue
 					}
 
 					s.mu.Lock()
-					s.tp = tp
+					s.cg = cg
 					s.mu.Unlock()
 
 					reload <- struct{}{}
@@ -79,7 +79,7 @@ func (s *Server) Start(ctx context.Context) error {
 	return s.srv.ListenAndServe()
 }
 
-func (s *Server) makeTextProcesor(ctx context.Context) (*textprocessor.Processor, error) {
+func (s *Server) makeCaptionGenerator(ctx context.Context) (domain.CaptionGenerator, error) {
 	model, err := s.getModel(ctx)
 	if err != nil {
 		return nil, err
@@ -91,12 +91,12 @@ func (s *Server) makeTextProcesor(ctx context.Context) (*textprocessor.Processor
 		return nil, err
 	}
 
-	tp := textprocessor.New(chain, &textprocessor.Config{
+	cg := captiongenerator.New(chain, &captiongenerator.Config{
 		MinCaptionLength: s.cfg.MinCaptionLength,
 		MaxCaptionLength: s.cfg.MaxCaptionLength,
 	})
 
-	return tp, nil
+	return cg, nil
 }
 
 func (s *Server) getModel(ctx context.Context) ([]byte, error) {
@@ -116,7 +116,7 @@ func (s *Server) getModel(ctx context.Context) ([]byte, error) {
 	return io.ReadAll(resp.Body)
 }
 
-func (s *Server) getManifest(ctx context.Context) (*manifest.Manifest, error) {
+func (s *Server) getManifest(ctx context.Context) (*domain.Manifest, error) {
 	url := s.cfg.ObjectStoreUrl + "/manifest.json"
 
 	// log.Debug("create manifest request: " + url)
@@ -141,7 +141,7 @@ func (s *Server) getManifest(ctx context.Context) (*manifest.Manifest, error) {
 	// log.Debug(string(data))
 
 	// log.Debug("unmarshal manifest data")
-	manifest := manifest.Manifest{}
+	manifest := domain.Manifest{}
 	err = json.Unmarshal(data, &manifest)
 	if err != nil {
 		return nil, err

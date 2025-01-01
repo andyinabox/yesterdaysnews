@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/uploader"
 )
 
@@ -28,7 +29,9 @@ func init() {
 
 func main() {
 
-	u := uploader.New(&uploader.Config{
+	var u domain.Uploader
+
+	u = uploader.New(&uploader.Config{
 		S3Endpoint:  os.Getenv("YN_S3_ENDPOINT"),
 		S3AccessKey: os.Getenv("YN_S3_ACCESS_KEY"),
 		S3SecretKey: os.Getenv("YN_S3_SECRET_ACCESS_KEY"),
@@ -39,7 +42,7 @@ func main() {
 
 	log.Info("uploading assets...")
 
-	prefix, err := u.Upload(context.Background(), "dist")
+	prefix, err := u.UploadDir(context.Background(), "dist")
 	if err != nil {
 		log.Fatal(err)
 	}

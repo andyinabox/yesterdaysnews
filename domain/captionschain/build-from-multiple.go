@@ -9,22 +9,10 @@ import (
 	"unicode"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
-type CorpusType string
-
-const (
-	CorpusTypeText CorpusType = "txt"
-	CorpusTypeVTT  CorpusType = "vtt"
-)
-
-type Corpus struct {
-	Type     CorpusType
-	FileGlob string
-	Weight   int
-}
-
-func (c *Chain) BuildFromMultiple(sources []Corpus) error {
+func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {
 
 	combined := ""
 
@@ -44,9 +32,9 @@ func (c *Chain) BuildFromMultiple(sources []Corpus) error {
 
 			// parse based on type
 			switch source.Type {
-			case CorpusTypeText:
+			case domain.CorpusTypeText:
 				parsedContent, err = c.parseTextFile(f)
-			case CorpusTypeVTT:
+			case domain.CorpusTypeVTT:
 				parsedContent, err = c.parseVTTFile(f)
 			default:
 				return fmt.Errorf("invalid CorpusType: %s", source.Type)

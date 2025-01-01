@@ -11,12 +11,12 @@ import (
 	"sync"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/manifest"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
 var ErrContainerDoesNotExist = errors.New("container does not exist")
 
-func (u *Uploader) Upload(ctx context.Context, dir string) (string, error) {
+func (u *Uploader) UploadDir(ctx context.Context, dir string) (string, error) {
 
 	var wg sync.WaitGroup
 
@@ -25,7 +25,7 @@ func (u *Uploader) Upload(ctx context.Context, dir string) (string, error) {
 		return "", fmt.Errorf("error reading manifest: %w", err)
 	}
 
-	manifest := manifest.Manifest{}
+	manifest := domain.Manifest{}
 	err = json.Unmarshal(manifestBytes, &manifest)
 	if err != nil {
 		return "", fmt.Errorf("error decoding manifest: %w", err)

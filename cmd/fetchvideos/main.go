@@ -10,6 +10,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/downloader"
 )
 
@@ -38,7 +39,10 @@ func init() {
 }
 
 func main() {
-	dl := downloader.New(&downloader.Config{
+
+	var dl domain.Downloader
+
+	dl = downloader.New(&downloader.Config{
 		GoogleAPIKey: os.Getenv("GOOGLE_API_KEY"),
 		BinPathYTDLP: os.Getenv("YT_DLP_PATH"),
 	})
@@ -48,7 +52,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	result, err := dl.DownloadVideosForChannel(context.Background(), downloader.DownloadRequest{
+	result, err := dl.DownloadVideosForChannel(context.Background(), domain.DownloadRequest{
 		ChannelUsername: channelName,
 		Date:            time.Now().AddDate(0, 0, -1),
 		MaxResults:      maxResults,

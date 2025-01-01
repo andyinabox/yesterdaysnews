@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/videoprocessor"
 )
 
@@ -35,7 +36,9 @@ func init() {
 }
 func main() {
 
-	vp := videoprocessor.New(&videoprocessor.Config{})
+	var vp domain.VideoProcessor
+
+	vp = videoprocessor.New(&videoprocessor.Config{})
 
 	files, err := filepath.Glob(inputGlob)
 	if err != nil {
@@ -47,7 +50,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	result := videoprocessor.BreakVideoIntoClipsResult{
+	result := domain.BreakVideoIntoClipsResult{
 		Files: []string{},
 	}
 
