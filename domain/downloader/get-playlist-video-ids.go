@@ -14,7 +14,7 @@ import (
 // we are requesting a large result so we can iterate and filter by date
 const getPlaylistVideosForDateMaxPages = 5
 
-func (d *Downloader) GetPlaylistVideosForDate(ctx context.Context, playlistId string, date time.Time, maxResults int) (ids []string, err error) {
+func (d *Downloader) GetPlaylistVideoIDs(ctx context.Context, playlistId string, date time.Time, maxResults int) (ids []string, err error) {
 	ctx, cancel := context.WithCancel(ctx)
 
 	idsChan := make(chan string)

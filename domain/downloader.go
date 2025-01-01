@@ -22,8 +22,8 @@ type DownloadResultFile struct {
 }
 
 type Downloader interface {
-	// DownloadVideo() // TODO
+	DownloadVideo(ctx context.Context, id, outDir string) (string, error)
 	DownloadVideosForChannel(context.Context, DownloadRequest) (*DownloadResult, error)
-	GetPlaylistVideosForDate(ctx context.Context, playlistId string, date time.Time, maxResults int) ([]string, error)
-	GetUploadsPlaylistIdForChannel(context.Context, string) (string, error)
+	GetPlaylistVideoIDs(ctx context.Context, playlistId string, date time.Time, maxResults int) ([]string, error)
+	GetChannelPlaylistID(ctx context.Context, channelName string) (string, error)
 }

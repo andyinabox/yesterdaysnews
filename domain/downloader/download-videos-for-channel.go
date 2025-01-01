@@ -16,7 +16,7 @@ func (d *Downloader) DownloadVideosForChannel(ctx context.Context, req domain.Do
 
 	log.Infof("getting playlistId for channel %q", req.ChannelUsername)
 	var playlistId string
-	playlistId, err = d.GetUploadsPlaylistIdForChannel(ctx, req.ChannelUsername)
+	playlistId, err = d.GetChannelPlaylistID(ctx, req.ChannelUsername)
 	if err != nil {
 		return
 	}
@@ -24,7 +24,7 @@ func (d *Downloader) DownloadVideosForChannel(ctx context.Context, req domain.Do
 
 	log.Infof("getting ~%d video ids from %s", req.MaxResults, req.Date)
 	var ids []string
-	ids, err = d.GetPlaylistVideosForDate(ctx, playlistId, req.Date, req.MaxResults)
+	ids, err = d.GetPlaylistVideoIDs(ctx, playlistId, req.Date, req.MaxResults)
 	if err != nil {
 		return
 	}
