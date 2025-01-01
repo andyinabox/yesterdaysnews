@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
 )
 
@@ -27,26 +28,28 @@ func init() {
 
 func main() {
 
-	c := captionschain.New(prefixLength)
+	var c domain.CaptionsChain
 
-	err := c.BuildFromMultiple([]captionschain.Corpus{
+	c = captionschain.New(prefixLength)
+
+	err := c.BuildFromMultiple([]domain.Corpus{
 		{
-			Type:     captionschain.CorpusTypeVTT,
+			Type:     domain.CorpusTypeVTT,
 			FileGlob: "download/cnn/*.vtt",
 			Weight:   1,
 		},
 		{
-			Type:     captionschain.CorpusTypeVTT,
+			Type:     domain.CorpusTypeVTT,
 			FileGlob: "download/msnbc/*.vtt",
 			Weight:   1,
 		},
 		{
-			Type:     captionschain.CorpusTypeVTT,
+			Type:     domain.CorpusTypeVTT,
 			FileGlob: "download/foxnews/*.vtt",
 			Weight:   1,
 		},
 		{
-			Type:     captionschain.CorpusTypeText,
+			Type:     domain.CorpusTypeText,
 			FileGlob: "hospital.txt",
 			Weight:   3,
 		},

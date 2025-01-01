@@ -1,50 +1,29 @@
 package manifest
 
 import (
-	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
-const (
-	VideoFileName    = "yesterdays-news.mp4"
-	SubsVileName     = "yesterdays-news.en.vtt"
-	CombinedFileName = "yesterdays-news-cc.mp4"
-	ModelFileName    = "yesterdays-news.model.json"
-	ClipsDirName     = "clips"
-)
-
-type Manifest struct {
-	Date  time.Time     `json:"date"`
-	ID    string        `json:"id"`
-	Files ManifestFiles `json:"files"`
-}
-
-type ManifestFiles struct {
-	VideoFile string `json:"video"`
-	// SubsFile     string   `json:"subs"`
-	// CombinedFile string   `json:"combined"`
-	ModelFile string   `json:"model"`
-	Clips     []string `json:"clips"`
-}
-
-func Create(dir string) (*Manifest, error) {
+func Create(dir string) (*domain.Manifest, error) {
 
 	now := time.Now()
 
-	manifest := &Manifest{
+	manifest := &domain.Manifest{
 		ID:   strconv.FormatInt(now.Unix(), 10),
 		Date: now,
 	}
 
-	if checkFileExists(filepath.Join(dir, VideoFileName)) {
-		manifest.Files.VideoFile = VideoFileName
+	if util.DoesFileExist(filepath.Join(dir, domain.ManifestVideoFileName)) {
+		manifest.Files.VideoFile = domain.ManifestVideoFileName
 	} else {
-		return nil, fmt.Errorf("video file %q missing", VideoFileName)
+		return nil, fmt.Errorf("video file %q missing", domain.ManifestVideoFileName)
 	}
 
 	// if checkFileExists(filepath.Join(dir, DefaultSubsFileName)) {
@@ -59,13 +38,13 @@ func Create(dir string) (*Manifest, error) {
 	// 	return nil, fmt.Errorf("video file %q missing", CombinedFileName)
 	// }
 
-	if checkFileExists(filepath.Join(dir, ModelFileName)) {
-		manifest.Files.ModelFile = ModelFileName
+	if util.DoesFileExist(filepath.Join(dir, domain.ManifestModelFileName)) {
+		manifest.Files.ModelFile = domain.ManifestModelFileName
 	} else {
-		return nil, fmt.Errorf("video file %q missing", ModelFileName)
+		return nil, fmt.Errorf("video file %q missing", domain.ManifestModelFileName)
 	}
 
-	entries, err := filepath.Glob(filepath.Join(dir, ClipsDirName, "*.webm"))
+	entries, err := filepath.Glob(filepath.Join(dir, domain.ManifestClipsDirName, "*.webm"))
 	if err != nil {
 		return nil, err
 	}
@@ -77,10 +56,4 @@ func Create(dir string) (*Manifest, error) {
 	}
 
 	return manifest, nil
-}
-
-func checkFileExists(filePath string) bool {
-	_, error := os.Stat(filePath)
-	//return !os.IsNotExist(err)
-	return !errors.Is(error, os.ErrNotExist)
 }
