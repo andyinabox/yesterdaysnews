@@ -30,7 +30,7 @@ func (s *Streamer) VideoDownloadStream(ctx context.Context, errs chan<- domain.S
 
 		// handle error
 		if err != nil {
-			errs <- NewStreamErr(domain.StreamErrDownloadVideo, err)
+			errs <- NewErr(domain.StreamErrDownloadVideo, err)
 			return
 		}
 

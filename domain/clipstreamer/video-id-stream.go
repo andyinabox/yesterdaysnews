@@ -37,13 +37,13 @@ func (s *Streamer) VideoIDStream(ctx context.Context, errs chan<- domain.StreamE
 					ids, pageToken, err = s.dl.GetPlaylistVideoIDs(ctx, s.cfg.VideoDate, playlistId, pageToken)
 
 					if err != nil {
-						errs <- NewStreamErr(domain.StreamErrGetVideoID, err)
+						errs <- NewErr(domain.StreamErrGetVideoID, err)
 					}
 
 					for _, id := range ids {
 						if id == "" {
 							err = fmt.Errorf("recieved empty video ID for playlist %q (pageToken %q)", playlistId, pageToken)
-							errs <- NewStreamErr(domain.StreamErrGetVideoID, err)
+							errs <- NewErr(domain.StreamErrGetVideoID, err)
 							continue
 						}
 

@@ -4,12 +4,15 @@ import (
 	"context"
 	"flag"
 	"os"
+	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/clipstreamer"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/downloader"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/uploader"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/videoprocessor"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
@@ -34,11 +37,17 @@ func init() {
 func main() {
 	var err error
 	var dl domain.Downloader
+	var vp domain.VideoProcessor
+	var up domain.Uploader
 	var cs domain.ClipStreamer
 
 	dl = downloader.New(&downloader.Config{
 		GoogleAPIKey: os.Getenv("YN_GOOGLE_API_KEY"),
 	})
+
+	vp = videoprocessor.New(&videoprocessor.Config{})
+
+	up = uploader.New(&uploader.Config{})
 
 	downloadDir := "download"
 	err = os.MkdirAll(downloadDir, os.ModePerm)
@@ -52,17 +61,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cs = clipstreamer.New(dl, &clipstreamer.Config{
+	cs = clipstreamer.New(dl, vp, up, &clipstreamer.Config{
 		VideoDate:                util.Yesterday(),
 		DownloadCountPerPlaylist: 10,
 		DownloadDir:              downloadDir,
 		OutputDir:                outputDir,
+		MinClipLength:            5 * time.Second,
+		MaxClipLength:            20 * time.Second,
+		FileUploadDir:            "test",
 	})
 
 	ctx, _ := context.WithCancelCause(context.Background())
 
 	errHandler := func(err domain.StreamErr) {
 		switch err.Type() {
+		case domain.StreamErrFatal:
+			log.Fatal(err)
 		case domain.StreamErrTODO:
 			log.Error("TODO stream error: %s", err)
 		default:
