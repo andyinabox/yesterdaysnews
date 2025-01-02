@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"flag"
 	"os"
 
 	"github.com/charmbracelet/log"
@@ -16,10 +16,12 @@ import (
 var verbose bool
 
 func init() {
-	verbose = false
+	flag.BoolVar(&verbose, "v", false, "verbose output")
+	flag.Parse()
 
 	if verbose {
 		log.SetLevel(log.DebugLevel)
+		log.SetReportCaller(true)
 	}
 
 	err := godotenv.Load()
@@ -82,9 +84,10 @@ func main() {
 
 	errs := cs.ErrorStream(ctx, errHandler)
 	ids := cs.VideoIDStream(ctx, errs, playlistIDs...)
+	paths := cs.VideoDownloadStream(ctx, errs, ids)
 
-	for id := range ids {
-		fmt.Println(id)
+	for path := range paths {
+		log.Info(path)
 	}
 
 	log.Info("Done")

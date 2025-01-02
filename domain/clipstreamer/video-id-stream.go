@@ -2,6 +2,7 @@ package clipstreamer
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
@@ -40,7 +41,14 @@ func (s *Streamer) VideoIDStream(ctx context.Context, errs chan<- domain.StreamE
 					}
 
 					for _, id := range ids {
+						if id == "" {
+							err = fmt.Errorf("recieved empty video ID for playlist %q (pageToken %q)", playlistId, pageToken)
+							errs <- NewStreamErr(domain.StreamErrGetVideoID, err)
+							continue
+						}
+
 						idStream <- id
+						count++
 						if count >= s.cfg.DownloadCountPerPlaylist {
 							return
 						}

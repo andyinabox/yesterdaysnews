@@ -7,6 +7,7 @@ type StreamErrType int
 const (
 	StreamErrTODO StreamErrType = iota
 	StreamErrGetVideoID
+	StreamErrDownloadVideo
 )
 
 type StreamErr interface {

@@ -2,22 +2,35 @@ package clipstreamer
 
 import (
 	"context"
+	"sync"
 
+	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
 func (s *Streamer) VideoDownloadStream(ctx context.Context, errs chan<- domain.StreamErr, ids <-chan string) <-chan string {
 	downloadPaths := make(chan string)
 
+	var wg sync.WaitGroup
+
+	// wait for existing
+	cleanup := func() {
+		log.Info("cleaning up video download stream")
+		wg.Wait()
+		close(downloadPaths)
+	}
+
 	// video download func
 	// not checking for ctx.Done() here,
 	// that should be done further down the chain
 	downloadVideo := func(id string) {
+		defer wg.Done()
+		log.Info("Download video", "id", id)
 		path, err := s.dl.DownloadVideo(ctx, id, s.cfg.DownloadDir)
 
 		// handle error
 		if err != nil {
-			errs <- NewStreamErr(domain.StreamErrTODO, err)
+			errs <- NewStreamErr(domain.StreamErrDownloadVideo, err)
 			return
 		}
 
@@ -27,12 +40,19 @@ func (s *Streamer) VideoDownloadStream(ctx context.Context, errs chan<- domain.S
 
 	// main goroutine
 	go func() {
-		defer close(downloadPaths)
+		defer cleanup()
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			case id := <-ids:
+			default:
+				id, open := <-ids
+
+				if !open {
+					return
+				}
+
+				wg.Add(1)
 				go downloadVideo(id)
 			}
 		}
