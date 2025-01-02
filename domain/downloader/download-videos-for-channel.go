@@ -1,91 +1,79 @@
 package downloader
 
-import (
-	"context"
-	"path/filepath"
-	"strings"
-	"sync"
+// func (d *Downloader) DownloadVideosForChannel(ctx context.Context, req domain.DownloadRequest) (result *domain.DownloadResult, err error) {
 
-	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
-)
+// 	log.Infof("getting playlistId for channel %q", req.ChannelUsername)
+// 	var playlistId string
+// 	playlistId, err = d.GetChannelPlaylistID(ctx, req.ChannelUsername)
+// 	if err != nil {
+// 		return
+// 	}
+// 	log.Infof("got playlistId %q", playlistId)
 
-func (d *Downloader) DownloadVideosForChannel(ctx context.Context, req domain.DownloadRequest) (result *domain.DownloadResult, err error) {
+// 	log.Infof("getting ~%d video ids from %s", req.MaxResults, req.Date)
+// 	var ids []string
+// 	ids, err = d.GetPlaylistVideoIDs(ctx, playlistId, req.Date, req.MaxResults)
+// 	if err != nil {
+// 		return
+// 	}
+// 	log.Infof("found %d ids", len(ids))
+// 	log.Debug(strings.Join(ids, "\n"))
 
-	log.Infof("getting playlistId for channel %q", req.ChannelUsername)
-	var playlistId string
-	playlistId, err = d.GetChannelPlaylistID(ctx, req.ChannelUsername)
-	if err != nil {
-		return
-	}
-	log.Infof("got playlistId %q", playlistId)
+// 	var mu sync.Mutex
+// 	var wg sync.WaitGroup
 
-	log.Infof("getting ~%d video ids from %s", req.MaxResults, req.Date)
-	var ids []string
-	ids, err = d.GetPlaylistVideoIDs(ctx, playlistId, req.Date, req.MaxResults)
-	if err != nil {
-		return
-	}
-	log.Infof("found %d ids", len(ids))
-	log.Debug(strings.Join(ids, "\n"))
+// 	result = &domain.DownloadResult{
+// 		Files: make([]domain.DownloadResultFile, 0),
+// 	}
 
-	var mu sync.Mutex
-	var wg sync.WaitGroup
+// 	for _, id := range ids {
+// 		wg.Add(1)
 
-	result = &domain.DownloadResult{
-		Files: make([]domain.DownloadResultFile, 0),
-	}
+// 		// download video in goroutine
+// 		go func() {
+// 			defer wg.Done()
 
-	for _, id := range ids {
-		wg.Add(1)
+// 			log.Infof("downloading video %s", id)
+// 			video, err := d.ytdl.DownloadVideo(ctx, id, youtubedownloader.Request{
+// 				Format:        VideoFormatString,
+// 				WriteAutoSubs: true,
+// 				SubFormat:     VideoSubFormat,
+// 				Output:        filepath.Join(req.OutputDir, "%(id)s.%(ext)s"),
+// 			})
+// 			if err != nil {
+// 				log.Error("error downloading video", "error", err, "id", id)
+// 			}
 
-		// download video in goroutine
-		go func() {
-			defer wg.Done()
+// 			videoFile := video.Filename
+// 			subsFile := strings.Replace(videoFile, filepath.Ext(videoFile), ".en."+VideoSubFormat, 1)
 
-			log.Infof("downloading video %s", id)
-			video, err := d.ytdl.DownloadVideo(ctx, id, youtubedownloader.Request{
-				Format:        VideoFormatString,
-				WriteAutoSubs: true,
-				SubFormat:     VideoSubFormat,
-				Output:        filepath.Join(req.OutputDir, "%(id)s.%(ext)s"),
-			})
-			if err != nil {
-				log.Error("error downloading video", "error", err, "id", id)
-			}
+// 			drf := domain.DownloadResultFile{}
 
-			videoFile := video.Filename
-			subsFile := strings.Replace(videoFile, filepath.Ext(videoFile), ".en."+VideoSubFormat, 1)
+// 			// check to see if expected files were written
+// 			videoExists := util.DoesFileExist(videoFile)
+// 			subsExists := util.DoesFileExist(subsFile)
 
-			drf := domain.DownloadResultFile{}
+// 			if videoExists {
+// 				drf.Video = videoFile
+// 			} else {
+// 				log.Errorf("expected file not found: %s", videoFile)
+// 			}
+// 			if subsExists {
+// 				drf.Subs = subsFile
+// 			} else {
+// 				log.Errorf("expected file not found: %s", subsFile)
+// 			}
 
-			// check to see if expected files were written
-			videoExists := util.DoesFileExist(videoFile)
-			subsExists := util.DoesFileExist(subsFile)
+// 			log.Infof("finished downloading video %s", videoFile)
 
-			if videoExists {
-				drf.Video = videoFile
-			} else {
-				log.Errorf("expected file not found: %s", videoFile)
-			}
-			if subsExists {
-				drf.Subs = subsFile
-			} else {
-				log.Errorf("expected file not found: %s", subsFile)
-			}
+// 			mu.Lock()
+// 			result.Files = append(result.Files, drf)
+// 			mu.Unlock()
+// 		}()
 
-			log.Infof("finished downloading video %s", videoFile)
+// 	}
 
-			mu.Lock()
-			result.Files = append(result.Files, drf)
-			mu.Unlock()
-		}()
+// 	wg.Wait()
 
-	}
-
-	wg.Wait()
-
-	return
-}
+// 	return
+// }
