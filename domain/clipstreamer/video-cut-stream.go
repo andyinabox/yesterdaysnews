@@ -10,7 +10,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
-func (s *Streamer) VideoCutStream(ctx context.Context, errs chan<- domain.StreamErr, videoFiles <-chan string) <-chan string {
+func (s *Streamer) VideoCutStream(ctx context.Context, videoFiles <-chan string) <-chan string {
 	clipStream := make(chan string)
 
 	var wg sync.WaitGroup
@@ -30,7 +30,7 @@ func (s *Streamer) VideoCutStream(ctx context.Context, errs chan<- domain.Stream
 		// do edit
 		file, err := s.vp.CutVideo(ctx, filePath, outPath, edit)
 		if err != nil {
-			errs <- NewErr(domain.StreamErrCutVideo, fmt.Errorf("error cutting video %q: %w", filePath, err))
+			s.error(domain.ErrTypeCutVideo, fmt.Errorf("error cutting video %q: %w", filePath, err))
 			return
 		}
 
@@ -56,7 +56,7 @@ func (s *Streamer) VideoCutStream(ctx context.Context, errs chan<- domain.Stream
 
 				// handle error and continue in loop
 				if err != nil {
-					errs <- NewErr(domain.StreamErrGetVideoEditPoints, fmt.Errorf("error getting video %q edit points: %w", filePath, err))
+					s.error(domain.ErrTypeGetVideoEditPoints, fmt.Errorf("error getting video %q edit points: %w", filePath, err))
 					continue
 				}
 

@@ -9,7 +9,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
-func (s *Streamer) VideoUploadStream(ctx context.Context, errs chan<- domain.StreamErr, clipFiles <-chan string) <-chan string {
+func (s *Streamer) VideoUploadStream(ctx context.Context, clipFiles <-chan string) <-chan string {
 	stream := make(chan string)
 
 	var wg sync.WaitGroup
@@ -28,7 +28,7 @@ func (s *Streamer) VideoUploadStream(ctx context.Context, errs chan<- domain.Str
 
 		fileKey, err = s.up.UploadFile(ctx, filePath, fileKey, false)
 		if err != nil {
-			errs <- NewErr(domain.StreamErrTODO, fmt.Errorf("error uploading file %q as %q; %w", filePath, fileKey, err))
+			s.error(domain.ErrTypeTODO, fmt.Errorf("error uploading file %q as %q; %w", filePath, fileKey, err))
 			return
 		}
 

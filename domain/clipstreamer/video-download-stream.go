@@ -8,7 +8,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
-func (s *Streamer) VideoDownloadStream(ctx context.Context, errs chan<- domain.StreamErr, ids <-chan string) <-chan string {
+func (s *Streamer) VideoDownloadStream(ctx context.Context, ids <-chan string) <-chan string {
 	downloadPaths := make(chan string)
 
 	var wg sync.WaitGroup
@@ -30,7 +30,7 @@ func (s *Streamer) VideoDownloadStream(ctx context.Context, errs chan<- domain.S
 
 		// handle error
 		if err != nil {
-			errs <- NewErr(domain.StreamErrDownloadVideo, err)
+			s.error(domain.ErrTypeDownloadVideo, err)
 			return
 		}
 

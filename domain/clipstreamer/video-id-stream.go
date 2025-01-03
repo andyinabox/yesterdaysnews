@@ -8,7 +8,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
-func (s *Streamer) VideoIDStream(ctx context.Context, errs chan<- domain.StreamErr, playlistIds ...string) <-chan string {
+func (s *Streamer) VideoIDStream(ctx context.Context, playlistIds ...string) <-chan string {
 	idStream := make(chan string)
 
 	var wg sync.WaitGroup
@@ -37,13 +37,13 @@ func (s *Streamer) VideoIDStream(ctx context.Context, errs chan<- domain.StreamE
 					ids, pageToken, err = s.dl.GetPlaylistVideoIDs(ctx, s.cfg.VideoDate, playlistId, pageToken)
 
 					if err != nil {
-						errs <- NewErr(domain.StreamErrGetVideoID, err)
+						s.error(domain.ErrTypeGetVideoID, err)
 					}
 
 					for _, id := range ids {
 						if id == "" {
 							err = fmt.Errorf("recieved empty video ID for playlist %q (pageToken %q)", playlistId, pageToken)
-							errs <- NewErr(domain.StreamErrGetVideoID, err)
+							s.error(domain.ErrTypeGetVideoID, err)
 							continue
 						}
 

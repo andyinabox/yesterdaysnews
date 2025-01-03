@@ -13,6 +13,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain/downloader"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/uploader"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/videoprocessor"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
@@ -38,10 +39,22 @@ func init() {
 
 func main() {
 	var err error
+	var eh errorhandler.ErrorHandler
 	var dl domain.Downloader
 	var vp domain.VideoProcessor
 	var up domain.Uploader
 	var cs domain.ClipStreamer
+
+	eh = errorhandler.New(context.Background(), &errorhandler.Config{
+		ErrorFunc: func(typ string, err error) {
+			log.Errorf("%s: %s", typ, err)
+		},
+		FatalFunc: func(typ string, err error) {
+			log.Fatalf("%s: %s", typ, err)
+		},
+	})
+
+	ctx := eh.Context()
 
 	dl = downloader.New(&downloader.Config{
 		GoogleAPIKey: os.Getenv("YN_GOOGLE_API_KEY"),
@@ -63,7 +76,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cs = clipstreamer.New(dl, vp, up, &clipstreamer.Config{
+	cs = clipstreamer.New(dl, vp, up, eh.Channel(), &clipstreamer.Config{
 		VideoDate:                util.Yesterday(),
 		DownloadCountPerPlaylist: 10,
 		DownloadDir:              downloadDir,
@@ -72,17 +85,6 @@ func main() {
 		MaxClipLength:            20 * time.Second,
 		FileUploadDir:            "test",
 	})
-
-	ctx, _ := context.WithCancelCause(context.Background())
-
-	errHandler := func(err domain.StreamErr) {
-		switch err.Type() {
-		case domain.StreamErrFatal:
-			log.Fatal(err)
-		default:
-			log.Errorf("%s: %s", err.Type(), err)
-		}
-	}
 
 	// TODO: let's just use the playlist IDs and skip this step
 	channelNames := []string{"@cnn", "@msnbc", "@foxnews"}
@@ -96,9 +98,8 @@ func main() {
 		playlistIDs[i] = playlistId
 	}
 
-	errs := cs.ErrorStream(ctx, errHandler)
-	ids := cs.VideoIDStream(ctx, errs, playlistIDs...)
-	paths := cs.VideoDownloadStream(ctx, errs, ids)
+	ids := cs.VideoIDStream(ctx, playlistIDs...)
+	paths := cs.VideoDownloadStream(ctx, ids)
 
 	for path := range paths {
 		log.Info(path)
