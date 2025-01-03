@@ -22,9 +22,11 @@ func init() {
 	flag.BoolVar(&verbose, "v", false, "verbose output")
 	flag.Parse()
 
+	log.SetReportCaller(true)
+	log.SetReportTimestamp(false)
+
 	if verbose {
 		log.SetLevel(log.DebugLevel)
-		log.SetReportCaller(true)
 	}
 
 	err := godotenv.Load()
@@ -77,10 +79,8 @@ func main() {
 		switch err.Type() {
 		case domain.StreamErrFatal:
 			log.Fatal(err)
-		case domain.StreamErrTODO:
-			log.Error("TODO stream error: %s", err)
 		default:
-			log.Error("Misc stream error: %s", err)
+			log.Errorf("%s: %s", err.Type(), err)
 		}
 	}
 

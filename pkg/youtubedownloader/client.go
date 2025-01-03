@@ -40,6 +40,10 @@ func (c *Client) Execute(ctx context.Context, url string, req Request) ([]byte, 
 
 	result, err := c.shell.Execute(ctx, fmt.Sprintf("%s%s '%s'", c.binPath, req.String(), url))
 
+	if err != nil {
+		err = fmt.Errorf("error executing youtubedownloader: %s: %w", string(result), err)
+	}
+
 	log.Debug(string(result))
 
 	return result, err

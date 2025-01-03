@@ -2,21 +2,23 @@ package downloader
 
 import (
 	"context"
+	"sync"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi/response"
 )
 
-// we are requesting a large result so we can iterate and filter by date
-const getPlaylistVideosForDateMaxPages = 5
-
 func (d *Downloader) GetPlaylistVideoIDs(ctx context.Context, date time.Time, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
+	var wg sync.WaitGroup
+	var mu sync.Mutex
 	var resp *response.PlaylistItemsListResponse
 
 	ids = []string{}
 
+	// fetch a page of video ids
 	resp, err = d.ytapi.PlaylistItemsList(ctx, youtubeapi.PlaylistItemsListRequest{
 		PlaylistId: playlistId,
 		Part:       []string{"snippet"},
@@ -26,14 +28,43 @@ func (d *Downloader) GetPlaylistVideoIDs(ctx context.Context, date time.Time, pl
 	if err != nil {
 		return
 	}
-
 	nextPageToken = resp.NextPageToken
 
+	wg.Add(len(resp.Items))
 	for _, item := range resp.Items {
-		if util.IsSameDay(date, item.Snippet.PublishedAt) {
-			ids = append(ids, item.Snippet.ResourceID.VideoID)
-		}
+		go func() {
+			defer wg.Done()
+
+			id := item.Snippet.ResourceID.VideoID
+
+			// check date
+			if !util.IsSameDay(date, item.Snippet.PublishedAt) {
+				log.Infof("skipping video %q: wrong date: %s / %s", id, date, item.Snippet.PublishedAt)
+				return
+			}
+
+			// this will error if the video format is not available
+			// TODO: better error handling to know if that is the cause
+			videoInfo, err := d.ytdl.GetVideoInfo(ctx, id, VideoFormatString)
+			if err != nil {
+				log.Infof("skipping video %q: error getting video info: %s", id, err)
+				return
+			}
+
+			// check for captions
+			if c, ok := videoInfo.AutomaticCaptions["en"]; !ok || len(c) == 0 {
+				log.Infof("skipping video %s: no subtitles", id)
+				return
+			}
+
+			// add to list of ids
+			mu.Lock()
+			ids = append(ids, id)
+			mu.Unlock()
+		}()
 	}
+
+	wg.Wait()
 
 	return
 }

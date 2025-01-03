@@ -2,15 +2,15 @@ package domain
 
 import "context"
 
-type StreamErrType int
+type StreamErrType string
 
 const (
-	StreamErrTODO StreamErrType = iota
-	StreamErrGetVideoID
-	StreamErrDownloadVideo
-	StreamErrCutVideo
-	StreamErrGetVideoEditPoints
-	StreamErrFatal
+	StreamErrTODO               = "StreamErrTODO"
+	StreamErrGetVideoID         = "StreamErrGetVideoID"
+	StreamErrDownloadVideo      = "StreamErrDownloadVideo"
+	StreamErrCutVideo           = "StreamErrCutVideo"
+	StreamErrGetVideoEditPoints = "StreamErrGetVideoEditPoints"
+	StreamErrFatal              = "StreamErrFatal"
 )
 
 type StreamErr interface {
