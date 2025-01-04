@@ -2,6 +2,7 @@ package downloader
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi/response"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
 )
 
 func (d *Downloader) GetPlaylistVideoIDs(ctx context.Context, date time.Time, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
@@ -39,21 +41,25 @@ func (d *Downloader) GetPlaylistVideoIDs(ctx context.Context, date time.Time, pl
 
 			// check date
 			if !util.IsSameDay(date, item.Snippet.PublishedAt) {
-				log.Infof("skipping video %q: wrong date: %s / %s", id, date, item.Snippet.PublishedAt)
+				log.Debugf("skipping video %q: wrong date: %s / %s", id, date, item.Snippet.PublishedAt)
 				return
 			}
 
 			// this will error if the video format is not available
-			// TODO: better error handling to know if that is the cause
 			videoInfo, err := d.ytdl.GetVideoInfo(ctx, id, VideoFormatString)
 			if err != nil {
-				log.Infof("skipping video %q: error getting video info: %s", id, err)
+				if errors.Is(err, youtubedownloader.ErrRequestedFormatNotAvailable) {
+					log.Debugf("skipping video %q because requested format is not available", id)
+					return
+				}
+
+				log.Errorf("skipping video %q: error getting video info: %s", id, err)
 				return
 			}
 
 			// check for captions
 			if c, ok := videoInfo.AutomaticCaptions["en"]; !ok || len(c) == 0 {
-				log.Infof("skipping video %s: no subtitles", id)
+				log.Debugf("skipping video %s: no subtitles", id)
 				return
 			}
 

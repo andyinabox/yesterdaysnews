@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"time"
 
@@ -18,6 +19,8 @@ import (
 )
 
 var verbose bool
+var timestamp string
+var yesterday time.Time
 
 func init() {
 	flag.BoolVar(&verbose, "v", false, "verbose output")
@@ -35,6 +38,9 @@ func init() {
 		log.Warnf("error loading .env: %s", err)
 	}
 
+	yesterday = util.Yesterday()
+	timestamp = util.Timestamp(yesterday)
+
 }
 
 func main() {
@@ -45,7 +51,9 @@ func main() {
 	var up domain.Uploader
 	var cs domain.ClipStreamer
 
-	eh = errorhandler.New(context.Background(), &errorhandler.Config{
+	ctx := context.Background()
+
+	eh = errorhandler.New(ctx, &errorhandler.Config{
 		ErrorFunc: func(typ string, err error) {
 			log.Errorf("%s: %s", typ, err)
 		},
@@ -54,10 +62,15 @@ func main() {
 		},
 	})
 
-	ctx := eh.Context()
+	// error recovery
+	defer func() {
+		report := eh.Report()
+		log.Print(eh.Report())
+		_ = os.WriteFile(fmt.Sprintf("errors.%s.json", timestamp), []byte(report), os.ModePerm)
+	}()
 
 	dl = downloader.New(&downloader.Config{
-		GoogleAPIKey: os.Getenv("YN_GOOGLE_API_KEY"),
+		GoogleAPIKey: os.Getenv("GOOGLE_API_KEY"),
 	})
 
 	vp = videoprocessor.New(&videoprocessor.Config{})
@@ -77,13 +90,13 @@ func main() {
 	}
 
 	cs = clipstreamer.New(dl, vp, up, eh.Channel(), &clipstreamer.Config{
-		VideoDate:                util.Yesterday(),
-		DownloadCountPerPlaylist: 10,
+		VideoDate:                yesterday,
+		DownloadCountPerPlaylist: 1, //10,
 		DownloadDir:              downloadDir,
 		OutputDir:                outputDir,
 		MinClipLength:            5 * time.Second,
 		MaxClipLength:            20 * time.Second,
-		FileUploadDir:            "test",
+		FileUploadDir:            timestamp,
 	})
 
 	// TODO: let's just use the playlist IDs and skip this step

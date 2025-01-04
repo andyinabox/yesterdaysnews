@@ -7,10 +7,12 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 func (u *Uploader) PromoteObjects(ctx context.Context, prefix string) (string, error) {
@@ -36,7 +38,7 @@ func (u *Uploader) PromoteObjects(ctx context.Context, prefix string) (string, e
 }
 
 func (u *Uploader) getDemotedDirName(ctx context.Context) (dir string) {
-	dir = timestamp()
+	dir = util.Timestamp(time.Now())
 
 	data, err := u.osclient.GetObject(ctx, u.cfg.ContainerName, filepath.Join(u.cfg.PrimaryDir, "manifest.json"))
 	if err != nil {

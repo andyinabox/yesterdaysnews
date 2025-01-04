@@ -23,7 +23,6 @@ type ErrorHandler interface {
 	Add(Error)
 	Count(string) int
 	CountAll() int
-	Context() context.Context
 	Channel() chan<- Error
 	Report() string
 }
@@ -35,7 +34,6 @@ type Config struct {
 }
 
 type errorHandler struct {
-	ctx        context.Context
 	errorFunc  func(string, error)
 	fatalFunc  func(string, error)
 	thresholds map[string]int
@@ -49,7 +47,6 @@ func New(ctx context.Context, cfg *Config) ErrorHandler {
 	stream := make(chan Error)
 
 	h := &errorHandler{
-		ctx:        ctx,
 		errorFunc:  defaultErrorFunc,
 		fatalFunc:  defaultFatalFunc,
 		thresholds: make(map[string]int),
@@ -125,9 +122,6 @@ func (h *errorHandler) CountAll() int {
 	}
 
 	return count
-}
-func (h *errorHandler) Context() context.Context {
-	return h.ctx
 }
 
 func (h *errorHandler) Channel() chan<- Error {

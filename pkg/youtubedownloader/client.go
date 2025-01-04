@@ -4,12 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/shell"
 )
 
-var ErrNoURLProvided = errors.New("no url provided")
+var (
+	ErrNoURLProvided               = errors.New("no url provided")
+	ErrRequestedFormatNotAvailable = errors.New("requested format is not available")
+)
 
 type Client struct {
 	binPath string // path to yt-dlp binary
@@ -41,6 +45,12 @@ func (c *Client) Execute(ctx context.Context, url string, req Request) ([]byte, 
 	result, err := c.shell.Execute(ctx, fmt.Sprintf("%s%s '%s'", c.binPath, req.String(), url))
 
 	if err != nil {
+
+		// handle requested format not available errors
+		if strings.Contains(string(result), "Requested format is not available.") {
+			err = ErrRequestedFormatNotAvailable
+		}
+
 		err = fmt.Errorf("error executing youtubedownloader: %s: %w", string(result), err)
 	}
 
