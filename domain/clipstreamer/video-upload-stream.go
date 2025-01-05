@@ -6,6 +6,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
@@ -26,11 +27,15 @@ func (s *Streamer) VideoUploadStream(ctx context.Context, clipFiles <-chan strin
 
 		fileKey := strings.Replace(filePath, s.cfg.OutputDir, s.cfg.FileUploadDir, 1)
 
-		fileKey, err = s.up.UploadFile(ctx, filePath, fileKey, false)
+		log.Infof("uploading video %q as %q", filePath, fileKey)
+
+		fileKey, err = s.up.UploadFile(ctx, filePath, fileKey, "video/webm", false)
 		if err != nil {
-			s.error(domain.ErrTypeTODO, fmt.Errorf("error uploading file %q as %q; %w", filePath, fileKey, err))
+			s.error(domain.ErrTypeUploadVideo, fmt.Errorf("error uploading video %q as %q; %w", filePath, fileKey, err))
 			return
 		}
+
+		log.Infof("finished uploading video %q", fileKey)
 
 		stream <- fileKey
 	}

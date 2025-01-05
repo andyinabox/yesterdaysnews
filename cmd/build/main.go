@@ -80,7 +80,14 @@ func main() {
 
 	vp = videoprocessor.New(&videoprocessor.Config{})
 
-	up = uploader.New(&uploader.Config{})
+	up = uploader.New(&uploader.Config{
+		S3Endpoint:  os.Getenv("YN_S3_ENDPOINT"),
+		S3AccessKey: os.Getenv("YN_S3_ACCESS_KEY"),
+		S3SecretKey: os.Getenv("YN_S3_SECRET_ACCESS_KEY"),
+
+		ContainerName: os.Getenv("YN_S3_BUCKET_NAME"),
+		PrimaryDir:    "current",
+	})
 
 	downloadDir := "download"
 	err = os.MkdirAll(downloadDir, os.ModePerm)
@@ -126,9 +133,10 @@ func main() {
 	ids := cs.VideoIDStream(ctx, playlistIDs...)
 	paths := cs.VideoDownloadStream(ctx, ids)
 	clips := cs.VideoCutStream(ctx, paths)
+	uploads := cs.VideoUploadStream(ctx, clips)
 
-	for clip := range clips {
-		log.Info(clip)
+	for upload := range uploads {
+		log.Info(upload)
 	}
 
 	log.Info("Done")

@@ -6,5 +6,6 @@ const (
 	ErrTypeDownloadVideo      = "ErrTypeDownloadVideo"
 	ErrTypeCutVideo           = "ErrTypeCutVideo"
 	ErrTypeGetVideoEditPoints = "ErrTypeGetVideoEditPoints"
+	ErrTypeUploadVideo        = "ErrTypeUploadVideo"
 	ErrTypeFatal              = "ErrTypeFatal"
 )
