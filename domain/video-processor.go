@@ -12,6 +12,7 @@ type BreakVideoIntoClipsResult struct {
 type VideoEdit interface {
 	Start() time.Duration
 	End() time.Duration
+	Duration() time.Duration
 }
 
 type VideoProcessor interface {

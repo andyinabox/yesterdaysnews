@@ -8,7 +8,7 @@ clean:
 
 .PHONY: clobber
 clobber: clean
-	-rm -rf downloads
+	-rm -rf download
 
 .PHONY: objectstoremock
 objectstoremock:

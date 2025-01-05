@@ -6,7 +6,7 @@ import (
 )
 
 func TestGetVideoInfo(t *testing.T) {
-	t.Skip()
+	// t.Skip()
 
 	id := "8N5yiQ1SABE"
 

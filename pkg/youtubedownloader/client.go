@@ -42,7 +42,7 @@ func (c *Client) Execute(ctx context.Context, url string, req Request) ([]byte, 
 
 	log.Debug("execute youtubedownloader", "url", url, "request", req)
 
-	result, err := c.shell.Execute(ctx, fmt.Sprintf("%s%s '%s'", c.binPath, req.String(), url))
+	result, err := c.shell.Execute(ctx, fmt.Sprintf("%s%s -- '%s'", c.binPath, req.String(), url))
 
 	if err != nil {
 

@@ -12,6 +12,7 @@ type Config struct {
 	DownloadCountPerPlaylist int
 	DownloadDir              string
 	OutputDir                string
+	ClipsDir                 string
 	MinClipLength            time.Duration
 	MaxClipLength            time.Duration
 	FileUploadDir            string

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -64,9 +65,13 @@ func main() {
 
 	// error recovery
 	defer func() {
-		report := eh.Report()
-		log.Print(eh.Report())
-		_ = os.WriteFile(fmt.Sprintf("errors.%s.json", timestamp), []byte(report), os.ModePerm)
+
+		// print error report if there are any errors
+		if eh.CountAll() > 0 {
+			report := eh.Report()
+			log.Print(eh.Report())
+			_ = os.WriteFile(fmt.Sprintf("errors.%s.json", timestamp), []byte(report), os.ModePerm)
+		}
 	}()
 
 	dl = downloader.New(&downloader.Config{
@@ -83,8 +88,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	outputDir := "output"
+	outputDir := "dist"
 	err = os.MkdirAll(outputDir, os.ModePerm)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	clipsDir := "clips"
+	err = os.MkdirAll(filepath.Join(outputDir, clipsDir), os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -94,6 +105,7 @@ func main() {
 		DownloadCountPerPlaylist: 1, //10,
 		DownloadDir:              downloadDir,
 		OutputDir:                outputDir,
+		ClipsDir:                 clipsDir,
 		MinClipLength:            5 * time.Second,
 		MaxClipLength:            20 * time.Second,
 		FileUploadDir:            timestamp,
@@ -113,9 +125,10 @@ func main() {
 
 	ids := cs.VideoIDStream(ctx, playlistIDs...)
 	paths := cs.VideoDownloadStream(ctx, ids)
+	clips := cs.VideoCutStream(ctx, paths)
 
-	for path := range paths {
-		log.Info(path)
+	for clip := range clips {
+		log.Info(clip)
 	}
 
 	log.Info("Done")

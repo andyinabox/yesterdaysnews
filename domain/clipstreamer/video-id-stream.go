@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
@@ -33,6 +34,8 @@ func (s *Streamer) VideoIDStream(ctx context.Context, playlistIds ...string) <-c
 					return
 				default:
 
+					log.Infof("fetch video ids for %q", playlistId)
+
 					// get a fresh batch of video ids
 					ids, pageToken, err = s.dl.GetPlaylistVideoIDs(ctx, s.cfg.VideoDate, playlistId, pageToken)
 
@@ -46,6 +49,8 @@ func (s *Streamer) VideoIDStream(ctx context.Context, playlistIds ...string) <-c
 							s.error(domain.ErrTypeGetVideoID, err)
 							continue
 						}
+
+						log.Infof("found valid video id: %q", id)
 
 						idStream <- id
 						count++

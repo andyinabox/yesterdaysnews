@@ -41,7 +41,13 @@ func (t *Tool) execute(ctx context.Context, exePath string, options *shellargs.A
 
 	log.Debug(command)
 
-	return t.shell.Execute(ctx, command)
+	data, err := t.shell.Execute(ctx, command)
+
+	if err != nil {
+		err = fmt.Errorf("mediatool error: %w: %s", err, string(data))
+	}
+
+	return data, err
 }
 
 func (t *Tool) executeFfmpeg(ctx context.Context, options *shellargs.Args) ([]byte, error) {
