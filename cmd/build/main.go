@@ -2,15 +2,19 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/clipstreamer"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/downloader"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/uploader"
@@ -22,6 +26,7 @@ import (
 var verbose bool
 var timestamp string
 var yesterday time.Time
+var prefixLength int
 
 func init() {
 	flag.BoolVar(&verbose, "v", false, "verbose output")
@@ -41,7 +46,7 @@ func init() {
 
 	yesterday = util.Yesterday()
 	timestamp = util.Timestamp(yesterday)
-
+	prefixLength = 2
 }
 
 func main() {
@@ -51,17 +56,43 @@ func main() {
 	var vp domain.VideoProcessor
 	var up domain.Uploader
 	var cs domain.ClipStreamer
+	var cc domain.CaptionsChain
+	var mu sync.Mutex
 
 	ctx := context.Background()
 
-	eh = errorhandler.New(ctx, &errorhandler.Config{
-		ErrorFunc: func(typ string, err error) {
-			log.Errorf("%s: %s", typ, err)
+	manifest := &domain.Manifest{
+		Date: yesterday,
+		ID:   timestamp,
+		Files: domain.ManifestFiles{
+			Clips: []string{},
 		},
-		FatalFunc: func(typ string, err error) {
-			log.Fatalf("%s: %s", typ, err)
+	}
+
+	fatalFunc := func(typ string, err error) {
+		log.Fatalf("%s: %s", typ, err)
+	}
+
+	errorFund := func(typ string, err error) {
+		if typ == domain.ErrTypeFatal {
+			fatalFunc(typ, err)
+		}
+		log.Errorf("%s: %s", typ, err)
+	}
+
+	eh = errorhandler.New(ctx, &errorhandler.Config{
+		ErrorFunc: errorFund,
+		FatalFunc: fatalFunc,
+		Thresholds: map[string]int{
+			domain.ErrTypeBuildModel:     1,
+			domain.ErrTypeSaveModel:      1,
+			domain.ErrTypeUploadModel:    1,
+			domain.ErrTypeSaveManifest:   1,
+			domain.ErrTypeUploadManifest: 1,
 		},
 	})
+
+	errs := eh.Channel()
 
 	// error recovery
 	defer func() {
@@ -133,10 +164,74 @@ func main() {
 	ids := cs.VideoIDStream(ctx, playlistIDs...)
 	paths := cs.VideoDownloadStream(ctx, ids)
 	clips := cs.VideoCutStream(ctx, paths)
-	uploads := cs.VideoUploadStream(ctx, clips)
+	clipUploades := cs.VideoUploadStream(ctx, clips)
 
-	for upload := range uploads {
-		log.Info(upload)
+	for upload := range clipUploades {
+		mu.Lock()
+		manifest.Files.Clips = append(manifest.Files.Clips, strings.Replace(upload, timestamp+"/", "", 1))
+		mu.Unlock()
+	}
+
+	cc = captionschain.New(prefixLength)
+	cc.BuildFromMultiple([]domain.Corpus{
+		{
+			Type:     domain.CorpusTypeVTT,
+			FileGlob: "download/*.vtt",
+			Weight:   1,
+		},
+		{
+			Type:     domain.CorpusTypeText,
+			FileGlob: "hospital.txt",
+			Weight:   3,
+		},
+	})
+
+	data, err := cc.Save()
+	if err != nil {
+		errs <- errorhandler.Err(domain.ErrTypeBuildModel, err)
+		return
+	}
+
+	modelFilePath := filepath.Join(outputDir, domain.ManifestModelFileName)
+	log.Infof("saving model file to %q", modelFilePath)
+	err = os.WriteFile(modelFilePath, data, os.ModePerm)
+	if err != nil {
+		errs <- errorhandler.Err(domain.ErrTypeSaveModel, err)
+		return
+	}
+
+	modelFileKey := filepath.Join(timestamp, domain.ManifestModelFileName)
+	log.Infof("uploading %q as %q", modelFilePath, modelFileKey)
+	modelFileKey, err = up.UploadFile(ctx, modelFilePath, modelFileKey, "application/json", false)
+	if err != nil {
+		errs <- errorhandler.Err(domain.ErrTypeUploadModel, err)
+		return
+	}
+
+	mu.Lock()
+	manifest.Files.ModelFile = strings.Replace(modelFileKey, timestamp+"/", "", 1)
+	mu.Unlock()
+
+	log.Info("saving manifest")
+	data, err = json.Marshal(manifest)
+	if err != nil {
+		errs <- errorhandler.Err(domain.ErrTypeSaveManifest, err)
+		return
+	}
+
+	manifestFilePath := filepath.Join(outputDir, "manifest.json")
+	err = os.WriteFile(manifestFilePath, data, os.ModePerm)
+	if err != nil {
+		errs <- errorhandler.Err(domain.ErrTypeSaveManifest, err)
+		return
+	}
+
+	manifestFileKey := filepath.Join(timestamp, "manifest.json")
+	log.Infof("uploading %q as %q", manifestFilePath, manifestFileKey)
+	modelFileKey, err = up.UploadFile(ctx, manifestFilePath, manifestFileKey, "application/json", false)
+	if err != nil {
+		errs <- errorhandler.Err(domain.ErrTypeUploadManifest, err)
+		return
 	}
 
 	log.Info("Done")

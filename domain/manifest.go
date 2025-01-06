@@ -17,9 +17,14 @@ type Manifest struct {
 }
 
 type ManifestFiles struct {
-	VideoFile string `json:"video"`
-	// SubsFile     string   `json:"subs"`
-	// CombinedFile string   `json:"combined"`
 	ModelFile string   `json:"model"`
 	Clips     []string `json:"clips"`
 }
+
+// type ManifestManager interface {
+// 	Load() (*Manifest, error)
+// 	Save() error
+// 	AddModel([]byte) error
+// 	AddClip(string) error
+// 	Check() error
+// }

@@ -75,8 +75,8 @@ func (u *Uploader) UploadDir(ctx context.Context, dir string) (string, error) {
 	go uploadFile(manifest.Files.ModelFile, "application/json", false)
 
 	// upload video file
-	wg.Add(1)
-	go uploadFile(manifest.Files.VideoFile, "video/mp4", true)
+	// wg.Add(1)
+	// go uploadFile(manifest.Files.VideoFile, "video/mp4", true)
 
 	// upload individual clips
 	for _, clipPath := range manifest.Files.Clips {
