@@ -1,6 +1,6 @@
 .PHONY: upload
-build: dist/manifest.json
-	go run ./cmd/upload/main.go
+build: clobber
+	go run ./cmd/build/main.go
 
 .PHONY: clean
 clean:

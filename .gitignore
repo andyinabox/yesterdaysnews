@@ -1,4 +1,5 @@
 dist
 download
+errors.*.json
 .env
 .DS_Store

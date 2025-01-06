@@ -234,6 +234,20 @@ func main() {
 		return
 	}
 
+	demotedPrefix, err := up.PromoteObjects(ctx, timestamp)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Infof("successfully promoted objects with prefix %q and demoted %q", timestamp, demotedPrefix)
+
+	deletedObjects, err := up.PruneObjects(context.Background(), demotedPrefix)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Infof("successfully pruned %d objects", len(deletedObjects))
+
 	log.Info("Done")
 
 }

@@ -87,12 +87,12 @@ func (u *Uploader) moveObjects(ctx context.Context, sourcePrefix, destPrefix str
 				dest,
 			)
 			if err != nil {
-				log.Errorf("error moving %q to %q", source, dest)
+				log.Errorf("error moving %q to %q: %s", source, dest, err)
 				return
 			}
 			err = u.osclient.DeleteObject(ctx, u.cfg.ContainerName, source)
 			if err != nil {
-				log.Errorf("error deleting object %q", source)
+				log.Errorf("error deleting object %q: %s", source, err)
 				return
 			}
 		}()
