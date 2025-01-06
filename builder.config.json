@@ -1,0 +1,7 @@
+{
+  "ObjectStoreContainerName": "yesterdaysnews",
+  "ObjectStorePrimaryDir": "current",
+  "ClipsDirName": "clips",
+  "MinClipLengthSeconds": 5,
+  "MaxClipLengthSeconds": 20
+}
