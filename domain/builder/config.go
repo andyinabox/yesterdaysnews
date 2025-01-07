@@ -4,9 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-
-	"github.com/charmbracelet/log"
-	"github.com/joho/godotenv"
 )
 
 const (
@@ -21,20 +18,18 @@ type Config struct {
 	S3SecretKey  string `env:"YN_S3_SECRET_ACCESS_KEY"`
 
 	// config variables
+	PlaylistIDs              []string
+	DownloadCountPerPlaylist int
 	ObjectStoreContainerName string
 	ObjectStorePrimaryDir    string
-	DownloadDir              string
 	OutputDir                string
 	ClipsDirName             string
 	MinClipLengthSeconds     int
 	MaxClipLengthSeconds     int
+	CaptionPrefixLength      int
 }
 
 func (c *Config) Load(configFile string) error {
-	err := godotenv.Load()
-	if err != nil {
-		log.Warnf("error loading .env: %s", err)
-	}
 
 	data, err := os.ReadFile(configFile)
 	if err != nil {

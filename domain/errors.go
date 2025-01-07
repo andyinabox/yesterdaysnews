@@ -1,5 +1,7 @@
 package domain
 
+import "gitlab.com/andyinabox/yesterdaysnews/pkg/errorhandler"
+
 const (
 	ErrTypeTODO               = "ErrTypeTODO"
 	ErrTypeGetVideoID         = "ErrTypeGetVideoID"
@@ -14,3 +16,11 @@ const (
 	ErrTypeUploadManifest     = "ErrTypeUploadManifest"
 	ErrTypeFatal              = "ErrTypeFatal"
 )
+
+type Error interface {
+	errorhandler.Error
+}
+
+type ErrorHandler interface {
+	errorhandler.ErrorHandler
+}

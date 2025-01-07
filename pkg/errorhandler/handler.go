@@ -20,10 +20,9 @@ func init() {
 }
 
 type ErrorHandler interface {
-	Add(Error)
+	Add(typ string, err error)
 	Count(string) int
 	CountAll() int
-	Channel() chan<- Error
 	Report() string
 }
 
@@ -102,8 +101,8 @@ func New(ctx context.Context, cfg *Config) ErrorHandler {
 	return h
 }
 
-func (h *errorHandler) Add(err Error) {
-	h.stream <- err
+func (h *errorHandler) Add(typ string, err error) {
+	h.stream <- Err(typ, err)
 }
 
 func (h *errorHandler) Count(typ string) int {
