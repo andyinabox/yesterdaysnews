@@ -72,31 +72,21 @@ func (b *Builder) getCurrentManifestName(ctx context.Context) (prefix string) {
 	prefix = util.Timestamp(time.Now())
 
 	currentManifestFileKey := filepath.Join(b.cfg.ObjectStorePrimaryDir, "manifest.json")
-	exists, err := b.os.ObjectExists(ctx, currentManifestFileKey)
+	data, err := b.os.GetObject(ctx, currentManifestFileKey)
 	if err != nil {
-		b.error(domain.ErrTypeGetCurrentManifestPrefix, fmt.Errorf("error determining if %q exists: %w", err))
+		b.error(domain.ErrTypeGetCurrentManifestPrefix, fmt.Errorf("error downloading %q: %w", currentManifestFileKey, err))
 		return
 	}
 
-	// attempt to get the
-	if exists {
-		data, err := b.os.DownloadObject(ctx, currentManifestFileKey)
-		if err != nil {
-			b.error(domain.ErrTypeGetCurrentManifestPrefix, fmt.Errorf("error downloading %q: %w", currentManifestFileKey, err))
-			return
-		}
+	manifest := domain.Manifest{}
+	err = json.Unmarshal(data, &manifest)
+	if err != nil {
+		b.error(domain.ErrTypeGetCurrentManifestPrefix, fmt.Errorf("error unmarshaling current manifest: %w", err))
+		return
+	}
 
-		manifest := domain.Manifest{}
-		err = json.Unmarshal(data, &manifest)
-		if err != nil {
-			b.error(domain.ErrTypeGetCurrentManifestPrefix, fmt.Errorf("error unmarshaling current manifest: %w", err))
-			return
-		}
-
-		if manifest.ID != "" {
-			prefix = manifest.ID
-		}
-
+	if manifest.ID != "" {
+		prefix = manifest.ID
 	}
 
 	return
