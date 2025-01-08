@@ -6,9 +6,9 @@ import (
 	"os"
 )
 
-func (u *Uploader) UploadFile(ctx context.Context, filePath, fileKey, contentType string, multipart bool) (string, error) {
+func (s *Service) UploadFile(ctx context.Context, filePath, fileKey, contentType string, multipart bool) (string, error) {
 
-	exists, err := u.osclient.ContainerExists(ctx, u.cfg.ContainerName)
+	exists, err := s.osclient.ContainerExists(ctx, s.cfg.ContainerName)
 	if err != nil {
 		return "", err
 	}
@@ -21,9 +21,9 @@ func (u *Uploader) UploadFile(ctx context.Context, filePath, fileKey, contentTyp
 		return "", fmt.Errorf("error opening file %q: %w", filePath, err)
 	}
 
-	return u.osclient.UploadFile(
+	return s.osclient.UploadFile(
 		ctx,
-		u.cfg.ContainerName,
+		s.cfg.ContainerName,
 		fileKey,
 		file,
 		contentType,

@@ -1,105 +1,90 @@
 package objectstoreservice
 
-import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"path/filepath"
-	"strings"
-	"sync"
-	"time"
+// func (s *Service) PromoteObjects(ctx context.Context, prefix string) (string, error) {
 
-	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
-)
+// 	currentObjects, err := u.osclient.ListObjects(ctx, u.cfg.ContainerName, &objectstoreclient.ListObjectsRequest{
+// 		Prefix: u.cfg.PrimaryDir,
+// 	})
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-func (u *Uploader) PromoteObjects(ctx context.Context, prefix string) (string, error) {
+// 	var demotedDir string
 
-	currentObjects, err := u.osclient.ListObjects(ctx, u.cfg.ContainerName, &objectstoreclient.ListObjectsRequest{
-		Prefix: u.cfg.PrimaryDir,
-	})
-	if err != nil {
-		return "", err
-	}
+// 	if len(currentObjects) != 0 {
+// 		demotedDir = u.getDemotedDirName(ctx)
+// 		err = u.moveObjects(ctx, u.cfg.PrimaryDir, demotedDir)
+// 		if err != nil {
+// 			return "", fmt.Errorf("error demoting current object: %w", err)
+// 		}
+// 	}
 
-	var demotedDir string
+// 	return demotedDir, u.moveObjects(ctx, prefix, u.cfg.PrimaryDir)
+// }
 
-	if len(currentObjects) != 0 {
-		demotedDir = u.getDemotedDirName(ctx)
-		err = u.moveObjects(ctx, u.cfg.PrimaryDir, demotedDir)
-		if err != nil {
-			return "", fmt.Errorf("error demoting current object: %w", err)
-		}
-	}
+// func (s *Service) getDemotedDirName(ctx context.Context) (dir string) {
+// 	dir = util.Timestamp(time.Now())
 
-	return demotedDir, u.moveObjects(ctx, prefix, u.cfg.PrimaryDir)
-}
+// 	data, err := u.osclient.GetObject(ctx, u.cfg.ContainerName, filepath.Join(u.cfg.PrimaryDir, "manifest.json"))
+// 	if err != nil {
+// 		log.Errorf("error fetching current manifest: %s", err)
+// 		return
+// 	}
 
-func (u *Uploader) getDemotedDirName(ctx context.Context) (dir string) {
-	dir = util.Timestamp(time.Now())
+// 	manifest := domain.Manifest{}
+// 	err = json.Unmarshal(data, &manifest)
+// 	if err != nil {
+// 		log.Errorf("error unmarshaling current manifest: %s", err)
+// 		return
+// 	}
 
-	data, err := u.osclient.GetObject(ctx, u.cfg.ContainerName, filepath.Join(u.cfg.PrimaryDir, "manifest.json"))
-	if err != nil {
-		log.Errorf("error fetching current manifest: %s", err)
-		return
-	}
+// 	if manifest.ID != "" {
+// 		dir = manifest.ID
+// 	}
 
-	manifest := domain.Manifest{}
-	err = json.Unmarshal(data, &manifest)
-	if err != nil {
-		log.Errorf("error unmarshaling current manifest: %s", err)
-		return
-	}
+// 	return
+// }
 
-	if manifest.ID != "" {
-		dir = manifest.ID
-	}
+// func (s *Service) moveObjects(ctx context.Context, sourcePrefix, destPrefix string) error {
+// 	toMove, err := u.osclient.ListObjects(ctx, u.cfg.ContainerName, &objectstoreclient.ListObjectsRequest{
+// 		Prefix: sourcePrefix,
+// 	})
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return
-}
+// 	var wg sync.WaitGroup
 
-func (u *Uploader) moveObjects(ctx context.Context, sourcePrefix, destPrefix string) error {
-	toMove, err := u.osclient.ListObjects(ctx, u.cfg.ContainerName, &objectstoreclient.ListObjectsRequest{
-		Prefix: sourcePrefix,
-	})
-	if err != nil {
-		return err
-	}
+// 	for _, key := range toMove {
 
-	var wg sync.WaitGroup
+// 		wg.Add(1)
+// 		go func() {
+// 			defer wg.Done()
+// 			source := key
+// 			dest := strings.Replace(key, sourcePrefix, destPrefix, 1)
 
-	for _, key := range toMove {
+// 			log.Debugf("copying %q to %q", source, dest)
+// 			err := u.osclient.CopyObject(
+// 				ctx,
+// 				u.cfg.ContainerName,
+// 				u.cfg.ContainerName,
+// 				source,
+// 				dest,
+// 			)
+// 			if err != nil {
+// 				log.Errorf("error moving %q to %q: %s", source, dest, err)
+// 				return
+// 			}
+// 			err = u.osclient.DeleteObject(ctx, u.cfg.ContainerName, source)
+// 			if err != nil {
+// 				log.Errorf("error deleting object %q: %s", source, err)
+// 				return
+// 			}
+// 		}()
 
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			source := key
-			dest := strings.Replace(key, sourcePrefix, destPrefix, 1)
+// 	}
 
-			log.Debugf("copying %q to %q", source, dest)
-			err := u.osclient.CopyObject(
-				ctx,
-				u.cfg.ContainerName,
-				u.cfg.ContainerName,
-				source,
-				dest,
-			)
-			if err != nil {
-				log.Errorf("error moving %q to %q: %s", source, dest, err)
-				return
-			}
-			err = u.osclient.DeleteObject(ctx, u.cfg.ContainerName, source)
-			if err != nil {
-				log.Errorf("error deleting object %q: %s", source, err)
-				return
-			}
-		}()
+// 	wg.Wait()
 
-	}
-
-	wg.Wait()
-
-	return nil
-}
+// 	return nil
+// }

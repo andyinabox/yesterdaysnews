@@ -1,97 +1,83 @@
 package objectstoreservice
 
-import (
-	"bytes"
-	"context"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"os"
-	"path/filepath"
-	"sync"
+// var ErrContainerDoesNotExist = errors.New("container does not exist")
 
-	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-)
+// func (s *Service) UploadDir(ctx context.Context, dir string) (string, error) {
 
-var ErrContainerDoesNotExist = errors.New("container does not exist")
+// 	var wg sync.WaitGroup
 
-func (u *Uploader) UploadDir(ctx context.Context, dir string) (string, error) {
+// 	manifestBytes, err := os.ReadFile(filepath.Join(dir, "manifest.json"))
+// 	if err != nil {
+// 		return "", fmt.Errorf("error reading manifest: %w", err)
+// 	}
 
-	var wg sync.WaitGroup
+// 	manifest := domain.Manifest{}
+// 	err = json.Unmarshal(manifestBytes, &manifest)
+// 	if err != nil {
+// 		return "", fmt.Errorf("error decoding manifest: %w", err)
+// 	}
 
-	manifestBytes, err := os.ReadFile(filepath.Join(dir, "manifest.json"))
-	if err != nil {
-		return "", fmt.Errorf("error reading manifest: %w", err)
-	}
+// 	deployDir := manifest.ID
 
-	manifest := domain.Manifest{}
-	err = json.Unmarshal(manifestBytes, &manifest)
-	if err != nil {
-		return "", fmt.Errorf("error decoding manifest: %w", err)
-	}
+// 	exists, err := u.osclient.ContainerExists(ctx, u.cfg.ContainerName)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	if !exists {
+// 		return "", ErrContainerDoesNotExist
+// 	}
 
-	deployDir := manifest.ID
+// 	// upload file func
+// 	uploadFile := func(path, contentType string, multipart bool) {
+// 		defer wg.Done()
 
-	exists, err := u.osclient.ContainerExists(ctx, u.cfg.ContainerName)
-	if err != nil {
-		return "", err
-	}
-	if !exists {
-		return "", ErrContainerDoesNotExist
-	}
+// 		key := filepath.Join(deployDir, path)
+// 		filePath := filepath.Join(dir, path)
 
-	// upload file func
-	uploadFile := func(path, contentType string, multipart bool) {
-		defer wg.Done()
+// 		log.Debugf("begin uploading file %q as %q", filePath, key)
 
-		key := filepath.Join(deployDir, path)
-		filePath := filepath.Join(dir, path)
+// 		file, err := os.Open(filePath)
+// 		if err != nil {
+// 			log.Errorf("error opening file %q: %s", filePath, err)
+// 		}
 
-		log.Debugf("begin uploading file %q as %q", filePath, key)
+// 		_, err = u.osclient.UploadFile(
+// 			ctx,
+// 			u.cfg.ContainerName,
+// 			key,
+// 			file,
+// 			contentType,
+// 			multipart,
+// 		)
+// 		if err != nil {
+// 			log.Errorf("error uploading file %q: %s", key, err)
+// 		}
 
-		file, err := os.Open(filePath)
-		if err != nil {
-			log.Errorf("error opening file %q: %s", filePath, err)
-		}
+// 		log.Debugf("finished uploading %q", key)
+// 	}
 
-		_, err = u.osclient.UploadFile(
-			ctx,
-			u.cfg.ContainerName,
-			key,
-			file,
-			contentType,
-			multipart,
-		)
-		if err != nil {
-			log.Errorf("error uploading file %q: %s", key, err)
-		}
+// 	// upload model file
+// 	wg.Add(1)
+// 	go uploadFile(manifest.Files.ModelFile, "application/json", false)
 
-		log.Debugf("finished uploading %q", key)
-	}
+// 	// upload video file
+// 	// wg.Add(1)
+// 	// go uploadFile(manifest.Files.VideoFile, "video/mp4", true)
 
-	// upload model file
-	wg.Add(1)
-	go uploadFile(manifest.Files.ModelFile, "application/json", false)
+// 	// upload individual clips
+// 	for _, clipPath := range manifest.Files.Clips {
+// 		wg.Add(1)
+// 		go uploadFile(clipPath, "video/webm", false)
+// 	}
 
-	// upload video file
-	// wg.Add(1)
-	// go uploadFile(manifest.Files.VideoFile, "video/mp4", true)
+// 	wg.Wait()
 
-	// upload individual clips
-	for _, clipPath := range manifest.Files.Clips {
-		wg.Add(1)
-		go uploadFile(clipPath, "video/webm", false)
-	}
+// 	manifestPath := filepath.Join(deployDir, "manifest.json")
+// 	log.Infof("uploading manifest to %s", manifestPath)
+// 	_, err = u.osclient.UploadFile(ctx, u.cfg.ContainerName, manifestPath, bytes.NewReader(manifestBytes), "application/json", false)
+// 	if err != nil {
+// 		return "", fmt.Errorf("error uploading manifest file: %w", err)
+// 	}
 
-	wg.Wait()
-
-	manifestPath := filepath.Join(deployDir, "manifest.json")
-	log.Infof("uploading manifest to %s", manifestPath)
-	_, err = u.osclient.UploadFile(ctx, u.cfg.ContainerName, manifestPath, bytes.NewReader(manifestBytes), "application/json", false)
-	if err != nil {
-		return "", fmt.Errorf("error uploading manifest file: %w", err)
-	}
-
-	return deployDir, nil
-}
+// 	return deployDir, nil
+// }

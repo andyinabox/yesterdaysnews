@@ -8,9 +8,9 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
-func (u *Uploader) CopyObject(ctx context.Context, from, to string) (string, error) {
+func (s *Service) CopyObject(ctx context.Context, from, to string) (string, error) {
 
-	err := u.osclient.CopyObject(ctx, u.cfg.ContainerName, u.cfg.ContainerName, from, to)
+	err := s.osclient.CopyObject(ctx, s.cfg.ContainerName, s.cfg.ContainerName, from, to)
 	if err != nil {
 		return "", fmt.Errorf("error copying object %q to %q: %w", from, to, err)
 	}
@@ -18,7 +18,7 @@ func (u *Uploader) CopyObject(ctx context.Context, from, to string) (string, err
 	return to, nil
 }
 
-func (u *Uploader) CopyObjectStream(ctx context.Context, errs chan<- domain.Error, fileKeys <-chan [2]string) <-chan string {
+func (s *Service) CopyObjectStream(ctx context.Context, errs chan<- domain.Error, fileKeys <-chan [2]string) <-chan string {
 	stream := make(chan string)
 
 	var wg sync.WaitGroup
@@ -31,7 +31,7 @@ func (u *Uploader) CopyObjectStream(ctx context.Context, errs chan<- domain.Erro
 	copyObject := func(from, to string) {
 		defer wg.Done()
 
-		fileKey, err := u.CopyObject(ctx, from, to)
+		fileKey, err := s.CopyObject(ctx, from, to)
 		if err != nil {
 			errs <- domain.Err(domain.ErrTypeCopyObject, err)
 			return

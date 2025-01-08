@@ -1,77 +1,67 @@
 package objectstoreservice
 
-import (
-	"context"
-	"fmt"
-	"strings"
-	"sync"
+// func (s *Service) PruneObjects(ctx context.Context, prefixToKeep string) ([]string, error) {
 
-	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
-)
+// 	prefixes, err := u.osclient.ListPrefixes(ctx, u.cfg.ContainerName)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-func (u *Uploader) PruneObjects(ctx context.Context, prefixToKeep string) ([]string, error) {
+// 	allDeleted := []string{}
 
-	prefixes, err := u.osclient.ListPrefixes(ctx, u.cfg.ContainerName)
-	if err != nil {
-		return nil, err
-	}
+// 	for _, prefix := range prefixes {
+// 		// skip primary dir
+// 		if strings.HasPrefix(prefix, u.cfg.PrimaryDir) {
+// 			continue
+// 		}
+// 		// skip keep prefix
+// 		if prefixToKeep != "" && strings.HasPrefix(prefix, prefixToKeep) {
+// 			continue
+// 		}
 
-	allDeleted := []string{}
+// 		deleted, err := u.deleteObjectsWithPrefix(ctx, prefix)
+// 		if err != nil {
+// 			log.Errorf("error deleting objects with prefix %q", prefix)
+// 			continue
+// 		}
+// 		log.Debugf("succesfully deleted %d objects with prefix %s", len(deleted), prefix)
+// 		allDeleted = append(allDeleted, deleted...)
+// 	}
 
-	for _, prefix := range prefixes {
-		// skip primary dir
-		if strings.HasPrefix(prefix, u.cfg.PrimaryDir) {
-			continue
-		}
-		// skip keep prefix
-		if prefixToKeep != "" && strings.HasPrefix(prefix, prefixToKeep) {
-			continue
-		}
+// 	return allDeleted, nil
+// }
 
-		deleted, err := u.deleteObjectsWithPrefix(ctx, prefix)
-		if err != nil {
-			log.Errorf("error deleting objects with prefix %q", prefix)
-			continue
-		}
-		log.Debugf("succesfully deleted %d objects with prefix %s", len(deleted), prefix)
-		allDeleted = append(allDeleted, deleted...)
-	}
+// func (s *Service) deleteObjectsWithPrefix(ctx context.Context, prefix string) ([]string, error) {
+// 	objectKeys, err := u.osclient.ListObjects(ctx, u.cfg.ContainerName, &objectstoreclient.ListObjectsRequest{
+// 		Prefix: prefix,
+// 	})
+// 	if err != nil {
+// 		return nil, fmt.Errorf("error listing objects: %w", err)
+// 	}
 
-	return allDeleted, nil
-}
+// 	var wg sync.WaitGroup
+// 	var mu sync.Mutex
+// 	deleted := []string{}
 
-func (u *Uploader) deleteObjectsWithPrefix(ctx context.Context, prefix string) ([]string, error) {
-	objectKeys, err := u.osclient.ListObjects(ctx, u.cfg.ContainerName, &objectstoreclient.ListObjectsRequest{
-		Prefix: prefix,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error listing objects: %w", err)
-	}
+// 	for _, key := range objectKeys {
+// 		wg.Add(1)
+// 		go func() {
+// 			defer wg.Done()
 
-	var wg sync.WaitGroup
-	var mu sync.Mutex
-	deleted := []string{}
+// 			log.Debugf("deleting %q", key)
+// 			err := u.osclient.DeleteObject(ctx, u.cfg.ContainerName, key)
+// 			if err != nil {
+// 				log.Errorf("error deleting %q: %s", key, err)
+// 			}
+// 			log.Debugf("finished deleting %q", key)
 
-	for _, key := range objectKeys {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+// 			mu.Lock()
+// 			deleted = append(deleted, key)
+// 			mu.Unlock()
+// 		}()
+// 	}
 
-			log.Debugf("deleting %q", key)
-			err := u.osclient.DeleteObject(ctx, u.cfg.ContainerName, key)
-			if err != nil {
-				log.Errorf("error deleting %q: %s", key, err)
-			}
-			log.Debugf("finished deleting %q", key)
+// 	wg.Wait()
 
-			mu.Lock()
-			deleted = append(deleted, key)
-			mu.Unlock()
-		}()
-	}
-
-	wg.Wait()
-
-	return deleted, nil
-}
+// 	return deleted, nil
+// }

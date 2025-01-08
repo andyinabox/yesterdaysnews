@@ -8,15 +8,15 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
-func (u *Uploader) DeleteObject(ctx context.Context, key string) (string, error) {
-	err := u.osclient.DeleteObject(ctx, u.cfg.ContainerName, key)
+func (s *Service) DeleteObject(ctx context.Context, key string) (string, error) {
+	err := s.osclient.DeleteObject(ctx, s.cfg.ContainerName, key)
 	if err != nil {
 		return "", fmt.Errorf("error deketing object %q: %w", key, err)
 	}
 	return key, nil
 }
 
-func (u *Uploader) DeleteObjectStream(ctx context.Context, errs chan<- domain.Error, fileKeys <-chan string) <-chan string {
+func (s *Service) DeleteObjectStream(ctx context.Context, errs chan<- domain.Error, fileKeys <-chan string) <-chan string {
 	stream := make(chan string)
 
 	var wg sync.WaitGroup
@@ -29,7 +29,7 @@ func (u *Uploader) DeleteObjectStream(ctx context.Context, errs chan<- domain.Er
 	deleteObject := func(key string) {
 		defer wg.Done()
 
-		fileKey, err := u.DeleteObject(ctx, key)
+		fileKey, err := s.DeleteObject(ctx, key)
 		if err != nil {
 			errs <- domain.Err(domain.ErrTypeDeleteObject, err)
 			return

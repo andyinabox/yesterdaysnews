@@ -8,14 +8,14 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
-func (u *Uploader) MoveObject(ctx context.Context, from, to string) (string, error) {
+func (s *Service) MoveObject(ctx context.Context, from, to string) (string, error) {
 
-	_, err := u.CopyObject(ctx, from, to)
+	_, err := s.CopyObject(ctx, from, to)
 	if err != nil {
 		return "", fmt.Errorf("error copying object %q to %q: %w", from, to, err)
 	}
 
-	err = u.osclient.DeleteObject(ctx, u.cfg.ContainerName, from)
+	_, err = s.DeleteObject(ctx, from)
 	if err != nil {
 		return "", fmt.Errorf("error deleting object %q: %w", from, err)
 	}
@@ -23,7 +23,7 @@ func (u *Uploader) MoveObject(ctx context.Context, from, to string) (string, err
 	return to, nil
 }
 
-func (u *Uploader) MoveObjectStream(ctx context.Context, errs chan<- domain.Error, fileKeys <-chan [2]string) <-chan string {
+func (s *Service) MoveObjectStream(ctx context.Context, errs chan<- domain.Error, fileKeys <-chan [2]string) <-chan string {
 	stream := make(chan string)
 
 	var wg sync.WaitGroup
@@ -36,7 +36,7 @@ func (u *Uploader) MoveObjectStream(ctx context.Context, errs chan<- domain.Erro
 	moveObject := func(from, to string) {
 		defer wg.Done()
 
-		fileKey, err := u.MoveObject(ctx, from, to)
+		fileKey, err := s.MoveObject(ctx, from, to)
 		if err != nil {
 			errs <- domain.Err(domain.ErrTypeMoveObject, err)
 			return
