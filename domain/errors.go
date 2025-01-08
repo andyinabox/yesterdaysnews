@@ -3,7 +3,7 @@ package domain
 import "gitlab.com/andyinabox/yesterdaysnews/pkg/errorhandler"
 
 const (
-	ErrTypeTODO               = "ErrTypeTODO"
+	// larger build phases
 	ErrTypeGetVideoID         = "ErrTypeGetVideoID"
 	ErrTypeDownloadVideo      = "ErrTypeDownloadVideo"
 	ErrTypeCutVideo           = "ErrTypeCutVideo"
@@ -14,7 +14,15 @@ const (
 	ErrTypeUploadModel        = "ErrTypeUploadModel"
 	ErrTypeSaveManifest       = "ErrTypeSaveManifest"
 	ErrTypeUploadManifest     = "ErrTypeUploadManifest"
-	ErrTypeFatal              = "ErrTypeFatal"
+
+	// object store
+	ErrTypeCopyObject   = "ErrTypeCopyObject"
+	ErrTypeMoveObject   = "ErrTypeMoveObject"
+	ErrTypeDeleteObject = "ErrTypeDeleteObject"
+
+	// misc
+	ErrTypeFatal = "ErrTypeFatal"
+	ErrTypeTODO  = "ErrTypeTODO"
 )
 
 type Error interface {
@@ -23,4 +31,8 @@ type Error interface {
 
 type ErrorHandler interface {
 	errorhandler.ErrorHandler
+}
+
+func Err(typ string, err error) Error {
+	return errorhandler.Err(typ, err)
 }

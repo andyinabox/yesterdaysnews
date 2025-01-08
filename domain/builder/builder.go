@@ -3,14 +3,14 @@ package builder
 import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/downloader"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/uploader"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/objectstoreservice"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/videoprocessor"
 )
 
 type Builder struct {
 	dl  domain.Downloader
 	vp  domain.VideoProcessor
-	up  domain.Uploader
+	up  domain.ObjectStoreService
 	eh  domain.ErrorHandler
 	cfg *Config
 }
@@ -23,7 +23,7 @@ func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 
 	vp := videoprocessor.New(&videoprocessor.Config{})
 
-	up := uploader.New(&uploader.Config{
+	up := objectstoreservice.New(&objectstoreservice.Config{
 		S3Endpoint:  cfg.S3Endpoint,
 		S3AccessKey: cfg.S3AccessKey,
 		S3SecretKey: cfg.S3SecretKey,

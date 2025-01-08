@@ -1,4 +1,4 @@
-package uploader
+package objectstoreservice
 
 import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
