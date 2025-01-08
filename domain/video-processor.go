@@ -18,6 +18,5 @@ type VideoEdit interface {
 type VideoProcessor interface {
 	GetVideoEditPoints(ctx context.Context, videoFile string, minClipLength, maxClipLength time.Duration) ([]VideoEdit, error)
 	CutVideo(ctx context.Context, inFile, outFile string, edit VideoEdit) (string, error)
-	// BreakVideoIntoClips(ctx context.Context, inputPath, outDir string, minLength, maxLength int) (*BreakVideoIntoClipsResult, error)
 	ShuffleClipsAndCombine(ctx context.Context, files []string, outFile string) (string, error)
 }

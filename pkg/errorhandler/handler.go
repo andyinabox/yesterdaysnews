@@ -21,6 +21,7 @@ func init() {
 
 type ErrorHandler interface {
 	Add(typ string, err error)
+	Channel() chan<- Error
 	Count(string) int
 	CountAll() int
 	Report() string

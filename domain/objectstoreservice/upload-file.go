@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sync"
+
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
 func (s *Service) UploadFile(ctx context.Context, filePath, fileKey, contentType string, multipart bool) (string, error) {
@@ -29,4 +32,46 @@ func (s *Service) UploadFile(ctx context.Context, filePath, fileKey, contentType
 		contentType,
 		multipart,
 	)
+}
+
+func (s *Service) UploadFileStream(ctx context.Context, errs chan<- domain.Error, filePaths <-chan [2]string, contentType string, multipart bool) <-chan string {
+	stream := make(chan string)
+
+	var wg sync.WaitGroup
+
+	cleanup := func() {
+		wg.Wait()
+		close(stream)
+	}
+
+	uploadFile := func(filePath, fileKey string) {
+		defer wg.Done()
+		fileKey, err := s.UploadFile(ctx, filePath, fileKey, contentType, multipart)
+		if err != nil {
+			errs <- domain.Err(domain.ErrTypeUploadFile, err)
+			return
+		}
+		stream <- fileKey
+	}
+
+	func() {
+		defer cleanup()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				fp, open := <-filePaths
+
+				if !open {
+					return
+				}
+
+				wg.Add(1)
+				go uploadFile(fp[0], fp[1])
+			}
+		}
+	}()
+
+	return stream
 }

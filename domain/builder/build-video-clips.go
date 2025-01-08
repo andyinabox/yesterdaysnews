@@ -9,9 +9,9 @@ import (
 func (b *Builder) BuildVideoClips(ctx context.Context, date time.Time, uploadDir string, playlistIDs []string) []string {
 
 	ids := b.videoIDStream(ctx, date, playlistIDs)
-	paths := b.videoDownloadStream(ctx, ids)
+	paths := b.yt.DownloadVideoStream(ctx, b.errs, ids, b.cfg.OutputDir)
 	clips := b.videoCutStream(ctx, paths)
-	clipUploads := b.videoUploadStream(ctx, uploadDir, clips)
+	clipUploads := b.videoUploadStream(ctx, clips, uploadDir)
 
 	clipPaths := []string{}
 	for fileKey := range clipUploads {

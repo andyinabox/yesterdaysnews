@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi/response"
@@ -73,6 +74,49 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, date time.Time, playl
 	wg.Wait()
 
 	return
+}
+
+func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- domain.Error, playlistId string, date time.Time, count int) <-chan string {
+	stream := make(chan string)
+
+	cleanup := func() {
+		close(stream)
+	}
+
+	go func() {
+		defer cleanup()
+
+		var total int
+		var err error
+		var pageToken string
+		var ids []string
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				log.Infof("fetch video ids for %q", playlistId)
+
+				ids, pageToken, err = s.GetPlaylistVideoIDs(ctx, date, playlistId, pageToken)
+				if err != nil {
+					errs <- domain.Err(domain.ErrTypeGetVideoID, err)
+					continue
+				}
+
+				for _, id := range ids {
+					log.Infof("found valid video id: %q", id)
+					stream <- id
+					total++
+					if total >= count {
+						return
+					}
+				}
+			}
+		}
+	}()
+
+	return stream
 }
 
 // func (s *Service) checkVideo(ctx context.Context, item *response.PlaylistItem, date time.Time, done func(), idsChan chan<- string) {

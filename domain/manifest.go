@@ -20,11 +20,3 @@ type ManifestFiles struct {
 	ModelFile string   `json:"model"`
 	Clips     []string `json:"clips"`
 }
-
-// type ManifestManager interface {
-// 	Load() (*Manifest, error)
-// 	Save() error
-// 	AddModel([]byte) error
-// 	AddClip(string) error
-// 	Check() error
-// }

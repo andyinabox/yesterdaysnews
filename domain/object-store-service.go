@@ -3,8 +3,11 @@ package domain
 import "context"
 
 type ObjectStoreService interface {
-	UploadFile(ctx context.Context, filePath, fileKey, contentType string, multipart bool) (string, error)
+	DownloadObject(ctx context.Context, fileKey string) ([]byte, error)
+	ObjectExists(ctx context.Context, fileKey string) (bool, error)
 	ListObjectsInDir(ctx context.Context, dirName string) ([]string, error)
+	UploadFile(ctx context.Context, filePath, fileKey, contentType string, multipart bool) (string, error)
+	UploadFileStream(ctx context.Context, errs chan<- Error, filePaths <-chan [2]string, contentType string, multipart bool) <-chan string
 	CopyObject(ctx context.Context, from, to string) (string, error)
 	CopyObjectStream(context.Context, chan<- Error, <-chan [2]string) <-chan string
 	MoveObject(ctx context.Context, from, to string) (string, error)

@@ -29,7 +29,7 @@ func (b *Builder) BuildModel(ctx context.Context, uploadDir string, corpi []doma
 
 	modelFileKey := filepath.Join(uploadDir, domain.ManifestModelFileName)
 	log.Infof("uploading %q as %q", modelFilePath, modelFileKey)
-	modelFileKey, err = b.up.UploadFile(ctx, modelFilePath, modelFileKey, "application/json", false)
+	modelFileKey, err = b.os.UploadFile(ctx, modelFilePath, modelFileKey, "application/json", false)
 	if err != nil {
 		return "", fmt.Errorf("error uploading %q: %w", modelFileKey, err)
 	}
