@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
@@ -22,7 +23,10 @@ func (b *Builder) Run(ctx context.Context) error {
 	yesterday := util.Yesterday()
 	uploadDir := util.Timestamp(yesterday)
 
+	log.Info("building video clips")
 	manifest.Files.Clips = b.BuildVideoClips(ctx, yesterday, uploadDir, b.cfg.PlaylistIDs)
+
+	log.Info("building model")
 	modelFile, err := b.BuildModel(ctx, uploadDir, []domain.Corpus{
 		{
 			Type:     domain.CorpusTypeVTT,
@@ -40,6 +44,7 @@ func (b *Builder) Run(ctx context.Context) error {
 	}
 	manifest.Files.ModelFile = modelFile
 
+	log.Info("uploading manifest")
 	err = b.UploadManifest(ctx, uploadDir, manifest)
 	if err != nil {
 		return err

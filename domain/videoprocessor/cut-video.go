@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
@@ -27,4 +28,40 @@ func (p *Processor) CutVideo(ctx context.Context, inFile, outFile string, edit d
 	}
 
 	return outFile, nil
+}
+
+func (p *Processor) CutVideoStream(ctx context.Context, errs chan<- domain.Error, inFile string, edits []domain.VideoEdit) <-chan string {
+	stream := make(chan string)
+
+	var wg sync.WaitGroup
+
+	cleanup := func() {
+		wg.Wait()
+		close(stream)
+	}
+
+	cutVideo := func(i int, edit domain.VideoEdit) {
+		defer wg.Done()
+
+		ext := filepath.Ext(inFile)
+		clipName := strings.Replace(inFile, ext, fmt.Sprintf("-%d%s", i, ext), 1)
+
+		videoClip, err := p.CutVideo(ctx, inFile, clipName, edit)
+		if err != nil {
+			errs <- domain.Err(domain.ErrTypeCutVideo, err)
+			return
+		}
+
+		stream <- videoClip
+	}
+
+	go func() {
+		defer cleanup()
+		wg.Add(len(edits))
+		for i, edit := range edits {
+			go cutVideo(i, edit)
+		}
+	}()
+
+	return stream
 }

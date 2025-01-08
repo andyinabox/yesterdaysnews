@@ -2,12 +2,8 @@ package builder
 
 import (
 	"context"
-	"fmt"
-	"path/filepath"
-	"strings"
 	"sync"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
@@ -22,27 +18,19 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 		close(clipStream)
 	}
 
-	cutVideo := func(i int, filePath string, edit domain.VideoEdit) {
+	cutVideo := func(filePath string) {
 		defer wg.Done()
 
-		log.Infof("cutting clip from %q: %v", filePath, edit)
-
-		// output filename
-		ext := filepath.Ext(filePath)
-		base := filepath.Base(filePath)
-		outBase := strings.Replace(base, ext, fmt.Sprintf("-%d%s", i, ext), 1)
-		outPath := filepath.Join(b.cfg.OutputDir, b.cfg.ClipsDirName, outBase)
-
-		// do edit
-		file, err := b.vp.CutVideo(ctx, filePath, outPath, edit)
+		// log.Infof("done cutting clip from %q: %v", filePath, edit)
+		editPoints, err := b.vp.GetVideoEditPoints(ctx, filePath, util.Seconds(b.cfg.MinClipLengthSeconds), util.Seconds(b.cfg.MaxClipLengthSeconds))
 		if err != nil {
-			b.error(domain.ErrTypeCutVideo, fmt.Errorf("error cutting video %q: %w", filePath, err))
+			b.error(domain.ErrTypeCutVideo, err)
 			return
 		}
 
-		log.Infof("done cutting clip from %q: %v", filePath, edit)
-
-		clipStream <- file
+		for clip := range b.vp.CutVideoStream(ctx, b.errs, filePath, editPoints) {
+			clipStream <- clip
+		}
 	}
 
 	go func() {
@@ -59,24 +47,9 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 					return
 				}
 
-				// get edit point
-				editPoints, err := b.vp.GetVideoEditPoints(ctx, filePath, util.Seconds(b.cfg.MinClipLengthSeconds), util.Seconds(b.cfg.MaxClipLengthSeconds))
-
-				// handle error and continue in loop
-				if err != nil {
-					b.error(domain.ErrTypeGetVideoEditPoints, fmt.Errorf("error getting video %q edit points: %w", filePath, err))
-					continue
-				}
-
-				// do  edit for each edit point
-				wg.Add(len(editPoints))
-				log.Infof("cutting %q into %d clips", filePath, len(editPoints))
-				for i, ep := range editPoints {
-					go cutVideo(i, filePath, ep)
-				}
-
+				wg.Add(1)
+				go cutVideo(filePath)
 			}
-
 		}
 	}()
 
