@@ -1,4 +1,4 @@
-package downloader
+package youtubeservice
 
 import (
 	"context"
@@ -8,9 +8,9 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
 )
 
-func (d *Downloader) GetChannelPlaylistID(ctx context.Context, userName string) (id string, err error) {
+func (s *Service) GetChannelPlaylistID(ctx context.Context, userName string) (id string, err error) {
 
-	resp, err := d.ytapi.ChannelsList(ctx, youtubeapi.ChannelsListRequest{
+	resp, err := s.ytapi.ChannelsList(ctx, youtubeapi.ChannelsListRequest{
 		ForHandle: userName,
 		Part:      []string{"contentDetails"},
 	})

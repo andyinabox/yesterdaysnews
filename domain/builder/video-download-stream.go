@@ -1,62 +1,54 @@
 package builder
 
-import (
-	"context"
-	"sync"
+// func (b *Builder) videoDownloadStream(ctx context.Context, ids <-chan string) <-chan string {
+// 	downloadPaths := make(chan string)
 
-	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-)
+// 	var wg sync.WaitGroup
 
-func (b *Builder) videoDownloadStream(ctx context.Context, ids <-chan string) <-chan string {
-	downloadPaths := make(chan string)
+// 	// wait for existing
+// 	cleanup := func() {
+// 		log.Info("cleaning up video download stream")
+// 		wg.Wait()
+// 		close(downloadPaths)
+// 	}
 
-	var wg sync.WaitGroup
+// 	// video download func
+// 	// not checking for ctx.Done() here,
+// 	// that should be done further down the chain
+// 	downloadVideo := func(id string) {
+// 		defer wg.Done()
+// 		log.Info("Download video", "id", id)
+// 		path, err := b.dl.DownloadVideo(ctx, id, b.cfg.OutputDir)
 
-	// wait for existing
-	cleanup := func() {
-		log.Info("cleaning up video download stream")
-		wg.Wait()
-		close(downloadPaths)
-	}
+// 		// handle error
+// 		if err != nil {
+// 			b.error(domain.ErrTypeDownloadVideo, err)
+// 			return
+// 		}
 
-	// video download func
-	// not checking for ctx.Done() here,
-	// that should be done further down the chain
-	downloadVideo := func(id string) {
-		defer wg.Done()
-		log.Info("Download video", "id", id)
-		path, err := b.dl.DownloadVideo(ctx, id, b.cfg.OutputDir)
+// 		// add path to stream
+// 		downloadPaths <- path
+// 	}
 
-		// handle error
-		if err != nil {
-			b.error(domain.ErrTypeDownloadVideo, err)
-			return
-		}
+// 	// main goroutine
+// 	go func() {
+// 		defer cleanup()
+// 		for {
+// 			select {
+// 			case <-ctx.Done():
+// 				return
+// 			default:
+// 				id, open := <-ids
 
-		// add path to stream
-		downloadPaths <- path
-	}
+// 				if !open {
+// 					return
+// 				}
 
-	// main goroutine
-	go func() {
-		defer cleanup()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-				id, open := <-ids
+// 				wg.Add(1)
+// 				go downloadVideo(id)
+// 			}
+// 		}
+// 	}()
 
-				if !open {
-					return
-				}
-
-				wg.Add(1)
-				go downloadVideo(id)
-			}
-		}
-	}()
-
-	return downloadPaths
-}
+// 	return downloadPaths
+// }

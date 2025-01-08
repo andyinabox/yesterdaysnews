@@ -5,10 +5,11 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain/downloader"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/objectstoreservice"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/videoprocessor"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/youtubeservice"
 )
 
 type Builder struct {
-	dl  domain.Downloader
+	yt  domain.YouTubeService
 	vp  domain.VideoProcessor
 	up  domain.ObjectStoreService
 	eh  domain.ErrorHandler
@@ -17,7 +18,7 @@ type Builder struct {
 
 func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 
-	dl := downloader.New(&downloader.Config{
+	yt := youtubeservice.New(&downloader.Config{
 		GoogleAPIKey: cfg.GoogleAPIKey,
 	})
 
@@ -33,7 +34,7 @@ func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 	})
 
 	return &Builder{
-		dl:  dl,
+		yt:  yt,
 		vp:  vp,
 		up:  up,
 		eh:  eh,

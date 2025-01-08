@@ -1,4 +1,4 @@
-package downloader
+package youtubeservice
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
 )
 
-func (d *Downloader) GetPlaylistVideoIDs(ctx context.Context, date time.Time, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
+func (s *Service) GetPlaylistVideoIDs(ctx context.Context, date time.Time, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var resp *response.PlaylistItemsListResponse
@@ -21,7 +21,7 @@ func (d *Downloader) GetPlaylistVideoIDs(ctx context.Context, date time.Time, pl
 	ids = []string{}
 
 	// fetch a page of video ids
-	resp, err = d.ytapi.PlaylistItemsList(ctx, youtubeapi.PlaylistItemsListRequest{
+	resp, err = s.ytapi.PlaylistItemsList(ctx, youtubeapi.PlaylistItemsListRequest{
 		PlaylistId: playlistId,
 		Part:       []string{"snippet"},
 		MaxResults: 50, // this is the maximum allowed by the API
@@ -46,7 +46,7 @@ func (d *Downloader) GetPlaylistVideoIDs(ctx context.Context, date time.Time, pl
 			}
 
 			// this will error if the video format is not available
-			videoInfo, err := d.ytdl.GetVideoInfo(ctx, id, VideoFormatString)
+			videoInfo, err := s.ytdl.GetVideoInfo(ctx, id, VideoFormatString)
 			if err != nil {
 				if errors.Is(err, youtubedownloader.ErrRequestedFormatNotAvailable) {
 					log.Debugf("skipping video %q because requested format is not available", id)
@@ -75,7 +75,7 @@ func (d *Downloader) GetPlaylistVideoIDs(ctx context.Context, date time.Time, pl
 	return
 }
 
-// func (d *Downloader) checkVideo(ctx context.Context, item *response.PlaylistItem, date time.Time, done func(), idsChan chan<- string) {
+// func (s *Service) checkVideo(ctx context.Context, item *response.PlaylistItem, date time.Time, done func(), idsChan chan<- string) {
 // 	defer done()
 
 // 	for {
@@ -118,7 +118,7 @@ func (d *Downloader) GetPlaylistVideoIDs(ctx context.Context, date time.Time, pl
 
 // }
 
-// func (d *Downloader) getPlaylistVideoIDs(ctx context.Context, playlistId string, date time.Time, maxResults int) (ids []string, err error) {
+// func (s *Service) getPlaylistVideoIDs(ctx context.Context, playlistId string, date time.Time, maxResults int) (ids []string, err error) {
 // 	ctx, cancel := context.WithCancel(ctx)
 
 // 	idsChan := make(chan string)
@@ -180,7 +180,7 @@ func (d *Downloader) GetPlaylistVideoIDs(ctx context.Context, date time.Time, pl
 
 // }
 
-// func (d *Downloader) fetchPage(ctx context.Context, playlistId string, date time.Time, pageToken string, idsChan chan<- string, pageTokensChan chan<- string) {
+// func (s *Service) fetchPage(ctx context.Context, playlistId string, date time.Time, pageToken string, idsChan chan<- string, pageTokensChan chan<- string) {
 
 // 	for {
 // 		select {

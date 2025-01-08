@@ -1,4 +1,4 @@
-package downloader
+package youtubeservice
 
 import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
@@ -13,14 +13,14 @@ type Config struct {
 	BinPathYTDLP string
 }
 
-type Downloader struct {
+type Service struct {
 	ytapi *youtubeapi.Client
 	ytdl  *youtubedownloader.Client
 	cfg   *Config
 }
 
-func New(cfg *Config) *Downloader {
-	return &Downloader{
+func New(cfg *Config) *Service {
+	return &Service{
 		ytapi: youtubeapi.New(cfg.GoogleAPIKey),
 		ytdl:  youtubedownloader.New(cfg.BinPathYTDLP),
 	}
