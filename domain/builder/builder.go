@@ -36,12 +36,10 @@ func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 	vp := videoprocessor.New(&videoprocessor.Config{})
 
 	os := objectstoreservice.New(&objectstoreservice.Config{
-		S3Endpoint:  cfg.S3Endpoint,
-		S3AccessKey: cfg.S3AccessKey,
-		S3SecretKey: cfg.S3SecretKey,
-
+		S3Endpoint:    cfg.S3Endpoint,
+		S3AccessKey:   cfg.S3AccessKey,
+		S3SecretKey:   cfg.S3SecretKey,
 		ContainerName: cfg.ObjectStoreContainerName,
-		PrimaryDir:    cfg.ObjectStorePrimaryDir,
 	})
 
 	return &Builder{

@@ -12,7 +12,6 @@ type Config struct {
 
 	// upload config
 	ContainerName string
-	PrimaryDir    string
 }
 
 type Service struct {

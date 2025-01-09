@@ -6,6 +6,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
@@ -40,21 +41,27 @@ func (s *Service) UploadFileStream(ctx context.Context, errs chan<- domain.Error
 	var wg sync.WaitGroup
 
 	cleanup := func() {
+		log.Info("waiting to close upload file stream")
 		wg.Wait()
+		log.Info("closing upload file stream")
 		close(stream)
 	}
 
 	uploadFile := func(filePath, fileKey string) {
 		defer wg.Done()
+
+		log.Infof("uploading file %q as %q", filePath, fileKey)
 		fileKey, err := s.UploadFile(ctx, filePath, fileKey, contentType, multipart)
 		if err != nil {
+			log.Errorf("error uploading file %q as %q: %s", filePath, fileKey, err)
 			errs <- domain.Err(domain.ErrTypeUploadFile, err)
 			return
 		}
+		log.Infof("finished uploading %q", fileKey)
 		stream <- fileKey
 	}
 
-	func() {
+	go func() {
 		defer cleanup()
 		for {
 			select {

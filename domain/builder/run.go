@@ -24,7 +24,7 @@ func (b *Builder) Run(ctx context.Context) error {
 	uploadDir := util.Timestamp(yesterday)
 
 	log.Info("building video clips")
-	manifest.Files.Clips = b.BuildVideoClips(ctx, yesterday, uploadDir, b.cfg.PlaylistIDs)
+	manifest.Files.Clips = b.BuildVideoClips(ctx, yesterday, uploadDir)
 
 	log.Info("building model")
 	modelFile, err := b.BuildModel(ctx, uploadDir, []domain.Corpus{
