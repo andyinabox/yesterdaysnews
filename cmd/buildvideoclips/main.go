@@ -12,7 +12,6 @@ import (
 	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/builder"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
@@ -38,21 +37,7 @@ func main() {
 	var eh domain.ErrorHandler
 
 	ctx := context.Background()
-
-	// set up error handling
-	fatalFunc := func(typ string, err error) {
-		log.Fatalf("%s: %s", typ, err)
-	}
-	errorFunc := func(typ string, err error) {
-		if typ == domain.ErrTypeFatal {
-			fatalFunc(typ, err)
-		}
-		log.Errorf("%s: %s", typ, err)
-	}
-	eh = errorhandler.New(ctx, &errorhandler.Config{
-		ErrorFunc: errorFunc,
-		FatalFunc: fatalFunc,
-	})
+	eh = domain.DefaultErrorHandler(ctx)
 
 	// error recovery
 	defer func() {

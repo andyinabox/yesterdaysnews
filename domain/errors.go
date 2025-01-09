@@ -1,6 +1,11 @@
 package domain
 
-import "gitlab.com/andyinabox/yesterdaysnews/pkg/errorhandler"
+import (
+	"context"
+
+	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/errorhandler"
+)
 
 const (
 	// larger build phases
@@ -37,4 +42,21 @@ type ErrorHandler interface {
 
 func Err(typ string, err error) Error {
 	return errorhandler.Err(typ, err)
+}
+
+func DefaultErrorHandler(ctx context.Context) ErrorHandler {
+	// set up error handling
+	fatalFunc := func(typ string, err error) {
+		log.Fatalf("%s: %s", typ, err)
+	}
+	errorFunc := func(typ string, err error) {
+		if typ == ErrTypeFatal {
+			fatalFunc(typ, err)
+		}
+		log.Errorf("%s: %s", typ, err)
+	}
+	return errorhandler.New(ctx, &errorhandler.Config{
+		ErrorFunc: errorFunc,
+		FatalFunc: fatalFunc,
+	})
 }
