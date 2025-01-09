@@ -20,13 +20,14 @@ func (b *Builder) BuildVideoClips(ctx context.Context, date time.Time, uploadDir
 	clips := b.videoCutStream(ctx, paths)
 	clipUploads := b.videoUploadStream(ctx, clips, uploadDir)
 
-	log.Info("waiting to finish converting upload filenames")
+	log.Debug("waiting to finish converting upload filenames")
 	clipPaths := []string{}
+
 	for fileKey := range clipUploads {
-		log.Infof("converting filename for %q", fileKey)
+		log.Debugf("converting filename for %q", fileKey)
 		mu.Lock()
-		defer mu.Unlock()
 		clipPaths = append(clipPaths, strings.Replace(fileKey, uploadDir+"/", "", 1))
+		mu.Unlock()
 	}
 
 	log.Info("done building video clips")
@@ -40,7 +41,7 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 
 	cleanup := func() {
 		wg.Wait()
-		log.Info("closing video clip stream")
+		log.Debug("closing video clip stream")
 		close(clipStream)
 	}
 
@@ -97,10 +98,10 @@ func (b *Builder) videoIDStream(ctx context.Context, date time.Time, playlistIDs
 	for _, playlistID := range playlistIDs {
 		go func() {
 			defer wg.Done()
-			log.Info("getting video id stream for %q", playlistID)
+			log.Infof("getting video id stream for %q", playlistID)
 			playlistIDs := b.yt.GetPlaylistVideoIDStream(ctx, b.errs, playlistID, date, b.cfg.DownloadCountPerPlaylist)
 			for id := range playlistIDs {
-				log.Info("got new video ID: %s", id)
+				log.Infof("got new video ID: %s", id)
 				stream <- id
 			}
 		}()
@@ -109,7 +110,7 @@ func (b *Builder) videoIDStream(ctx context.Context, date time.Time, playlistIDs
 	// close stream once all playlistIDs are gathered
 	go func() {
 		wg.Wait()
-		log.Info("closing video id stream")
+		log.Debug("closing video id stream")
 		close(stream)
 	}()
 
@@ -124,10 +125,10 @@ func (b *Builder) videoUploadStream(ctx context.Context, filePaths <-chan string
 		defer close(uploadPaths)
 		for filePath := range filePaths {
 			fileKey := strings.Replace(filePath, b.cfg.OutputDir, uploadDir, 1)
-			log.Infof("add upload path for %q, %q", filePath, fileKey)
+			log.Debugf("add upload path for %q, %q", filePath, fileKey)
 			uploadPaths <- [2]string{filePath, fileKey}
 		}
-		log.Info("finished translating upload paths, closing")
+		log.Debug("finished translating upload paths, closing")
 	}()
 
 	return b.os.UploadFileStream(ctx, b.errs, uploadPaths, "video/webm", false)

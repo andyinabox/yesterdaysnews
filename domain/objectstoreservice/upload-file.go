@@ -41,9 +41,8 @@ func (s *Service) UploadFileStream(ctx context.Context, errs chan<- domain.Error
 	var wg sync.WaitGroup
 
 	cleanup := func() {
-		log.Info("waiting to close upload file stream")
 		wg.Wait()
-		log.Info("closing upload file stream")
+		log.Debug("closing upload file stream")
 		close(stream)
 	}
 
