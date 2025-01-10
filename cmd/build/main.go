@@ -3,16 +3,11 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
-	"os"
-	"path/filepath"
-	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/builder"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 var verbose bool
@@ -41,16 +36,7 @@ func main() {
 	ctx := context.Background()
 
 	eh = domain.DefaultErrorHandler(ctx)
-
-	// error recovery
-	defer func() {
-		// print error report if there are any errors
-		if eh.CountAll() > 0 {
-			report := eh.Report()
-			log.Print(eh.Report())
-			_ = os.WriteFile(fmt.Sprintf("errors.%s.json", util.Timestamp(time.Now())), []byte(report), os.ModePerm)
-		}
-	}()
+	defer eh.DeferredReport()
 
 	// load config
 	config := &builder.Config{}
@@ -62,14 +48,7 @@ func main() {
 	// for testing setting this to 1
 	config.DownloadCountPerPlaylist = 1
 
-	// making output dirs
-	err = os.MkdirAll(filepath.Join(config.OutputDir, config.ClipsDirName), os.ModePerm)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	b = builder.New(config, eh)
-
 	err = b.Run(ctx)
 	if err != nil {
 		log.Fatal(err)

@@ -6,11 +6,14 @@ import (
 )
 
 type Builder interface {
+	// Run will execute the below subcommands in sequence
 	Run(ctx context.Context) error
 
 	// these are mainly exported so they can be tested with subcommands
-	BuildVideoClips(ctx context.Context, date time.Time, uploadDir string) []string
-	BuildModel(ctx context.Context, uploadDir string, corpi []Corpus) (string, error)
-	UploadManifest(ctx context.Context, uploadDir string, manifest *Manifest) error
-	Promote(ctx context.Context, uploadDir string) error
+	Setup(ctx context.Context) error
+	VideoClips(ctx context.Context, date time.Time, uploadDir string) ([]string, error)
+	Model(ctx context.Context, uploadDir string, corpi []Corpus) (string, error)
+	Manifest(ctx context.Context, uploadDir string, manifest *Manifest) (string, error)
+	Promote(ctx context.Context, uploadDir string) (string, error)
+	Cleanup(ctx context.Context, toKeep string) ([]string, error)
 }

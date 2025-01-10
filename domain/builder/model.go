@@ -11,7 +11,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
 )
 
-func (b *Builder) BuildModel(ctx context.Context, uploadDir string, corpi []domain.Corpus) (string, error) {
+func (b *Builder) Model(ctx context.Context, uploadDir string, corpi []domain.Corpus) (string, error) {
 	cc := captionschain.New(b.cfg.CaptionPrefixLength)
 	cc.BuildFromMultiple(corpi)
 

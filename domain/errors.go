@@ -58,5 +58,8 @@ func DefaultErrorHandler(ctx context.Context) ErrorHandler {
 	return errorhandler.New(ctx, &errorhandler.Config{
 		ErrorFunc: errorFunc,
 		FatalFunc: fatalFunc,
+		Thresholds: map[string]int{
+			ErrTypeMoveObject: 10,
+		},
 	})
 }

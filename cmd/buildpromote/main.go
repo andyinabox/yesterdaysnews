@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"os"
 	"path/filepath"
@@ -10,7 +11,6 @@ import (
 	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/builder"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 var verbose bool
@@ -45,22 +45,26 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// for testing setting this to 1
-	config.PlaylistIDs = []string{"UUupvZG-5ko_eiXAupbDfxWw"}
-	config.DownloadCountPerPlaylist = 1
-
-	// making output dirs
-	err = os.MkdirAll(filepath.Join(config.OutputDir, config.ClipsDirName), os.ModePerm)
+	b = builder.New(config, eh)
+	err = b.Setup(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	b = builder.New(config, eh)
+	data, err := os.ReadFile(filepath.Join(config.OutputDir, "manifest.json"))
+	if err != nil {
+		log.Fatalf("cannot open manifest file: %s", err)
+	}
 
-	yesterday := util.Yesterday()
-	uploadDir := util.Timestamp(yesterday)
+	manifest := domain.Manifest{}
+	err = json.Unmarshal(data, &manifest)
+	if err != nil {
+		log.Fatalf("cannot unmarshal manifest data: %s", err)
+	}
 
-	clips, err := b.VideoClips(ctx, util.Yesterday(), uploadDir)
+	uploadDir := manifest.ID
+
+	clips, err := b.Promote(ctx, uploadDir)
 	if err != nil {
 		log.Fatal(err)
 	}

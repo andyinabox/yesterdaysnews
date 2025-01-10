@@ -14,28 +14,30 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
-func (b *Builder) Promote(ctx context.Context, uploadDir string) error {
+func (b *Builder) Promote(ctx context.Context, uploadDir string) (string, error) {
 
 	// first move the files from the primary prefix to a different prefiex
 	demotedName := b.getCurrentManifestName(ctx)
 	log.Infof("demoting current objects to %q", demotedName)
 	fileKeys, err := b.moveObjects(ctx, b.cfg.ObjectStorePrimaryDir, demotedName)
 	if err != nil {
-		return fmt.Errorf("error moving objects from %q to %q: %w", b.cfg.ObjectStorePrimaryDir, demotedName, err)
+		return "", fmt.Errorf("error moving objects from %q to %q: %w", b.cfg.ObjectStorePrimaryDir, demotedName, err)
 	}
 	log.Infof("successfully moved %d objects from %q to %q", len(fileKeys), b.cfg.ObjectStorePrimaryDir, demotedName)
 
-	log.Info("promoting %q", uploadDir)
+	log.Infof("promoting %q", uploadDir)
 	fileKeys, err = b.moveObjects(ctx, uploadDir, b.cfg.ObjectStorePrimaryDir)
 	if err != nil {
-		return fmt.Errorf("error moving objects from %q to %q: %w", uploadDir, b.cfg.ObjectStorePrimaryDir, err)
+		return "", fmt.Errorf("error moving objects from %q to %q: %w", uploadDir, b.cfg.ObjectStorePrimaryDir, err)
 	}
 	log.Infof("successfully moved %d objects from %q to %q", len(fileKeys), uploadDir, b.cfg.ObjectStorePrimaryDir)
 
-	return nil
+	return demotedName, nil
 }
 
 func (b *Builder) moveObjects(ctx context.Context, fromPrefix, toPrefix string) ([]string, error) {
+	log.Debugf("move objects %q, %q", fromPrefix, toPrefix)
+
 	stream := make(chan [2]string)
 
 	var mu sync.Mutex
@@ -58,8 +60,8 @@ func (b *Builder) moveObjects(ctx context.Context, fromPrefix, toPrefix string) 
 
 	for key := range b.os.MoveObjectStream(ctx, b.errs, stream) {
 		mu.Lock()
-		defer mu.Unlock()
 		movedFiles = append(movedFiles, key)
+		mu.Unlock()
 	}
 
 	return movedFiles, nil

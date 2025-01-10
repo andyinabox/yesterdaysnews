@@ -11,28 +11,28 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
-func (b *Builder) UploadManifest(ctx context.Context, uploadDir string, manifest *domain.Manifest) error {
+func (b *Builder) Manifest(ctx context.Context, uploadDir string, manifest *domain.Manifest) (string, error) {
 	log.Info("saving manifest")
 
 	// TODO: check manifest?
 
 	data, err := json.Marshal(manifest)
 	if err != nil {
-		return fmt.Errorf("error marshaling manifest: %w", err)
+		return "", fmt.Errorf("error marshaling manifest: %w", err)
 	}
 
 	manifestFilePath := filepath.Join(b.cfg.OutputDir, "manifest.json")
 	err = os.WriteFile(manifestFilePath, data, os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("error writing manifest file %q: %w", manifestFilePath, err)
+		return "", fmt.Errorf("error writing manifest file %q: %w", manifestFilePath, err)
 	}
 
 	manifestFileKey := filepath.Join(uploadDir, "manifest.json")
 	log.Infof("uploading %q as %q", manifestFilePath, manifestFileKey)
 	manifestFileKey, err = b.os.UploadFile(ctx, manifestFilePath, manifestFileKey, "application/json", false)
 	if err != nil {
-		return fmt.Errorf("error uploading manifest file %q: %w", manifestFilePath, err)
+		return "", fmt.Errorf("error uploading manifest file %q: %w", manifestFilePath, err)
 	}
 
-	return nil
+	return manifestFileKey, nil
 }

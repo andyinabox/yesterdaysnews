@@ -11,7 +11,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
-func (b *Builder) BuildVideoClips(ctx context.Context, date time.Time, uploadDir string) []string {
+func (b *Builder) VideoClips(ctx context.Context, date time.Time, uploadDir string) ([]string, error) {
 
 	var mu sync.Mutex
 
@@ -31,7 +31,9 @@ func (b *Builder) BuildVideoClips(ctx context.Context, date time.Time, uploadDir
 	}
 
 	log.Info("done building video clips")
-	return clipPaths
+
+	// TODO: is there any way of returning errors here?
+	return clipPaths, nil
 }
 
 func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) <-chan string {

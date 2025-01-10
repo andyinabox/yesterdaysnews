@@ -5,7 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"sync"
+	"time"
+
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 var defaultErrorFunc, defaultFatalFunc func(string, error)
@@ -25,6 +29,7 @@ type ErrorHandler interface {
 	Count(string) int
 	CountAll() int
 	Report() string
+	DeferredReport()
 }
 
 type Config struct {
@@ -134,4 +139,13 @@ func (h *errorHandler) Report() string {
 		log.Fatal(fmt.Errorf("unable to generate error report: %w", err))
 	}
 	return string(data)
+}
+
+// DeferredReport will log the error report and output an errors file if there are errors (use like `defer h.DeferredReport()`)
+func (h *errorHandler) DeferredReport() {
+	if h.CountAll() > 0 {
+		report := h.Report()
+		log.Print(h.Report())
+		_ = os.WriteFile(fmt.Sprintf("errors.%s.json", util.Timestamp(time.Now())), []byte(report), os.ModePerm)
+	}
 }

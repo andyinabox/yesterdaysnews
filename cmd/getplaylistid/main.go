@@ -8,7 +8,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/downloader"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/youtubeservice"
 )
 
 var channelName string
@@ -34,7 +34,7 @@ func init() {
 }
 
 func main() {
-	dl := downloader.New(&downloader.Config{
+	dl := youtubeservice.New(&youtubeservice.Config{
 		GoogleAPIKey: os.Getenv("GOOGLE_API_KEY"),
 	})
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
@@ -30,12 +31,14 @@ func (s *Service) MoveObjectStream(ctx context.Context, errs chan<- domain.Error
 
 	cleanup := func() {
 		wg.Wait()
+		log.Debug("closing MoveObjectStream channel")
 		close(stream)
 	}
 
 	moveObject := func(from, to string) {
 		defer wg.Done()
 
+		log.Debugf("move object stream %q to %q", from, to)
 		fileKey, err := s.MoveObject(ctx, from, to)
 		if err != nil {
 			errs <- domain.Err(domain.ErrTypeMoveObject, err)
@@ -52,9 +55,10 @@ func (s *Service) MoveObjectStream(ctx context.Context, errs chan<- domain.Error
 			case <-ctx.Done():
 				return
 			default:
-				keys, closed := <-fileKeys
+				keys, open := <-fileKeys
 
-				if closed {
+				if !open {
+					log.Debug("MoveObjectStream input channel was closed")
 					return
 				}
 
