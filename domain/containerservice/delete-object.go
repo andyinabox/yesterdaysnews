@@ -1,4 +1,4 @@
-package objectstoreservice
+package containerservice
 
 import (
 	"context"

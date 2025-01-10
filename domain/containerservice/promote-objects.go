@@ -1,4 +1,4 @@
-package objectstoreservice
+package containerservice
 
 // func (s *Service) PromoteObjects(ctx context.Context, prefix string) (string, error) {
 

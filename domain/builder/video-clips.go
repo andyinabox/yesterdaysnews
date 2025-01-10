@@ -133,5 +133,5 @@ func (b *Builder) videoUploadStream(ctx context.Context, filePaths <-chan string
 		log.Debug("finished translating upload paths, closing")
 	}()
 
-	return b.os.UploadFileStream(ctx, b.errs, uploadPaths, "video/webm", false)
+	return b.cs.UploadFileStream(ctx, b.errs, uploadPaths, "video/webm", false)
 }

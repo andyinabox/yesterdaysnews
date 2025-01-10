@@ -1,7 +1,7 @@
 //go:build objectstoretest
 // +build objectstoretest
 
-package objectstoreservice
+package containerservice
 
 import (
 	"context"

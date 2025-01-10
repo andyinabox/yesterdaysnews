@@ -40,7 +40,7 @@ func (b *Builder) deletePrefixesStream(ctx context.Context, toKeep string) <-cha
 
 	go func() {
 		defer close(toDeleteStream)
-		prefixes, err := b.os.ListPrefixes(ctx)
+		prefixes, err := b.cs.ListPrefixes(ctx)
 		if err != nil {
 			b.error(domain.ErrTypeTODO, fmt.Errorf("error listing container prefixes: %w", err))
 		}
@@ -62,7 +62,7 @@ func (b *Builder) deletePrefixesStream(ctx context.Context, toKeep string) <-cha
 
 	}()
 
-	return b.os.DeleteObjectStream(ctx, b.errs, toDeleteStream)
+	return b.cs.DeleteObjectStream(ctx, b.errs, toDeleteStream)
 }
 
 // func (s *Service) PruneObjects(ctx context.Context, prefixToKeep string) ([]string, error) {

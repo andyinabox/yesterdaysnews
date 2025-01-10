@@ -44,7 +44,7 @@ func (b *Builder) moveObjects(ctx context.Context, fromPrefix, toPrefix string) 
 
 	movedFiles := []string{}
 
-	fileKeys, err := b.os.ListObjectsInDir(ctx, fromPrefix)
+	fileKeys, err := b.cs.ListObjectsInDir(ctx, fromPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error listing objects with %q prefix: %w", fromPrefix, err)
 	}
@@ -58,7 +58,7 @@ func (b *Builder) moveObjects(ctx context.Context, fromPrefix, toPrefix string) 
 		}
 	}()
 
-	for key := range b.os.MoveObjectStream(ctx, b.errs, stream) {
+	for key := range b.cs.MoveObjectStream(ctx, b.errs, stream) {
 		mu.Lock()
 		movedFiles = append(movedFiles, key)
 		mu.Unlock()
@@ -74,7 +74,7 @@ func (b *Builder) getCurrentManifestName(ctx context.Context) (prefix string) {
 	prefix = util.Timestamp(time.Now())
 
 	currentManifestFileKey := filepath.Join(b.cfg.ObjectStorePrimaryDir, "manifest.json")
-	data, err := b.os.GetObject(ctx, currentManifestFileKey)
+	data, err := b.cs.GetObject(ctx, currentManifestFileKey)
 	if err != nil {
 		b.error(domain.ErrTypeGetCurrentManifestPrefix, fmt.Errorf("error downloading %q: %w", currentManifestFileKey, err))
 		return

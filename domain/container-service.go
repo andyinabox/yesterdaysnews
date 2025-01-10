@@ -2,7 +2,7 @@ package domain
 
 import "context"
 
-type ObjectStoreService interface {
+type ContainerService interface {
 	GetObject(ctx context.Context, fileKey string) ([]byte, error)
 	ListObjectsInDir(ctx context.Context, dirName string) ([]string, error)
 	ListPrefixes(context.Context) ([]string, error)

@@ -1,4 +1,4 @@
-package objectstoreservice
+package containerservice
 
 // func (s *Service) PruneObjects(ctx context.Context, prefixToKeep string) ([]string, error) {
 

@@ -1,4 +1,4 @@
-package objectstoreservice
+package containerservice
 
 // var ErrContainerDoesNotExist = errors.New("container does not exist")
 

@@ -2,7 +2,7 @@ package builder
 
 import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/objectstoreservice"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/containerservice"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/videoprocessor"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/youtubeservice"
 )
@@ -10,7 +10,7 @@ import (
 type Builder struct {
 	yt   domain.YouTubeService
 	vp   domain.VideoProcessor
-	os   domain.ObjectStoreService
+	cs   domain.ContainerService
 	eh   domain.ErrorHandler
 	errs chan<- domain.Error
 	cfg  *Config
@@ -35,7 +35,7 @@ func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 
 	vp := videoprocessor.New(&videoprocessor.Config{})
 
-	os := objectstoreservice.New(&objectstoreservice.Config{
+	cs := containerservice.New(&containerservice.Config{
 		S3Endpoint:    cfg.S3Endpoint,
 		S3AccessKey:   cfg.S3AccessKey,
 		S3SecretKey:   cfg.S3SecretKey,
@@ -45,7 +45,7 @@ func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 	return &Builder{
 		yt:   yt,
 		vp:   vp,
-		os:   os,
+		cs:   cs,
 		eh:   eh,
 		errs: errs,
 		cfg:  cfg,
