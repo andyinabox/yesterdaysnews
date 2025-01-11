@@ -20,6 +20,7 @@ const (
 	ErrTypeSaveManifest             = "ErrTypeSaveManifest"
 	ErrTypeUploadManifest           = "ErrTypeUploadManifest"
 	ErrTypeGetCurrentManifestPrefix = "ErrTypeGetCurrentManifestPrefix"
+	ErrTypeCleanup                  = "ErrTypeCleanup"
 
 	// object store
 	ErrTypeCopyObject   = "ErrTypeCopyObject"

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
@@ -29,6 +30,7 @@ func (s *Service) DeleteObjectStream(ctx context.Context, errs chan<- domain.Err
 	deleteObject := func(key string) {
 		defer wg.Done()
 
+		log.Debugf("delete %q from stream", key)
 		fileKey, err := s.DeleteObject(ctx, key)
 		if err != nil {
 			errs <- domain.Err(domain.ErrTypeDeleteObject, err)
@@ -45,9 +47,9 @@ func (s *Service) DeleteObjectStream(ctx context.Context, errs chan<- domain.Err
 			case <-ctx.Done():
 				return
 			default:
-				key, closed := <-fileKeys
+				key, open := <-fileKeys
 
-				if closed {
+				if !open {
 					return
 				}
 

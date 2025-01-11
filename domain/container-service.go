@@ -4,7 +4,8 @@ import "context"
 
 type ContainerService interface {
 	GetObject(ctx context.Context, fileKey string) ([]byte, error)
-	ListObjectsInDir(ctx context.Context, dirName string) ([]string, error)
+	ListObjectsWithPrefix(ctx context.Context, prefix string) ([]string, error)
+	ListObjectsWithPrefixStream(ctx context.Context, errs chan<- Error, prefixes <-chan string) <-chan string
 	ListPrefixes(context.Context) ([]string, error)
 	UploadFile(ctx context.Context, filePath, fileKey, contentType string, multipart bool) (string, error)
 	UploadFileStream(ctx context.Context, errs chan<- Error, filePaths <-chan [2]string, contentType string, multipart bool) <-chan string

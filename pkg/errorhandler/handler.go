@@ -42,7 +42,7 @@ type errorHandler struct {
 	errorFunc  func(string, error)
 	fatalFunc  func(string, error)
 	thresholds map[string]int
-	errs       map[string][]Error
+	errs       map[string][]error
 	stream     chan Error
 }
 
@@ -55,7 +55,7 @@ func New(ctx context.Context, cfg *Config) ErrorHandler {
 		errorFunc:  defaultErrorFunc,
 		fatalFunc:  defaultFatalFunc,
 		thresholds: make(map[string]int),
-		errs:       make(map[string][]Error),
+		errs:       make(map[string][]error),
 		stream:     stream,
 	}
 

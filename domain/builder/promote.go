@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
@@ -38,33 +38,25 @@ func (b *Builder) Promote(ctx context.Context, uploadDir string) (string, error)
 func (b *Builder) moveObjects(ctx context.Context, fromPrefix, toPrefix string) ([]string, error) {
 	log.Debugf("move objects %q, %q", fromPrefix, toPrefix)
 
-	stream := make(chan [2]string)
-
-	var mu sync.Mutex
-
-	movedFiles := []string{}
-
-	fileKeys, err := b.cs.ListObjectsInDir(ctx, fromPrefix)
+	// get slice of keys from list command
+	fileKeys, err := b.cs.ListObjectsWithPrefix(ctx, fromPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error listing objects with %q prefix: %w", fromPrefix, err)
 	}
 
-	// tranlate to use correct format for object move stream
-	go func() {
-		defer close(stream)
-		for _, fromKey := range fileKeys {
-			toKey := strings.Replace(fromKey, fromPrefix, toPrefix, 1)
-			stream <- [2]string{fromKey, toKey}
-		}
-	}()
+	// convert to string stream with throttling
+	fileKeyStream := streams.StringStreamThrottled(ctx, time.Millisecond, fileKeys...)
 
-	for key := range b.cs.MoveObjectStream(ctx, b.errs, stream) {
-		mu.Lock()
-		movedFiles = append(movedFiles, key)
-		mu.Unlock()
-	}
+	// convert to [2]string stream for renaming
+	movePathStream := streams.StringStreamTo2StringSliceStream(ctx, fileKeyStream, func(s string) [2]string {
+		return [2]string{s, strings.Replace(s, fromPrefix, toPrefix, 1)}
+	})
 
-	return movedFiles, nil
+	// move objects
+	movedObjectsStream := b.cs.MoveObjectStream(ctx, b.errs, movePathStream)
+
+	// return a string slice
+	return streams.StringSlice(ctx, movedObjectsStream), nil
 }
 
 // getCurrentManifestName attempts to get the build ID from the manifest in

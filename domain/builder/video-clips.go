@@ -8,32 +8,37 @@ import (
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 func (b *Builder) VideoClips(ctx context.Context, date time.Time, uploadDir string) ([]string, error) {
 
-	var mu sync.Mutex
-
+	// get stream of ids
 	ids := b.videoIDStream(ctx, date, b.cfg.PlaylistIDs)
+
+	// get stream of downloaded video paths
 	paths := b.yt.DownloadVideoStream(ctx, b.errs, ids, b.cfg.OutputDir)
+
+	// get stream of video clip paths
 	clips := b.videoCutStream(ctx, paths)
-	clipUploads := b.videoUploadStream(ctx, clips, uploadDir)
 
-	log.Debug("waiting to finish converting upload filenames")
-	clipPaths := []string{}
+	// take clip paths amd make stream of upload paths
+	uploadPaths := streams.StringStreamTo2StringSliceStream(ctx, clips, func(s string) [2]string {
+		// first string is the file name, second is the the object key
+		return [2]string{s, strings.Replace(s, b.cfg.OutputDir, uploadDir, 1)}
+	})
 
-	for fileKey := range clipUploads {
-		log.Debugf("converting filename for %q", fileKey)
-		mu.Lock()
-		clipPaths = append(clipPaths, strings.Replace(fileKey, uploadDir+"/", "", 1))
-		mu.Unlock()
-	}
+	// upload files
+	clipUploads := b.cs.UploadFileStream(ctx, b.errs, uploadPaths, "video/webm", false)
 
-	log.Info("done building video clips")
+	// remove upload dir to get relative paths from upload root
+	clipPathsStream := streams.StringTransformStream(ctx, clipUploads, func(s string) string {
+		return strings.Replace(s, uploadDir+"/", "", 1)
+	})
 
-	// TODO: is there any way of returning errors here?
-	return clipPaths, nil
+	// wait for all clips to be complete and return a string slice
+	return streams.StringSlice(ctx, clipPathsStream), nil
 }
 
 func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) <-chan string {
@@ -117,21 +122,4 @@ func (b *Builder) videoIDStream(ctx context.Context, date time.Time, playlistIDs
 	}()
 
 	return stream
-}
-
-func (b *Builder) videoUploadStream(ctx context.Context, filePaths <-chan string, uploadDir string) <-chan string {
-
-	// create upload fileKeys and send on 2-string channel
-	uploadPaths := make(chan [2]string)
-	go func() {
-		defer close(uploadPaths)
-		for filePath := range filePaths {
-			fileKey := strings.Replace(filePath, b.cfg.OutputDir, uploadDir, 1)
-			log.Debugf("add upload path for %q, %q", filePath, fileKey)
-			uploadPaths <- [2]string{filePath, fileKey}
-		}
-		log.Debug("finished translating upload paths, closing")
-	}()
-
-	return b.cs.UploadFileStream(ctx, b.errs, uploadPaths, "video/webm", false)
 }
