@@ -8,6 +8,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 )
 
 func (s *Service) UploadFile(ctx context.Context, filePath, fileKey, contentType string, multipart bool) (string, error) {
@@ -53,7 +54,7 @@ func (s *Service) UploadFileStream(ctx context.Context, errs chan<- domain.Error
 		fileKey, err := s.UploadFile(ctx, filePath, fileKey, contentType, multipart)
 		if err != nil {
 			log.Errorf("error uploading file %q as %q: %s", filePath, fileKey, err)
-			errs <- domain.Err(domain.ErrTypeUploadFile, err)
+			errs <- errorhandler.Err(domain.ErrTypeUploadFile, err)
 			return
 		}
 		log.Infof("finished uploading %q", fileKey)

@@ -2,12 +2,9 @@ package errorhandler
 
 import (
 	"fmt"
-)
 
-type Error interface {
-	error
-	Type() string
-}
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
+)
 
 type err struct {
 	typ string
@@ -26,6 +23,6 @@ func (e *err) String() string {
 	return fmt.Sprintf("%s: %s", e.typ, e.err.Error())
 }
 
-func Err(typ string, e error) Error {
+func Err(typ string, e error) domain.Error {
 	return &err{typ, e}
 }

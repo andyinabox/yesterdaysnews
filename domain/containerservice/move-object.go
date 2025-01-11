@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 )
 
 func (s *Service) MoveObject(ctx context.Context, from, to string) (string, error) {
@@ -41,7 +42,7 @@ func (s *Service) MoveObjectStream(ctx context.Context, errs chan<- domain.Error
 		log.Debugf("move object stream %q to %q", from, to)
 		fileKey, err := s.MoveObject(ctx, from, to)
 		if err != nil {
-			errs <- domain.Err(domain.ErrTypeMoveObject, err)
+			errs <- errorhandler.Err(domain.ErrTypeMoveObject, err)
 			return
 		}
 

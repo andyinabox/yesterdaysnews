@@ -8,6 +8,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi/response"
@@ -100,7 +101,7 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 
 				ids, pageToken, err = s.GetPlaylistVideoIDs(ctx, date, playlistId, pageToken)
 				if err != nil {
-					errs <- domain.Err(domain.ErrTypeGetVideoID, err)
+					errs <- errorhandler.Err(domain.ErrTypeGetVideoID, err)
 					continue
 				}
 

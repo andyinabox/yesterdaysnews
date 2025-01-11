@@ -1,12 +1,5 @@
 package domain
 
-import (
-	"context"
-
-	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/errorhandler"
-)
-
 const (
 	// larger build phases
 	ErrTypeGetVideoID               = "ErrTypeGetVideoID"
@@ -34,33 +27,17 @@ const (
 )
 
 type Error interface {
-	errorhandler.Error
+	error
+	Type() string
 }
 
 type ErrorHandler interface {
-	errorhandler.ErrorHandler
-}
-
-func Err(typ string, err error) Error {
-	return errorhandler.Err(typ, err)
-}
-
-func DefaultErrorHandler(ctx context.Context) ErrorHandler {
-	// set up error handling
-	fatalFunc := func(typ string, err error) {
-		log.Fatalf("%s: %s", typ, err)
-	}
-	errorFunc := func(typ string, err error) {
-		if typ == ErrTypeFatal {
-			fatalFunc(typ, err)
-		}
-		log.Errorf("%s: %s", typ, err)
-	}
-	return errorhandler.New(ctx, &errorhandler.Config{
-		ErrorFunc: errorFunc,
-		FatalFunc: fatalFunc,
-		Thresholds: map[string]int{
-			ErrTypeMoveObject: 10,
-		},
-	})
+	Add(typ string, err error)
+	Channel() chan<- Error
+	Count(string) int
+	CountAll() int
+	Report() string
+	DeferredReport()
+	Reset()
+	Err() error
 }

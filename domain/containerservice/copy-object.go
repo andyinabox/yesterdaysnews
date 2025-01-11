@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 )
 
 func (s *Service) CopyObject(ctx context.Context, from, to string) (string, error) {
@@ -33,7 +34,7 @@ func (s *Service) CopyObjectStream(ctx context.Context, errs chan<- domain.Error
 
 		fileKey, err := s.CopyObject(ctx, from, to)
 		if err != nil {
-			errs <- domain.Err(domain.ErrTypeCopyObject, err)
+			errs <- errorhandler.Err(domain.ErrTypeCopyObject, err)
 			return
 		}
 

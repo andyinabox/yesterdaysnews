@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/builder"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
@@ -35,7 +36,7 @@ func main() {
 	var eh domain.ErrorHandler
 
 	ctx := context.Background()
-	eh = domain.DefaultErrorHandler(ctx)
+	eh = errorhandler.DefaultErrorHandler(ctx)
 	defer eh.DeferredReport()
 
 	// load config

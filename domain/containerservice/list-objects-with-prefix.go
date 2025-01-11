@@ -8,6 +8,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
 )
 
@@ -46,7 +47,7 @@ func (s *Service) ListObjectsWithPrefixStream(ctx context.Context, errs chan<- d
 
 		objects, err := s.ListObjectsWithPrefix(ctx, prefix)
 		if err != nil {
-			errs <- domain.Err(domain.ErrTypeDeleteObject, err)
+			errs <- errorhandler.Err(domain.ErrTypeDeleteObject, err)
 			return
 		}
 

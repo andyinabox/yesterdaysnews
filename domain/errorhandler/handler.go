@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
@@ -18,23 +19,10 @@ func init() {
 	defaultErrorFunc = func(typ string, err error) {
 		log.Printf("%s error: %s\n", typ, err)
 	}
-	defaultFatalFunc = func(typ string, err error) {
-		panic(fmt.Errorf("%s error: %w", typ, err))
-	}
-}
-
-type ErrorHandler interface {
-	Add(typ string, err error)
-	Channel() chan<- Error
-	Count(string) int
-	CountAll() int
-	Report() string
-	DeferredReport()
 }
 
 type Config struct {
 	ErrorFunc  func(string, error)
-	FatalFunc  func(string, error)
 	Thresholds map[string]int
 }
 
@@ -43,17 +31,17 @@ type errorHandler struct {
 	fatalFunc  func(string, error)
 	thresholds map[string]int
 	errs       map[string][]error
-	stream     chan Error
+	stream     chan domain.Error
+	err        error
 }
 
-func New(ctx context.Context, cfg *Config) ErrorHandler {
+func New(ctx context.Context, cfg *Config) domain.ErrorHandler {
 	var mu sync.Mutex
 	// ctx, cancel = context.WithCancelCause(ctx)
-	stream := make(chan Error)
+	stream := make(chan domain.Error)
 
 	h := &errorHandler{
 		errorFunc:  defaultErrorFunc,
-		fatalFunc:  defaultFatalFunc,
 		thresholds: make(map[string]int),
 		errs:       make(map[string][]error),
 		stream:     stream,
@@ -63,15 +51,11 @@ func New(ctx context.Context, cfg *Config) ErrorHandler {
 		h.errorFunc = cfg.ErrorFunc
 	}
 
-	if cfg.FatalFunc != nil {
-		h.fatalFunc = cfg.FatalFunc
-	}
-
 	if cfg.Thresholds != nil {
 		h.thresholds = cfg.Thresholds
 	}
 
-	handleErr := func(err Error) {
+	handleErr := func(err domain.Error) {
 
 		typ := err.Type()
 
@@ -83,7 +67,7 @@ func New(ctx context.Context, cfg *Config) ErrorHandler {
 		// check threshold
 		limit, found := h.thresholds[err.Type()]
 		if found && h.Count(typ) > limit {
-			h.fatalFunc(typ, fmt.Errorf("recieved %d %q errors, limit is %d: %w", h.Count(typ), typ, limit, err))
+			h.err = fmt.Errorf("recieved %d %q errors, limit is %d: %w", h.Count(typ), typ, limit, h.err)
 			return
 		}
 
@@ -129,7 +113,7 @@ func (h *errorHandler) CountAll() int {
 	return count
 }
 
-func (h *errorHandler) Channel() chan<- Error {
+func (h *errorHandler) Channel() chan<- domain.Error {
 	return h.stream
 }
 
@@ -148,4 +132,12 @@ func (h *errorHandler) DeferredReport() {
 		log.Print(h.Report())
 		_ = os.WriteFile(fmt.Sprintf("errors.%s.json", util.Timestamp(time.Now())), []byte(report), os.ModePerm)
 	}
+}
+
+func (h *errorHandler) Reset() {
+	h.err = nil
+}
+
+func (h *errorHandler) Err() error {
+	return h.err
 }

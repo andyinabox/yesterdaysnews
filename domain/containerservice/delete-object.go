@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 )
 
 func (s *Service) DeleteObject(ctx context.Context, key string) (string, error) {
@@ -33,7 +34,7 @@ func (s *Service) DeleteObjectStream(ctx context.Context, errs chan<- domain.Err
 		log.Debugf("delete %q from stream", key)
 		fileKey, err := s.DeleteObject(ctx, key)
 		if err != nil {
-			errs <- domain.Err(domain.ErrTypeDeleteObject, err)
+			errs <- errorhandler.Err(domain.ErrTypeDeleteObject, err)
 			return
 		}
 

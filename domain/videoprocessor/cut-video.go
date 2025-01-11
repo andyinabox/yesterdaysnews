@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
 )
 
@@ -48,7 +49,7 @@ func (p *Processor) CutVideoStream(ctx context.Context, errs chan<- domain.Error
 
 		videoClip, err := p.CutVideo(ctx, inFile, clipName, edit)
 		if err != nil {
-			errs <- domain.Err(domain.ErrTypeCutVideo, err)
+			errs <- errorhandler.Err(domain.ErrTypeCutVideo, err)
 			return
 		}
 

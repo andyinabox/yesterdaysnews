@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
 )
 
@@ -48,7 +49,7 @@ func (s *Service) DownloadVideoStream(ctx context.Context, errs chan<- domain.Er
 
 		// handle error
 		if err != nil {
-			errs <- domain.Err(domain.ErrTypeDownloadVideo, err)
+			errs <- errorhandler.Err(domain.ErrTypeDownloadVideo, err)
 			return
 		}
 
