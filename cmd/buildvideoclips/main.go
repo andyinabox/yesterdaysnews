@@ -37,7 +37,7 @@ func main() {
 
 	ctx := context.Background()
 	eh = errorhandler.DefaultErrorHandler(ctx)
-	defer eh.DeferredReport()
+	defer eh.Report()
 
 	// load config
 	config := &builder.Config{}

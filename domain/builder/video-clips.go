@@ -58,7 +58,7 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 		editPoints, err := b.vp.GetVideoEditPoints(ctx, filePath, util.Seconds(b.cfg.MinClipLengthSeconds), util.Seconds(b.cfg.MaxClipLengthSeconds))
 
 		if err != nil {
-			b.error(domain.ErrTypeCutVideo, err)
+			b.eh.Add(domain.ErrTypeCutVideo, err)
 			return
 		}
 

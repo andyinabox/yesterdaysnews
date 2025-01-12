@@ -1,5 +1,10 @@
 package domain
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 const (
 	// larger build phases
 	ErrTypeGetVideoID               = "ErrTypeGetVideoID"
@@ -28,16 +33,27 @@ const (
 
 type Error interface {
 	error
+	json.Marshaler
+	fmt.Stringer
 	Type() string
 }
 
 type ErrorHandler interface {
+	fmt.Stringer
+	json.Marshaler
+
+	// adding errors
 	Add(typ string, err error)
 	Channel() chan<- Error
+
+	// error counts
 	Count(string) int
 	CountAll() int
-	Report() string
-	DeferredReport()
-	Reset()
-	Err() error
+
+	// output
+	Report()
+
+	// Print()
+	// Reset()
+	// Err() error
 }

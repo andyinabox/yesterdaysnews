@@ -68,14 +68,14 @@ func (b *Builder) getCurrentManifestName(ctx context.Context) (prefix string) {
 	currentManifestFileKey := filepath.Join(b.cfg.ObjectStorePrimaryDir, "manifest.json")
 	data, err := b.cs.GetObject(ctx, currentManifestFileKey)
 	if err != nil {
-		b.error(domain.ErrTypeGetCurrentManifestPrefix, fmt.Errorf("error downloading %q: %w", currentManifestFileKey, err))
+		b.eh.Add(domain.ErrTypeGetCurrentManifestPrefix, fmt.Errorf("error downloading %q: %w", currentManifestFileKey, err))
 		return
 	}
 
 	manifest := domain.Manifest{}
 	err = json.Unmarshal(data, &manifest)
 	if err != nil {
-		b.error(domain.ErrTypeGetCurrentManifestPrefix, fmt.Errorf("error unmarshaling current manifest: %w", err))
+		b.eh.Add(domain.ErrTypeGetCurrentManifestPrefix, fmt.Errorf("error unmarshaling current manifest: %w", err))
 		return
 	}
 

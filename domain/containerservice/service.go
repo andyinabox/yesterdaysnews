@@ -1,6 +1,7 @@
 package containerservice
 
 import (
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
 )
 
@@ -16,6 +17,7 @@ type Config struct {
 
 type Service struct {
 	osclient *objectstoreclient.Client
+	eh       domain.ErrorHandler
 	cfg      *Config
 }
 

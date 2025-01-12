@@ -18,17 +18,6 @@ type Builder struct {
 
 func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 
-	// not sure if there's a better way to do this,
-	// allows us to take errors as domain.Error
-	// rather than errorhandler.Error
-	errs := make(chan domain.Error)
-	go func() {
-		defer close(errs)
-		for err := range errs {
-			eh.Channel() <- err
-		}
-	}()
-
 	yt := youtubeservice.New(&youtubeservice.Config{
 		GoogleAPIKey: cfg.GoogleAPIKey,
 	})
@@ -47,7 +36,7 @@ func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 		vp:   vp,
 		cs:   cs,
 		eh:   eh,
-		errs: errs,
+		errs: eh.Channel(),
 		cfg:  cfg,
 	}
 }

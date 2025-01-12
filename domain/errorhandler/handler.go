@@ -30,7 +30,7 @@ type errorHandler struct {
 	errorFunc  func(string, error)
 	fatalFunc  func(string, error)
 	thresholds map[string]int
-	errs       map[string][]error
+	errs       map[string][]domain.Error
 	stream     chan domain.Error
 	err        error
 }
@@ -43,7 +43,7 @@ func New(ctx context.Context, cfg *Config) domain.ErrorHandler {
 	h := &errorHandler{
 		errorFunc:  defaultErrorFunc,
 		thresholds: make(map[string]int),
-		errs:       make(map[string][]error),
+		errs:       make(map[string][]domain.Error),
 		stream:     stream,
 	}
 
@@ -117,27 +117,46 @@ func (h *errorHandler) Channel() chan<- domain.Error {
 	return h.stream
 }
 
-func (h *errorHandler) Report() string {
-	data, err := json.MarshalIndent(h.errs, "", "  ")
-	if err != nil {
-		log.Fatal(fmt.Errorf("unable to generate error report: %w", err))
-	}
-	return string(data)
+func (h *errorHandler) MarshalJSON() ([]byte, error) {
+	return json.Marshal(h.errs)
 }
 
-// DeferredReport will log the error report and output an errors file if there are errors (use like `defer h.DeferredReport()`)
-func (h *errorHandler) DeferredReport() {
+func (h *errorHandler) String() (str string) {
+
+	for typ, errs := range h.errs {
+		str += fmt.Sprintf("%s:\n", typ)
+		for i, err := range errs {
+			str += fmt.Sprintf("  %d: %q\n", i+1, err.Error())
+		}
+	}
+
+	return
+}
+
+// Report will log the error report and output an errors file if there are errors (use like `defer h.DeferredReport()`)
+func (h *errorHandler) Report() {
 	if h.CountAll() > 0 {
-		report := h.Report()
-		log.Print(h.Report())
-		_ = os.WriteFile(fmt.Sprintf("errors.%s.json", util.Timestamp(time.Now())), []byte(report), os.ModePerm)
+
+		log.Println(h.String())
+
+		// don't output file if no filename is provided
+		data, err := h.MarshalJSON()
+		if err != nil {
+			log.Printf("error marshaling error data: %s\n", err)
+			return
+		}
+
+		_ = os.WriteFile(fmt.Sprintf("errors.%s.json", util.Timestamp(time.Now())), data, os.ModePerm)
+
+	} else {
+		log.Println("no errors to report")
 	}
 }
 
-func (h *errorHandler) Reset() {
-	h.err = nil
-}
+// func (h *errorHandler) Reset() {
+// 	h.err = nil
+// }
 
-func (h *errorHandler) Err() error {
-	return h.err
-}
+// func (h *errorHandler) Err() error {
+// 	return h.err
+// }
