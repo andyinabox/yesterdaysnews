@@ -49,7 +49,8 @@ func (s *Server) Start(ctx context.Context) error {
 				return
 			default:
 				time.Sleep(s.cfg.ManifestCheckInterval)
-				log.Debug("checking manifest")
+
+				log.Debug("checking build id")
 
 				buildID, err := s.getCurrentBuildID(ctx)
 				if err != nil {
@@ -113,47 +114,11 @@ func (s *Server) makeCaptionGenerator(ctx context.Context) (domain.CaptionGenera
 }
 
 func (s *Server) getModel(ctx context.Context) ([]byte, error) {
-	// url := s.cfg.ObjectStoreUrl + "/" + s.manifest.Files.ModelFile
-	url := fmt.Sprintf("%s/%s/%s", s.cfg.ObjectStoreUrl, s.buildID, s.manifest.Files.ModelFile)
-
-	log.Debug("create model request: " + url)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, fmt.Errorf("recieved non-200 status code: %q", resp.Status)
-	}
-
-	defer resp.Body.Close()
-	return io.ReadAll(resp.Body)
+	return s.getObjectStoreFile(ctx, fmt.Sprintf("%s/%s", s.buildID, s.manifest.Files.ModelFile))
 }
 
 func (s *Server) getManifest(ctx context.Context) (*domain.Manifest, error) {
-
-	url := fmt.Sprintf("%s/%s/manifest.json", s.cfg.ObjectStoreUrl, s.buildID)
-
-	log.Debug("create manifest request: " + url)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	// log.Debug("do manifest request")
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Debug("read manifest response")
-	defer resp.Body.Close()
-	data, err := io.ReadAll(resp.Body)
+	data, err := s.getObjectStoreFile(ctx, fmt.Sprintf("%s/%s", s.buildID, "manifest.json"))
 	if err != nil {
 		return nil, err
 	}
@@ -171,32 +136,39 @@ func (s *Server) getManifest(ctx context.Context) (*domain.Manifest, error) {
 }
 
 func (s *Server) getCurrentBuildID(ctx context.Context) (string, error) {
-	url := s.cfg.ObjectStoreUrl + "/current.txt"
 
-	log.Debug("create buildID request: " + url)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	data, err := s.getObjectStoreFile(ctx, "current.txt")
 	if err != nil {
-		return "", err
-	}
-
-	log.Debug("do buildID request")
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return "", fmt.Errorf("recieved non-200 status code: %q", resp.Status)
-	}
-
-	log.Debug("read buildID response")
-	defer resp.Body.Close()
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error getting current build id: %w", err)
 	}
 
 	log.Debug(string(data))
 
 	return string(data), nil
+}
+
+func (s *Server) getObjectStoreFile(ctx context.Context, path string) ([]byte, error) {
+	url := fmt.Sprintf("%s/%s", s.cfg.ObjectStoreUrl, path)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error creating new request for %q: %w", url, err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error executing get request for %q: %w", url, err)
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("recieved non-200 status code for %q: %s", url, resp.Status)
+	}
+
+	defer resp.Body.Close()
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error reading response body for %q: %w", url, err)
+	}
+
+	return data, nil
 }
