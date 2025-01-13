@@ -26,37 +26,25 @@ func (b *Builder) Cleanup(ctx context.Context, toKeep int) ([]string, error) {
 
 	if len(toDelete) != 0 {
 		log.Infof("found %d prefixes to delete: %v", len(toDelete), toDelete)
+
+		// convert prefix list to stream
 		prefixesStream := streams.StringStreamThrottled(ctx, time.Millisecond, toDelete...)
 
-		// filteredPrefixesStream := streams.StringFilterStream(ctx, prefixesStream, func(s string) bool {
-		// 	log.Debugf("checking %q", s)
-
-		// 	// skip primary dir
-		// 	if strings.HasPrefix(s, b.cfg.ObjectStorePrimaryDir) {
-		// 		return false
-		// 	}
-
-		// 	// skip dir to keep
-		// 	if toKeep != "" && strings.HasPrefix(s, toKeep) {
-		// 		return false
-		// 	}
-
-		// 	log.Debugf("adding %q to delete stream", s)
-		// 	return true
-		// })
-
+		// get object keys from prefixes
 		objectsWithPrefixStream := b.cs.ListObjectsWithPrefixStream(ctx, b.errs, prefixesStream)
 
 		// add throttling
 		objectsToDeleteStream := streams.StringPipeThrottled(ctx, time.Millisecond, objectsWithPrefixStream)
 
+		// delete objects
 		deletedStream := b.cs.DeleteObjectStream(ctx, b.errs, objectsToDeleteStream)
 
+		// condense into slice
 		deletedObjects = streams.StringSlice(ctx, deletedStream)
 	}
 
 	if b.cfg.RemoveFilesOnCompletion {
-		log.Info("removing output dir")
+		log.Info("removing dir %q", b.cfg.OutputDir)
 		err = os.RemoveAll(b.cfg.OutputDir)
 		if err != nil {
 			return deletedObjects, fmt.Errorf("error removing %q from filesystem: %w", b.cfg.OutputDir, err)
