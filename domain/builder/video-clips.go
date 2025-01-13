@@ -2,6 +2,7 @@ package builder
 
 import (
 	"context"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -63,7 +64,8 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 		}
 
 		log.Infof("cutting %q into %d clips", filePath, len(editPoints))
-		for clip := range b.vp.CutVideoStream(ctx, b.errs, filePath, editPoints) {
+		outDir := filepath.Join(b.cfg.OutputDir, b.cfg.ClipsDirName)
+		for clip := range b.vp.CutVideoStream(ctx, b.errs, filePath, outDir, editPoints) {
 			log.Infof("finished cutting %q", clip)
 			clipStream <- clip
 		}

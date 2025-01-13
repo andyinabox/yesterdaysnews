@@ -33,7 +33,7 @@ func main() {
 	var eh domain.ErrorHandler
 
 	ctx := context.Background()
-	eh = errorhandler.DefaultErrorHandler(ctx)
+	eh = errorhandler.DefaultErrorHandler(ctx, 0)
 	defer eh.Report()
 
 	// load config

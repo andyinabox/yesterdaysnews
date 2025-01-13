@@ -3,6 +3,7 @@ package youtubeservice
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -84,6 +85,9 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 		close(stream)
 	}
 
+	maxRequests := 20
+	totalRequests := 0
+
 	go func() {
 		defer cleanup()
 
@@ -99,7 +103,13 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 			default:
 				log.Infof("fetch video ids for %q", playlistId)
 
+				if totalRequests >= maxRequests {
+					errs <- errorhandler.Err(domain.ErrTypeGetVideoID, fmt.Errorf("reached max requests for playlist %q, aborting", playlistId))
+					return
+				}
+
 				ids, pageToken, err = s.GetPlaylistVideoIDs(ctx, date, playlistId, pageToken)
+				totalRequests++
 				if err != nil {
 					errs <- errorhandler.Err(domain.ErrTypeGetVideoID, err)
 					continue

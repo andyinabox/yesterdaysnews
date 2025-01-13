@@ -27,6 +27,7 @@ type Config struct {
 	MinClipLengthSeconds     int
 	MaxClipLengthSeconds     int
 	CaptionPrefixLength      int
+	RemoveFilesOnCompletion  bool
 }
 
 func (c *Config) Load(configFile string) error {

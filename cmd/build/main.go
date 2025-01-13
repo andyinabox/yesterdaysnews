@@ -12,9 +12,11 @@ import (
 )
 
 var verbose bool
+var downloadCountPerPlaylist int
 
 func init() {
 	flag.BoolVar(&verbose, "v", false, "verbose output")
+	flag.IntVar(&downloadCountPerPlaylist, "d", 10, "download count per playlist")
 	flag.Parse()
 
 	log.SetReportCaller(true)
@@ -36,7 +38,7 @@ func main() {
 
 	ctx := context.Background()
 
-	eh = errorhandler.DefaultErrorHandler(ctx)
+	eh = errorhandler.DefaultErrorHandler(ctx, downloadCountPerPlaylist*3)
 	defer eh.Report()
 
 	// load config
@@ -47,7 +49,7 @@ func main() {
 	}
 
 	// for testing setting this to 1
-	config.DownloadCountPerPlaylist = 1
+	config.DownloadCountPerPlaylist = downloadCountPerPlaylist
 
 	b = builder.New(config, eh)
 	err = b.Run(ctx)

@@ -47,11 +47,13 @@ func (c *Client) Execute(ctx context.Context, url string, req Request) ([]byte, 
 	if err != nil {
 
 		// handle requested format not available errors
-		if strings.Contains(string(result), "Requested format is not available.") {
+		if strings.Contains(string(result), "requested format is not available") {
 			err = ErrRequestedFormatNotAvailable
 		}
 
-		err = fmt.Errorf("error executing youtubedownloader: %s: %w", string(result), err)
+		// err = fmt.Errorf("error executing youtubedownloader: %s: %w", string(result), err)
+		err = fmt.Errorf("error executing youtubedownloader: %w", err)
+
 	}
 
 	log.Debug(string(result))

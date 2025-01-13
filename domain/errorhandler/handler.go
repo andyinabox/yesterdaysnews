@@ -19,10 +19,14 @@ func init() {
 	defaultErrorFunc = func(typ string, err error) {
 		log.Printf("%s error: %s\n", typ, err)
 	}
+	defaultFatalFunc = func(typ string, err error) {
+		log.Fatalf("%s error: %s\n", typ, err)
+	}
 }
 
 type Config struct {
 	ErrorFunc  func(string, error)
+	FatalFunc  func(string, error)
 	Thresholds map[string]int
 }
 
@@ -42,6 +46,7 @@ func New(ctx context.Context, cfg *Config) domain.ErrorHandler {
 
 	h := &errorHandler{
 		errorFunc:  defaultErrorFunc,
+		fatalFunc:  defaultFatalFunc,
 		thresholds: make(map[string]int),
 		errs:       make(map[string][]domain.Error),
 		stream:     stream,
@@ -67,7 +72,7 @@ func New(ctx context.Context, cfg *Config) domain.ErrorHandler {
 		// check threshold
 		limit, found := h.thresholds[err.Type()]
 		if found && h.Count(typ) > limit {
-			h.err = fmt.Errorf("recieved %d %q errors, limit is %d: %w", h.Count(typ), typ, limit, h.err)
+			h.fatalFunc(err.Type(), fmt.Errorf("recieved %d %q errors, limit is %d: %w", h.Count(typ), typ, limit, h.err))
 			return
 		}
 

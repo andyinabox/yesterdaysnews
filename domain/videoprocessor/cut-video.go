@@ -31,7 +31,7 @@ func (p *Processor) CutVideo(ctx context.Context, inFile, outFile string, edit d
 	return outFile, nil
 }
 
-func (p *Processor) CutVideoStream(ctx context.Context, errs chan<- domain.Error, inFile string, edits []domain.VideoEdit) <-chan string {
+func (p *Processor) CutVideoStream(ctx context.Context, errs chan<- domain.Error, inFile, outDir string, edits []domain.VideoEdit) <-chan string {
 	stream := make(chan string)
 
 	var wg sync.WaitGroup
@@ -45,9 +45,10 @@ func (p *Processor) CutVideoStream(ctx context.Context, errs chan<- domain.Error
 		defer wg.Done()
 
 		ext := filepath.Ext(inFile)
-		clipName := strings.Replace(inFile, ext, fmt.Sprintf("-%d%s", i, ext), 1)
+		base := filepath.Base(inFile)
+		outBase := strings.Replace(base, ext, fmt.Sprintf("-%d%s", i, ext), 1)
 
-		videoClip, err := p.CutVideo(ctx, inFile, clipName, edit)
+		videoClip, err := p.CutVideo(ctx, inFile, filepath.Join(outDir, outBase), edit)
 		if err != nil {
 			errs <- errorhandler.Err(domain.ErrTypeCutVideo, err)
 			return

@@ -46,10 +46,12 @@ func (b *Builder) Cleanup(ctx context.Context, toKeep string) ([]string, error) 
 
 	deletedObjects := streams.StringSlice(ctx, deletedStream)
 
-	log.Info("removing output dir")
-	err = os.RemoveAll(b.cfg.OutputDir)
-	if err != nil {
-		return deletedObjects, fmt.Errorf("error removing %q from filesystem: %w", b.cfg.OutputDir, err)
+	if b.cfg.RemoveFilesOnCompletion {
+		log.Info("removing output dir")
+		err = os.RemoveAll(b.cfg.OutputDir)
+		if err != nil {
+			return deletedObjects, fmt.Errorf("error removing %q from filesystem: %w", b.cfg.OutputDir, err)
+		}
 	}
 
 	return deletedObjects, nil
