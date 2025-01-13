@@ -69,7 +69,7 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 			log.Infof("finished cutting %q", clip)
 			clipStream <- clip
 		}
-		log.Info("exiting cutVideo loop")
+		log.Debug("exiting cutVideo loop")
 	}
 
 	go func() {

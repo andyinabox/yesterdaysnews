@@ -19,7 +19,7 @@ func init() {
 	flag.IntVar(&downloadCountPerPlaylist, "d", 10, "download count per playlist")
 	flag.Parse()
 
-	log.SetReportCaller(true)
+	// log.SetReportCaller(true)
 	log.SetReportTimestamp(false)
 
 	if verbose {
