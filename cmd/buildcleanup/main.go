@@ -44,7 +44,7 @@ func main() {
 	}
 
 	b = builder.New(config, eh)
-	deleted, err := b.Cleanup(ctx, "")
+	deleted, err := b.Cleanup(ctx, 2)
 	if err != nil {
 		log.Fatal(err)
 	}

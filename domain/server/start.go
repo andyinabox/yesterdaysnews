@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -25,14 +26,19 @@ func (s *Server) Start(ctx context.Context) error {
 		close(reload)
 	}()
 
+	s.buildID, err = s.getCurrentBuildID(ctx)
+	if err != nil {
+		return fmt.Errorf("error loading buildID on startup: %w", err)
+	}
+
 	s.manifest, err = s.getManifest(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("error loading manifest on startup: %w", err)
 	}
 
 	s.cg, err = s.makeCaptionGenerator(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("error making caption generator on startup: %w", err)
 	}
 
 	// poll for changes to manifest
@@ -45,17 +51,24 @@ func (s *Server) Start(ctx context.Context) error {
 				time.Sleep(s.cfg.ManifestCheckInterval)
 				log.Debug("checking manifest")
 
-				manifest, err := s.getManifest(ctx)
+				buildID, err := s.getCurrentBuildID(ctx)
 				if err != nil {
-					log.Errorf("error loading manifest: %s", err)
+					log.Errorf("error loading current buildID: %s", err)
 					continue
 				}
 
-				// log.Debug("comparing manifest date", "current", s.manifest.Date, "new", manifest.Date)
-				if manifest.Date != s.manifest.Date {
-					log.Info("manifest is updated, reloading...")
+				log.Debug("comparing buildID", "current", s.buildID, "new", buildID)
+				if buildID != s.buildID {
+					log.Info("buildID is updated, reloading...")
+
+					manifest, err := s.getManifest(ctx)
+					if err != nil {
+						log.Errorf("error loading manifest: %s", err)
+						continue
+					}
 
 					s.mu.Lock()
+					s.buildID = buildID
 					s.manifest = manifest
 					s.mu.Unlock()
 
@@ -82,13 +95,13 @@ func (s *Server) Start(ctx context.Context) error {
 func (s *Server) makeCaptionGenerator(ctx context.Context) (domain.CaptionGenerator, error) {
 	model, err := s.getModel(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting model for caption generator: %w", err)
 	}
 
 	chain := captionschain.New(0)
 	err = chain.Load(model)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error loading model for caption generator: %w", err)
 	}
 
 	cg := captiongenerator.New(chain, &captiongenerator.Config{
@@ -100,8 +113,10 @@ func (s *Server) makeCaptionGenerator(ctx context.Context) (domain.CaptionGenera
 }
 
 func (s *Server) getModel(ctx context.Context) ([]byte, error) {
-	url := s.cfg.ObjectStoreUrl + "/" + s.manifest.Files.ModelFile
+	// url := s.cfg.ObjectStoreUrl + "/" + s.manifest.Files.ModelFile
+	url := fmt.Sprintf("%s/%s/%s", s.cfg.ObjectStoreUrl, s.buildID, s.manifest.Files.ModelFile)
 
+	log.Debug("create model request: " + url)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -112,14 +127,19 @@ func (s *Server) getModel(ctx context.Context) ([]byte, error) {
 		return nil, err
 	}
 
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("recieved non-200 status code: %q", resp.Status)
+	}
+
 	defer resp.Body.Close()
 	return io.ReadAll(resp.Body)
 }
 
 func (s *Server) getManifest(ctx context.Context) (*domain.Manifest, error) {
-	url := s.cfg.ObjectStoreUrl + "/manifest.json"
 
-	// log.Debug("create manifest request: " + url)
+	url := fmt.Sprintf("%s/%s/manifest.json", s.cfg.ObjectStoreUrl, s.buildID)
+
+	log.Debug("create manifest request: " + url)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -131,16 +151,16 @@ func (s *Server) getManifest(ctx context.Context) (*domain.Manifest, error) {
 		return nil, err
 	}
 
-	// log.Debug("read manifest response")
+	log.Debug("read manifest response")
 	defer resp.Body.Close()
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	// log.Debug(string(data))
+	log.Debug(string(data))
 
-	// log.Debug("unmarshal manifest data")
+	log.Debug("unmarshal manifest data")
 	manifest := domain.Manifest{}
 	err = json.Unmarshal(data, &manifest)
 	if err != nil {
@@ -148,4 +168,35 @@ func (s *Server) getManifest(ctx context.Context) (*domain.Manifest, error) {
 	}
 
 	return &manifest, nil
+}
+
+func (s *Server) getCurrentBuildID(ctx context.Context) (string, error) {
+	url := s.cfg.ObjectStoreUrl + "/current.txt"
+
+	log.Debug("create buildID request: " + url)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return "", err
+	}
+
+	log.Debug("do buildID request")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return "", fmt.Errorf("recieved non-200 status code: %q", resp.Status)
+	}
+
+	log.Debug("read buildID response")
+	defer resp.Body.Close()
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	log.Debug(string(data))
+
+	return string(data), nil
 }

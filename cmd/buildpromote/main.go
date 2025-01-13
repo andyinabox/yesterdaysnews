@@ -65,10 +65,10 @@ func main() {
 
 	uploadDir := manifest.ID
 
-	clips, err := b.Promote(ctx, uploadDir)
+	err = b.Promote(ctx, uploadDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Infof("finished processing %d clips", len(clips))
+	log.Infof("finished promoting %q clips", uploadDir)
 }

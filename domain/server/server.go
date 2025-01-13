@@ -27,6 +27,7 @@ type Config struct {
 type Server struct {
 	cg       domain.CaptionGenerator
 	srv      *http.Server
+	buildID  string
 	manifest *domain.Manifest
 	cfg      *Config
 	reload   <-chan struct{}
