@@ -35,17 +35,11 @@ func StringPipeThrottled(ctx context.Context, d time.Duration, inStream <-chan s
 	stream := make(chan string)
 	go func() {
 		defer close(stream)
-		for {
+		for s := range inStream {
 			select {
 			case <-ctx.Done():
 				return
 			default:
-				s, open := <-inStream
-
-				if !open {
-					return
-				}
-
 				stream <- s
 				time.Sleep(d)
 			}
@@ -100,17 +94,11 @@ func StringTransformStream(ctx context.Context, inStream <-chan string, fn func(
 
 	go func() {
 		defer close(outStream)
-		for {
+		for s := range inStream {
 			select {
 			case <-ctx.Done():
 				return
 			default:
-				s, open := <-inStream
-
-				if !open {
-					return
-				}
-
 				outStream <- fn(s)
 			}
 		}
@@ -124,21 +112,14 @@ func StringFilterStream(ctx context.Context, inStream <-chan string, fn func(str
 
 	go func() {
 		defer close(outStream)
-		for {
+		for s := range inStream {
 			select {
 			case <-ctx.Done():
 				return
 			default:
-				s, open := <-inStream
-
-				if !open {
-					return
-				}
-
 				if fn(s) {
 					outStream <- s
 				}
-
 			}
 		}
 	}()
@@ -151,17 +132,11 @@ func StringStreamTo2StringSliceStream(ctx context.Context, inStream <-chan strin
 
 	go func() {
 		defer close(outStream)
-		for {
+		for s := range inStream {
 			select {
 			case <-ctx.Done():
 				return
 			default:
-				s, open := <-inStream
-
-				if !open {
-					return
-				}
-
 				outStream <- fn(s)
 			}
 		}

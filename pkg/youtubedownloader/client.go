@@ -47,7 +47,7 @@ func (c *Client) Execute(ctx context.Context, url string, req Request) ([]byte, 
 	if err != nil {
 
 		// handle requested format not available errors
-		if strings.Contains(string(result), "requested format is not available") {
+		if strings.Contains(strings.ToLower(string(result)), "requested format is not available") {
 			err = ErrRequestedFormatNotAvailable
 		}
 

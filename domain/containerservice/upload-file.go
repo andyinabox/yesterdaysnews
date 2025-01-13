@@ -13,27 +13,12 @@ import (
 
 func (s *Service) UploadFile(ctx context.Context, filePath, fileKey, contentType string, multipart bool) (string, error) {
 
-	exists, err := s.osclient.ContainerExists(ctx, s.cfg.ContainerName)
-	if err != nil {
-		return "", err
-	}
-	if !exists {
-		return "", ErrContainerDoesNotExist
-	}
-
 	file, err := os.Open(filePath)
 	if err != nil {
 		return "", fmt.Errorf("error opening file %q: %w", filePath, err)
 	}
 
-	return s.osclient.UploadFile(
-		ctx,
-		s.cfg.ContainerName,
-		fileKey,
-		file,
-		contentType,
-		multipart,
-	)
+	return s.UploadReader(ctx, file, fileKey, contentType, multipart)
 }
 
 func (s *Service) UploadFileStream(ctx context.Context, errs chan<- domain.Error, filePaths <-chan [2]string, contentType string, multipart bool) <-chan string {

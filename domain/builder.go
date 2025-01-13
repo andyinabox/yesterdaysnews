@@ -14,6 +14,6 @@ type Builder interface {
 	VideoClips(ctx context.Context, date time.Time, uploadDir string) ([]string, error)
 	Model(ctx context.Context, uploadDir string, corpi []Corpus) (string, error)
 	Manifest(ctx context.Context, uploadDir string, manifest *Manifest) (string, error)
-	Promote(ctx context.Context, uploadDir string) (string, error)
-	Cleanup(ctx context.Context, toKeep string) ([]string, error)
+	Promote(ctx context.Context, uploadDir string) error
+	Cleanup(ctx context.Context, toKeep int) ([]string, error)
 }

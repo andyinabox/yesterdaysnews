@@ -59,14 +59,14 @@ func (b *Builder) Run(ctx context.Context) error {
 	log.Infof("successfully uploaded %q", manifestKey)
 
 	log.Info("promoting uploaded files to current...")
-	demoted, err := b.Promote(ctx, uploadDir)
+	err = b.Promote(ctx, uploadDir)
 	if err != nil {
 		return fmt.Errorf("error during Promote phase: %w", err)
 	}
-	log.Infof("promoted new files and demoted %q", demoted)
+	log.Infof("promoted %q to current", uploadDir)
 
 	log.Info("cleaning up...")
-	removed, err := b.Cleanup(ctx, demoted)
+	removed, err := b.Cleanup(ctx, b.cfg.TotalPrefixesToKeep)
 	if err != nil {
 		return fmt.Errorf("error during Cleanup phase: %w", err)
 	}

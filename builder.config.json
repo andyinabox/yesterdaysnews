@@ -12,5 +12,6 @@
   "MinClipLengthSeconds": 5,
   "MaxClipLengthSeconds": 20,
   "CaptionPrefixLength": 2,
-  "RemoveFilesOnCompletion": false
+  "RemoveFilesOnCompletion": false,
+  "TotalPrefixesToKeep": 2
 }

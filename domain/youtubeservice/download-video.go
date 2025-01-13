@@ -40,10 +40,10 @@ func (s *Service) DownloadVideoStream(ctx context.Context, errs chan<- domain.Er
 	}
 
 	// video download func
-	// not checking for ctx.Done() here,
 	// that should be done further down the chain
 	downloadVideo := func(id string) {
 		defer wg.Done()
+
 		log.Info("Download video", "id", id)
 		path, err := s.DownloadVideo(ctx, id, outDir)
 
@@ -60,17 +60,11 @@ func (s *Service) DownloadVideoStream(ctx context.Context, errs chan<- domain.Er
 	// main goroutine
 	go func() {
 		defer cleanup()
-		for {
+		for id := range ids {
 			select {
 			case <-ctx.Done():
 				return
 			default:
-				id, open := <-ids
-
-				if !open {
-					return
-				}
-
 				wg.Add(1)
 				go downloadVideo(id)
 			}

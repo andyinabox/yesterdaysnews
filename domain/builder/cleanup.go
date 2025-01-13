@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -11,40 +13,47 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
 )
 
-func (b *Builder) Cleanup(ctx context.Context, toKeep string) ([]string, error) {
+func (b *Builder) Cleanup(ctx context.Context, toKeep int) ([]string, error) {
+
+	deletedObjects := []string{}
 
 	prefixes, err := b.cs.ListPrefixes(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error listing container prefixes: %w", err)
 	}
 
-	prefixesStream := streams.StringStreamThrottled(ctx, time.Millisecond, prefixes...)
+	toDelete := getPrefixesToDelete(prefixes, toKeep)
 
-	filteredPrefixesStream := streams.StringFilterStream(ctx, prefixesStream, func(s string) bool {
-		log.Debugf("checking %q", s)
+	if len(toDelete) != 0 {
+		log.Infof("found %d prefixes to delete: %v", len(toDelete), toDelete)
+		prefixesStream := streams.StringStreamThrottled(ctx, time.Millisecond, toDelete...)
 
-		// skip primary dir
-		if strings.HasPrefix(s, b.cfg.ObjectStorePrimaryDir) {
-			return false
-		}
+		// filteredPrefixesStream := streams.StringFilterStream(ctx, prefixesStream, func(s string) bool {
+		// 	log.Debugf("checking %q", s)
 
-		// skip dir to keep
-		if toKeep != "" && strings.HasPrefix(s, toKeep) {
-			return false
-		}
+		// 	// skip primary dir
+		// 	if strings.HasPrefix(s, b.cfg.ObjectStorePrimaryDir) {
+		// 		return false
+		// 	}
 
-		log.Debugf("adding %q to delete stream", s)
-		return true
-	})
+		// 	// skip dir to keep
+		// 	if toKeep != "" && strings.HasPrefix(s, toKeep) {
+		// 		return false
+		// 	}
 
-	objectsWithPrefixStream := b.cs.ListObjectsWithPrefixStream(ctx, b.errs, filteredPrefixesStream)
+		// 	log.Debugf("adding %q to delete stream", s)
+		// 	return true
+		// })
 
-	// add throttling
-	objectsToDeleteStream := streams.StringPipeThrottled(ctx, time.Millisecond, objectsWithPrefixStream)
+		objectsWithPrefixStream := b.cs.ListObjectsWithPrefixStream(ctx, b.errs, prefixesStream)
 
-	deletedStream := b.cs.DeleteObjectStream(ctx, b.errs, objectsToDeleteStream)
+		// add throttling
+		objectsToDeleteStream := streams.StringPipeThrottled(ctx, time.Millisecond, objectsWithPrefixStream)
 
-	deletedObjects := streams.StringSlice(ctx, deletedStream)
+		deletedStream := b.cs.DeleteObjectStream(ctx, b.errs, objectsToDeleteStream)
+
+		deletedObjects = streams.StringSlice(ctx, deletedStream)
+	}
 
 	if b.cfg.RemoveFilesOnCompletion {
 		log.Info("removing output dir")
@@ -55,4 +64,28 @@ func (b *Builder) Cleanup(ctx context.Context, toKeep string) ([]string, error) 
 	}
 
 	return deletedObjects, nil
+}
+
+func getPrefixesToDelete(prefixes []string, totalToKeep int) []string {
+
+	if len(prefixes) <= totalToKeep {
+		return []string{}
+	}
+
+	// sort prefixes by number
+	sort.Slice(prefixes, func(i, j int) bool {
+		s1 := strings.ReplaceAll(prefixes[i], "/", "")
+		n1, err := strconv.Atoi(s1)
+		if err != nil {
+			return false
+		}
+		s2 := strings.ReplaceAll(prefixes[j], "/", "")
+		n2, err := strconv.Atoi(s2)
+		if err != nil {
+			return true
+		}
+		return n1 > n2
+	})
+
+	return prefixes[totalToKeep:]
 }
