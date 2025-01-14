@@ -66,7 +66,7 @@ func (b *Builder) Run(ctx context.Context) error {
 	log.Infof("promoted %q to current", uploadDir)
 
 	log.Info("cleaning up...")
-	removed, err := b.Cleanup(ctx, b.cfg.TotalPrefixesToKeep)
+	removed, err := b.Cleanup(ctx, b.cfg.TotalBuildsToKeep)
 	if err != nil {
 		return fmt.Errorf("error during Cleanup phase: %w", err)
 	}

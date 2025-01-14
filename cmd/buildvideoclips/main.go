@@ -52,7 +52,7 @@ func main() {
 	config.DownloadCountPerPlaylist = 1
 
 	// making output dirs
-	err = os.MkdirAll(filepath.Join(config.OutputDir, config.ClipsDirName), os.ModePerm)
+	err = os.MkdirAll(filepath.Join(config.OutputDir, domain.ClipsDirName), os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
 	}
