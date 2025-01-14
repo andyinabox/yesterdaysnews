@@ -11,6 +11,7 @@ type YouTubeVideo struct {
 	AspectRatio        float32                      `json:"aspect_ratio"`
 	Ext                string                       `json:"ext"`
 	Filename           string                       `json:"filename"`
+	FilesizeApprox     uint                         `json:"filesize_approx"`
 	UploadDate         string                       `json:"upload_date"` // format: YYYMMDD
 	Timestamp          uint                         `json:"timestamp"`   // format: 1734177608 (js timestamp i think)
 	Formats            []YouTubeVideoFormat         `json:"formats"`

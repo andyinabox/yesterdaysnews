@@ -6,4 +6,5 @@ const (
 	ManifestFileName       = "manifest.json"
 	ClipsDirName           = "clips"
 	CurrentBuildIDFileName = "current.txt"
+	MaxVideoSize           = 50 * 1048576 // 50MB
 )

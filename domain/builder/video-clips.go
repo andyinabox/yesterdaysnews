@@ -108,7 +108,7 @@ func (b *Builder) videoIDStream(ctx context.Context, date time.Time, playlistIDs
 		go func() {
 			defer wg.Done()
 			log.Infof("getting video id stream for %q", playlistID)
-			playlistIDs := b.yt.GetPlaylistVideoIDStream(ctx, b.errs, playlistID, date, b.cfg.DownloadCountPerPlaylist)
+			playlistIDs := b.yt.GetPlaylistVideoIDStream(ctx, b.errs, playlistID, date, b.cfg.MaxVideoSize, b.cfg.DownloadCountPerPlaylist)
 			for id := range playlistIDs {
 				log.Infof("got new video ID: %s", id)
 				stream <- id
