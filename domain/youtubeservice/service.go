@@ -23,5 +23,6 @@ func New(cfg *Config) *Service {
 	return &Service{
 		ytapi: youtubeapi.New(cfg.GoogleAPIKey),
 		ytdl:  youtubedownloader.New(cfg.BinPathYTDLP),
+		cfg:   cfg,
 	}
 }

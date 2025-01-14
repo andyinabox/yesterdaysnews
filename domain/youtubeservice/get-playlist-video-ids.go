@@ -16,7 +16,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
 )
 
-func (s *Service) GetPlaylistVideoIDs(ctx context.Context, date time.Time, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
+func (s *Service) GetPlaylistVideoIDs(ctx context.Context, date time.Time, maxSize uint, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var resp *response.PlaylistItemsListResponse
@@ -60,6 +60,12 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, date time.Time, playl
 				return
 			}
 
+			// check filesize
+			if videoInfo.FilesizeApprox > maxSize {
+				log.Debugf("skipping video %s: size %d is too large", id, videoInfo.FilesizeApprox)
+				return
+			}
+
 			// check for captions
 			if c, ok := videoInfo.AutomaticCaptions["en"]; !ok || len(c) == 0 {
 				log.Debugf("skipping video %s: no subtitles", id)
@@ -78,7 +84,7 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, date time.Time, playl
 	return
 }
 
-func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- domain.Error, playlistId string, date time.Time, count int) <-chan string {
+func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- domain.Error, playlistId string, date time.Time, maxSize uint, count int) <-chan string {
 	stream := make(chan string)
 
 	cleanup := func() {
@@ -108,7 +114,7 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 					return
 				}
 
-				ids, pageToken, err = s.GetPlaylistVideoIDs(ctx, date, playlistId, pageToken)
+				ids, pageToken, err = s.GetPlaylistVideoIDs(ctx, date, maxSize, playlistId, pageToken)
 				totalRequests++
 				if err != nil {
 					errs <- errorhandler.Err(domain.ErrTypeGetVideoID, err)

@@ -19,6 +19,7 @@ type Config struct {
 	DownloadCountPerPlaylist int
 	ObjectStoreContainerName string
 	OutputDir                string
+	MaxVideoSize             uint
 	MinClipLengthSeconds     int
 	MaxClipLengthSeconds     int
 	CaptionPrefixLength      int

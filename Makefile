@@ -1,14 +1,10 @@
 .PHONY: upload
-build: clobber
+build: clean
 	go run ./cmd/build/main.go -d 10
 
 .PHONY: clean
 clean:
 	-rm -rf dist
-
-.PHONY: clobber
-clobber: clean
-	-rm -rf download
 
 .PHONY: objectstoremock
 objectstoremock:
