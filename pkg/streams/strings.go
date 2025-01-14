@@ -144,3 +144,69 @@ func StringStreamTo2StringSliceStream(ctx context.Context, inStream <-chan strin
 
 	return outStream
 }
+
+func MergeStringStreams(ctx context.Context, streams ...<-chan string) <-chan string {
+	merged := make(chan string)
+
+	var wg sync.WaitGroup
+
+	wg.Add(len(streams))
+	for _, stream := range streams {
+		go func() {
+			defer wg.Done()
+			for s := range stream {
+				select {
+				case <-ctx.Done():
+					return
+				default:
+					merged <- s
+				}
+			}
+		}()
+	}
+
+	// close merge stream
+	go func() {
+		wg.Wait()
+		close(merged)
+	}()
+
+	return merged
+}
+
+func BifurcatedStringStream(ctx context.Context, stream <-chan string, fn func(s string) bool) (<-chan string, <-chan string) {
+	trueStream := make(chan string)
+	falseStream := make(chan string)
+
+	var wg sync.WaitGroup
+
+	cleanup := func() {
+		wg.Wait()
+		close(trueStream)
+		close(falseStream)
+	}
+
+	check := func(s string) {
+		defer wg.Done()
+		if fn(s) {
+			trueStream <- s
+		} else {
+			falseStream <- s
+		}
+	}
+
+	go func() {
+		defer cleanup()
+		for s := range stream {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				wg.Add(1)
+				go check(s)
+			}
+		}
+	}()
+
+	return trueStream, falseStream
+}

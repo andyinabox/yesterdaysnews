@@ -7,6 +7,7 @@ import (
 
 type ContainerService interface {
 	GetObject(ctx context.Context, fileKey string) ([]byte, error)
+	ObjectExists(ct context.Context, fileKey string) (bool, error)
 	ListPrefixes(context.Context) ([]string, error)
 	ListObjectsWithPrefix(ctx context.Context, prefix string) ([]string, error)
 	ListObjectsWithPrefixStream(ctx context.Context, errs chan<- Error, prefixes <-chan string) <-chan string
