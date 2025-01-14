@@ -14,8 +14,9 @@ func (s *Server) Index() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		clipUrl := fmt.Sprintf(
-			"%s/%s",
+			"%s/%s/%s",
 			s.cfg.ObjectStoreUrl,
+			s.buildID,
 			s.manifest.Files.Clips[rand.Intn(len(s.manifest.Files.Clips))],
 		)
 

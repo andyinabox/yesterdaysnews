@@ -10,8 +10,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 )
 
-var ErrBucketDoesNotExist = fmt.Errorf("bucket does not exist")
-
 type ListObjectsRequest struct {
 	Prefix string
 }

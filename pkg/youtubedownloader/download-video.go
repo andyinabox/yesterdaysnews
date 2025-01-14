@@ -3,6 +3,7 @@ package youtubedownloader
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 )
 
 // DownloadVideo will execute a download with JSON response, so it's possible to get info about
@@ -14,13 +15,13 @@ func (c *Client) DownloadVideo(ctx context.Context, url string, req Request) (*Y
 
 	result, err := c.Execute(ctx, url, req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error downloading video %q: %w", url, err)
 	}
 
 	video := YouTubeVideo{}
 	err = json.Unmarshal(result, &video)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error unmarshaling video download result: %w", err)
 	}
 
 	return &video, err

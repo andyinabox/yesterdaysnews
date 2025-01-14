@@ -16,7 +16,7 @@ func (s *Server) Clips() http.HandlerFunc {
 		clips := make([]string, len(s.manifest.Files.Clips))
 
 		for i, c := range s.manifest.Files.Clips {
-			clips[i] = fmt.Sprintf("%s/%s", s.cfg.ObjectStoreUrl, c)
+			clips[i] = fmt.Sprintf("%s/%s/%s", s.cfg.ObjectStoreUrl, s.buildID, c)
 		}
 
 		rand.Shuffle(len(clips), func(i, j int) {

@@ -1,0 +1,38 @@
+package builder
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+
+	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
+)
+
+func (b *Builder) Model(ctx context.Context, uploadDir string, corpi []domain.Corpus) (string, error) {
+	cc := captionschain.New(b.cfg.CaptionPrefixLength)
+	cc.BuildFromMultiple(corpi)
+
+	data, err := cc.Save()
+	if err != nil {
+		return "", fmt.Errorf("error saving model data: %w", err)
+	}
+
+	modelFilePath := filepath.Join(b.cfg.OutputDir, domain.ManifestModelFileName)
+	log.Infof("saving model file to %q", modelFilePath)
+	err = os.WriteFile(modelFilePath, data, os.ModePerm)
+	if err != nil {
+		return "", fmt.Errorf("error saving model file %s: %w", domain.ManifestModelFileName, err)
+	}
+
+	modelFileKey := filepath.Join(uploadDir, domain.ManifestModelFileName)
+	log.Infof("uploading %q as %q", modelFilePath, modelFileKey)
+	modelFileKey, err = b.cs.UploadFile(ctx, modelFilePath, modelFileKey, "application/json", false)
+	if err != nil {
+		return "", fmt.Errorf("error uploading %q: %w", modelFileKey, err)
+	}
+
+	return domain.ManifestModelFileName, nil
+}

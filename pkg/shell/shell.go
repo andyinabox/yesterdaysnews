@@ -3,8 +3,6 @@ package shell
 import (
 	"context"
 	"strings"
-
-	"github.com/charmbracelet/log"
 )
 
 type Shell struct{}
@@ -19,10 +17,10 @@ type logWriter struct {
 }
 
 func (l *logWriter) Write(d []byte) (int, error) {
-	lines := strings.Split(string(d), "\n")
-	for _, l := range lines {
-		log.Debug(l)
-	}
+	// lines := strings.Split(string(d), "\n")
+	// for _, l := range lines {
+	// 	log.Debug(l)
+	// }
 	return len(d), nil
 }
 
