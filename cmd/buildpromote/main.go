@@ -12,6 +12,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/builder"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
 )
 
 var verbose bool
@@ -40,13 +41,13 @@ func main() {
 	defer eh.Report()
 
 	// load config
-	config := &builder.Config{}
-	err := config.Load("builder.config.json")
+	config := builder.Config{}
+	err := configloader.LoadJSONFile(&config, "builder.config.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	b = builder.New(config, eh)
+	b = builder.New(&config, eh)
 	err = b.Setup(ctx)
 	if err != nil {
 		log.Fatal(err)

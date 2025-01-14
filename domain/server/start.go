@@ -118,7 +118,7 @@ func (s *Server) getModel(ctx context.Context) ([]byte, error) {
 }
 
 func (s *Server) getManifest(ctx context.Context) (*domain.Manifest, error) {
-	data, err := s.getObjectStoreFile(ctx, fmt.Sprintf("%s/%s", s.buildID, "manifest.json"))
+	data, err := s.getObjectStoreFile(ctx, fmt.Sprintf("%s/%s", s.buildID, domain.ManifestFileName))
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func (s *Server) getManifest(ctx context.Context) (*domain.Manifest, error) {
 
 func (s *Server) getCurrentBuildID(ctx context.Context) (string, error) {
 
-	data, err := s.getObjectStoreFile(ctx, "current.txt")
+	data, err := s.getObjectStoreFile(ctx, domain.CurrentBuildIDFileName)
 	if err != nil {
 		return "", fmt.Errorf("error getting current build id: %w", err)
 	}

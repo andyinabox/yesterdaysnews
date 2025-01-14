@@ -20,19 +20,19 @@ func (b *Builder) Model(ctx context.Context, uploadDir string, corpi []domain.Co
 		return "", fmt.Errorf("error saving model data: %w", err)
 	}
 
-	modelFilePath := filepath.Join(b.cfg.OutputDir, domain.ManifestModelFileName)
+	modelFilePath := filepath.Join(b.cfg.OutputDir, domain.ModelFileName)
 	log.Infof("saving model file to %q", modelFilePath)
 	err = os.WriteFile(modelFilePath, data, os.ModePerm)
 	if err != nil {
-		return "", fmt.Errorf("error saving model file %s: %w", domain.ManifestModelFileName, err)
+		return "", fmt.Errorf("error saving model file %s: %w", domain.ModelFileName, err)
 	}
 
-	modelFileKey := filepath.Join(uploadDir, domain.ManifestModelFileName)
+	modelFileKey := filepath.Join(uploadDir, domain.ModelFileName)
 	log.Infof("uploading %q as %q", modelFilePath, modelFileKey)
 	modelFileKey, err = b.cs.UploadFile(ctx, modelFilePath, modelFileKey, "application/json", false)
 	if err != nil {
 		return "", fmt.Errorf("error uploading %q: %w", modelFileKey, err)
 	}
 
-	return domain.ManifestModelFileName, nil
+	return domain.ModelFileName, nil
 }

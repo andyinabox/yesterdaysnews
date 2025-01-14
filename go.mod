@@ -1,6 +1,8 @@
 module gitlab.com/andyinabox/yesterdaysnews
 
-go 1.22.1
+go 1.22.4
+
+toolchain go1.22.10
 
 require (
 	github.com/aws/aws-sdk-go v1.55.5
@@ -31,6 +33,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.3 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/lipgloss v0.10.0 // indirect
+	github.com/codingconcepts/env v0.0.0-20240618133406-5b0845441187 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect

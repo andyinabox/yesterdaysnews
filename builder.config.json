@@ -4,14 +4,12 @@
     "UUaXkIU1QidjPwiAYu6GcHjg",
     "UUXIJgqnII2ZOINSWNOGFThA"
   ],
-  "DownloadCountPerPlaylist": 10,
   "ObjectStoreContainerName": "yesterdaysnews",
-  "ObjectStorePrimaryDir": "current",
   "OutputDir": "dist",
-  "ClipsDirName": "clips",
+  "DownloadCountPerPlaylist": 10,
   "MinClipLengthSeconds": 5,
   "MaxClipLengthSeconds": 20,
   "CaptionPrefixLength": 2,
-  "RemoveFilesOnCompletion": false,
-  "TotalPrefixesToKeep": 2
+  "TotalBuildsToKeep": 2,
+  "RemoveFilesOnCompletion": false
 }

@@ -11,6 +11,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/builder"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
@@ -40,8 +41,8 @@ func main() {
 	defer eh.Report()
 
 	// load config
-	config := &builder.Config{}
-	err := config.Load("builder.config.json")
+	config := builder.Config{}
+	err := configloader.LoadJSONFile(&config, "builder.config.json")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,12 +52,12 @@ func main() {
 	config.DownloadCountPerPlaylist = 1
 
 	// making output dirs
-	err = os.MkdirAll(filepath.Join(config.OutputDir, config.ClipsDirName), os.ModePerm)
+	err = os.MkdirAll(filepath.Join(config.OutputDir, domain.ClipsDirName), os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	b = builder.New(config, eh)
+	b = builder.New(&config, eh)
 
 	yesterday := util.Yesterday()
 	uploadDir := util.Timestamp(yesterday)
