@@ -7,6 +7,7 @@
   "ObjectStoreContainerName": "yesterdaysnews",
   "OutputDir": "dist",
   "DownloadCountPerPlaylist": 10,
+  "MaxVideoSize": 52428800,
   "MinClipLengthSeconds": 5,
   "MaxClipLengthSeconds": 20,
   "CaptionPrefixLength": 2,
