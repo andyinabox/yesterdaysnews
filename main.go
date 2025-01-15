@@ -71,6 +71,14 @@ func main() {
 		log.Fatalf("error parsing manifest interval %s: %s", manifestCheckIntervalStr, err)
 	}
 
+	// for {
+	// 	if os.Getenv("YN_OBJECTSTORE_URL") != "" {
+	// 		break
+	// 	}
+	// 	log.Warn("env var %q is not yet set, retrying shortly...", "YN_OBJECTSTORE_URL")
+	// 	time.Sleep(500 * time.Millisecond)
+	// }
+
 	cfg := &server.Config{
 		ObjectStoreUrl:        os.Getenv("YN_OBJECTSTORE_URL"),
 		Templates:             template.Must(template.New("index.html.tmpl").Parse(indexTemplate)),
