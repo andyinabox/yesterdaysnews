@@ -8,11 +8,21 @@ import (
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 func (b *Builder) Run(ctx context.Context) error {
 	var err error
+
+	defer func() {
+		log.Info("cleaning up...")
+		removed, err := b.Cleanup(ctx, b.cfg.TotalBuildsToKeep)
+		if err != nil {
+			b.errs <- errorhandler.Err(domain.ErrTypeCleanup, fmt.Errorf("error during Cleanup phase: %w", err))
+		}
+		log.Infof("removed %d objects from object store", len(removed))
+	}()
 
 	log.Info("running setup...")
 	err = b.Setup(ctx)
@@ -64,13 +74,6 @@ func (b *Builder) Run(ctx context.Context) error {
 		return fmt.Errorf("error during Promote phase: %w", err)
 	}
 	log.Infof("promoted %q to current", uploadDir)
-
-	log.Info("cleaning up...")
-	removed, err := b.Cleanup(ctx, b.cfg.TotalBuildsToKeep)
-	if err != nil {
-		return fmt.Errorf("error during Cleanup phase: %w", err)
-	}
-	log.Infof("removed %d objects from object store", len(removed))
 
 	return nil
 }

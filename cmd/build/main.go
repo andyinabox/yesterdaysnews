@@ -6,8 +6,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -58,7 +60,7 @@ func init() {
 	flag.IntVar(&captionPrefixLength, "prefixlength", 2, "caption chain prefix length")
 	flag.IntVar(&captionNewsCorpusWeight, "newsweight", 1, "weight for the news corpus in chain")
 	flag.IntVar(&captionHospitalCorpusWeight, "hospitalweight", 1, "weight for the hospital corpus in chain")
-	flag.IntVar(&totalBuildsToKeep, "buildstokeep", 2, "total completed builds to keep when cleaning up")
+	flag.IntVar(&totalBuildsToKeep, "buildstokeep", 5, "total completed builds to keep when cleaning up")
 
 	// just to clarify, by default this WILL remove files but adding the --keepoutput flag will cancel cleanup
 	flag.BoolVar(&keepOutputFiles, "keepoutput", false, "keep artifacts after successful build")
@@ -80,10 +82,20 @@ func init() {
 
 func main() {
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 
 	eh := errorhandler.DefaultErrorHandler(ctx, downloadCountPerPlaylist*3)
 	defer eh.Report()
+
+	// capture sigint
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		cancel()
+		eh.Report()
+		os.Exit(1)
+	}()
 
 	// load config
 	config := builder.Config{
