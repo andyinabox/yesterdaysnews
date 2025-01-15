@@ -13,18 +13,21 @@ type Config struct {
 	S3Endpoint   string `env:"YN_S3_ENDPOINT" required:"true"`
 	S3AccessKey  string `env:"YN_S3_ACCESS_KEY" required:"true"`
 	S3SecretKey  string `env:"YN_S3_SECRET_ACCESS_KEY" required:"true"`
+	S3Region     string `env:"YN_S3_REGION" required:"true"`
 
 	// config variables
-	PlaylistIDs              []string
-	DownloadCountPerPlaylist int
-	ObjectStoreContainerName string
-	OutputDir                string
-	MaxVideoSize             uint
-	MinClipLengthSeconds     int
-	MaxClipLengthSeconds     int
-	CaptionPrefixLength      int
-	RemoveFilesOnCompletion  bool
-	TotalBuildsToKeep        int
+	PlaylistIDs                 []string
+	DownloadCountPerPlaylist    int
+	ObjectStoreContainerName    string
+	OutputDir                   string
+	MaxVideoSize                uint
+	MinClipLengthSeconds        int
+	MaxClipLengthSeconds        int
+	CaptionPrefixLength         int
+	CaptionNewsCorpusWeight     int
+	CaptionHospitalCorpusWeight int
+	RemoveFilesOnCompletion     bool
+	TotalBuildsToKeep           int
 }
 
 type Builder struct {

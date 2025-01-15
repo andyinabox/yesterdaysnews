@@ -34,6 +34,7 @@ class VideoPlayer extends HTMLElement {
   async preloadNextClip() {
     // get the next url
     const url = this.clips.pop()
+    console.log('start preloading clip ' + url)
     // fetch the video
     const resp = await fetch(url)
     // get the video data as array buffer
@@ -42,6 +43,7 @@ class VideoPlayer extends HTMLElement {
     this.preloaded.push(
       URL.createObjectURL(new Blob([data], { type: 'video/webm' }))
     )
+    console.log('done preloading clip ' + url)
   }
 
   async loadClips() {

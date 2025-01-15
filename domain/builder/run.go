@@ -37,12 +37,12 @@ func (b *Builder) Run(ctx context.Context) error {
 		{
 			Type:     domain.CorpusTypeVTT,
 			FileGlob: filepath.Join(b.cfg.OutputDir, "*.vtt"),
-			Weight:   1,
+			Weight:   b.cfg.CaptionNewsCorpusWeight,
 		},
 		{
 			Type:     domain.CorpusTypeText,
 			FileGlob: "hospital.txt",
-			Weight:   3,
+			Weight:   b.cfg.CaptionHospitalCorpusWeight,
 		},
 	})
 	if err != nil {

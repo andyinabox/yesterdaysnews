@@ -15,7 +15,7 @@ func (s *Service) UploadReader(ctx context.Context, r io.Reader, fileKey, conten
 		return "", ErrContainerDoesNotExist
 	}
 
-	return s.osclient.UploadFile(
+	return s.osclient.UploadPublicFile(
 		ctx,
 		s.cfg.ContainerName,
 		fileKey,
