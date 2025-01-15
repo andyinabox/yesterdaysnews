@@ -1,34 +1,20 @@
-class VideoPlayer extends HTMLElement {
+class VideoPlayer {
   clips = []
   preloaded = []
 
-  constructor() {
-    super()
-
+  constructor(videoId) {
     // create video element
-    this.video = document.createElement('video')
-    this.video.setAttribute('muted', true)
+    this.video = document.getElementById(videoId)
     this.video.addEventListener('ended', this.onVideoEnded.bind(this))
     this.video.addEventListener('error', this.onVideoError.bind(this))
 
     // create source element
-    this.videoSource = document.createElement('source')
-    this.videoSource.setAttribute('type', 'video/webm')
+    this.videoSource = this.video.querySelector('source')
 
-    // add source to video
-    this.video.appendChild(this.videoSource)
-  }
-  connectedCallback() {
-    this.resourceUrl = this.getAttribute('resource-url')
+    this.resourceUrl = this.video.getAttribute('data-resource-url')
 
     // load the list of clips
     this.clipsLoading = this.loadClips()
-
-    // append the main video player
-    this.appendChild(this.video)
-
-    // load and play the initial clip
-    this.loadNewVideo(this.getAttribute('initial-clip'))
   }
 
   async preloadNextClip() {

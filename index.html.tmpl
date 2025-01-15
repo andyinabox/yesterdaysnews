@@ -16,11 +16,14 @@
   </head>
   <body data-resource-url="/reload">
     <main>
-      <video-player resource-url="/clips" initial-clip="{{ .InitialClipURL }}"></video-player>
+      <video muted autoplay id="video" data-resource-url="/clips">
+        <source type="video/webm" src="{{ .InitialClipURL }}">
+      </video>
       <caption-display resource-url="/captions"></caption-display>
     </main>
     <script>
       ;(function(){
+        const videoPlayer = new VideoPlayer('video')
         const reloader = new Reloader("/reload")
       })()
     </script>
