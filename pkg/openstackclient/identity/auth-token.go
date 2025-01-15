@@ -18,14 +18,12 @@ const authTokenRequestTemplate = `
 					],
 					"password": {
 							"user": {
-									"name": "%s",
-									"domain": {
-											"name": "%s"
-									},
+									"id": "%s",
 									"password": "%s"
 							}
 					}
-			}
+			},
+			"scope": "unscoped"
 	}
 }	
 `
@@ -34,10 +32,11 @@ func (c *Client) AuthToken(ctx context.Context) (string, error) {
 	endpoint := fmt.Sprintf("%s/auth/tokens", c.cfg.IdentityEndpoint)
 	reqBody := strings.TrimSpace(fmt.Sprintf(
 		authTokenRequestTemplate,
-		c.cfg.Username,
-		c.cfg.UserDomainName,
+		c.cfg.UserID,
 		c.cfg.Password,
 	))
+
+	// log.Debug(reqBody)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader([]byte(reqBody)))
 	if err != nil {

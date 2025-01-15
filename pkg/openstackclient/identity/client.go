@@ -2,8 +2,7 @@ package identity
 
 type Config struct {
 	IdentityEndpoint string
-	UserDomainName   string
-	Username         string
+	UserID           string
 	Password         string
 }
 
