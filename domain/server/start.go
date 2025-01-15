@@ -50,7 +50,7 @@ func (s *Server) Start(ctx context.Context) error {
 			default:
 				time.Sleep(s.cfg.ManifestCheckInterval)
 
-				log.Debug("checking build id")
+				log.Info("checking build id")
 
 				newBuildID, err := s.getCurrentBuildID(ctx)
 				if err != nil {

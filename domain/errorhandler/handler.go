@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/charmbracelet/log"
 
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
@@ -17,7 +18,7 @@ var defaultErrorFunc, defaultFatalFunc func(string, error)
 
 func init() {
 	defaultErrorFunc = func(typ string, err error) {
-		log.Printf("%s error: %s\n", typ, err)
+		log.Errorf("%s error: %s\n", typ, err)
 	}
 	defaultFatalFunc = func(typ string, err error) {
 		log.Fatalf("%s error: %s\n", typ, err)
@@ -25,9 +26,10 @@ func init() {
 }
 
 type Config struct {
-	ErrorFunc  func(string, error)
-	FatalFunc  func(string, error)
-	Thresholds map[string]int
+	SaveErrorFile bool
+	ErrorFunc     func(string, error)
+	FatalFunc     func(string, error)
+	Thresholds    map[string]int
 }
 
 type errorHandler struct {
@@ -37,6 +39,7 @@ type errorHandler struct {
 	errs       map[string][]domain.Error
 	stream     chan domain.Error
 	err        error
+	cfg        *Config
 }
 
 func New(ctx context.Context, cfg *Config) domain.ErrorHandler {
@@ -50,6 +53,7 @@ func New(ctx context.Context, cfg *Config) domain.ErrorHandler {
 		thresholds: make(map[string]int),
 		errs:       make(map[string][]domain.Error),
 		stream:     stream,
+		cfg:        cfg,
 	}
 
 	if cfg.ErrorFunc != nil {
@@ -142,19 +146,21 @@ func (h *errorHandler) String() (str string) {
 func (h *errorHandler) Report() {
 	if h.CountAll() > 0 {
 
-		log.Println(h.String())
+		log.Error(h.String())
 
-		// don't output file if no filename is provided
-		data, err := h.MarshalJSON()
-		if err != nil {
-			log.Printf("error marshaling error data: %s\n", err)
-			return
+		if h.cfg.SaveErrorFile {
+			// don't output file if no filename is provided
+			data, err := h.MarshalJSON()
+			if err != nil {
+				log.Errorf("error marshaling error data: %s\n", err)
+				return
+			}
+
+			_ = os.WriteFile(fmt.Sprintf("errors.%s.json", util.Timestamp(time.Now())), data, os.ModePerm)
 		}
 
-		_ = os.WriteFile(fmt.Sprintf("errors.%s.json", util.Timestamp(time.Now())), data, os.ModePerm)
-
 	} else {
-		log.Println("no errors to report")
+		log.Info("no errors to report")
 	}
 }
 
