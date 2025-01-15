@@ -5,6 +5,18 @@ import (
 	"time"
 )
 
+type BuildPhase string
+
+const (
+	BuildPhaseAll        BuildPhase = "all"
+	BuildPhaseSetup      BuildPhase = "setup"
+	BuildPhaseVideoClips BuildPhase = "video-clips"
+	BuildPhaseModel      BuildPhase = "model"
+	BuildPhaseManifest   BuildPhase = "manifest"
+	BuildPhasePromote    BuildPhase = "promote"
+	BuildPhaseCleanup    BuildPhase = "cleanup"
+)
+
 type Builder interface {
 	// Run will execute the below subcommands in sequence
 	Run(ctx context.Context) error
