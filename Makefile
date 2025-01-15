@@ -2,6 +2,26 @@
 build: clean
 	go run ./cmd/build/main.go --keepoutput
 
+.PHONY: build-setup
+build-setup:
+	go run ./cmd/build/main.go -v -b setup
+
+.PHONY: build-video-clips
+build-video-clips:
+	go run ./cmd/build/main.go -v -b video-clips --playlistids UUaXkIU1QidjPwiAYu6GcHjg --count 1
+
+.PHONY: build-model
+build-model:
+	go run ./cmd/build/main.go -v -b model
+
+.PHONY: build-promote
+build-promote:
+	go run ./cmd/build/main.go -v -b promote
+
+.PHONY: build-cleanup
+build-cleanup:
+	go run ./cmd/build/main.go -v -b cleanup
+
 .PHONY: clean
 clean:
 	-rm -rf dist

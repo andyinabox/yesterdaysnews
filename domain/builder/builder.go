@@ -27,7 +27,7 @@ type Config struct {
 	CaptionNewsCorpusWeight     int
 	CaptionHospitalCorpusWeight int
 	TotalBuildsToKeep           int
-	RemoveFilesOnCompletion     bool
+	KeepOutputFiles             bool
 }
 
 type Builder struct {

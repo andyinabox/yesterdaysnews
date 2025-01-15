@@ -22,8 +22,8 @@ func (b *Builder) Cleanup(ctx context.Context, toKeep int) ([]string, error) {
 		return nil, fmt.Errorf("error cleaning up object store: %w", err)
 	}
 
-	if b.cfg.RemoveFilesOnCompletion {
-		log.Info("removing dir %q", b.cfg.OutputDir)
+	if !b.cfg.KeepOutputFiles {
+		log.Infof("removing dir %q", b.cfg.OutputDir)
 		err = os.RemoveAll(b.cfg.OutputDir)
 		if err != nil {
 			return deletedObjects, fmt.Errorf("error removing %q from filesystem: %w", b.cfg.OutputDir, err)

@@ -38,7 +38,7 @@ var (
 	captionNewsCorpusWeight, captionHospitalCorpusWeight int
 	totalBuildsToKeep                                    int
 
-	removeFilesOnCompletion bool
+	keepOutputFiles bool
 )
 
 func init() {
@@ -61,7 +61,7 @@ func init() {
 	flag.IntVar(&totalBuildsToKeep, "buildstokeep", 2, "total completed builds to keep when cleaning up")
 
 	// just to clarify, by default this WILL remove files but adding the --keepoutput flag will cancel cleanup
-	flag.BoolVar(&removeFilesOnCompletion, "keepoutput", true, "keep artifacts after successful build")
+	flag.BoolVar(&keepOutputFiles, "keepoutput", false, "keep artifacts after successful build")
 
 	flag.Parse()
 
@@ -98,7 +98,7 @@ func main() {
 		CaptionNewsCorpusWeight:     captionNewsCorpusWeight,
 		CaptionHospitalCorpusWeight: captionHospitalCorpusWeight,
 		TotalBuildsToKeep:           totalBuildsToKeep,
-		RemoveFilesOnCompletion:     removeFilesOnCompletion,
+		KeepOutputFiles:             keepOutputFiles,
 	}
 	// auto-load env vars
 	err := configloader.Load(&config)
@@ -111,7 +111,7 @@ func main() {
 
 	handleBuildPhaseErr := func(err error) {
 		if err != nil {
-			log.Fatalf("error building %s: %s", buildPhase, err)
+			log.Fatalf("error building %q: %s", buildPhase, err)
 		}
 	}
 
@@ -223,8 +223,14 @@ func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 func buildPromote(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
-	uploadDir := getBuildID(config)
-	err := b.Promote(ctx, uploadDir)
+	manifest, err := getManifest(config)
+	if err != nil {
+		return err
+	}
+
+	uploadDir := manifest.ID
+
+	err = b.Promote(ctx, uploadDir)
 	if err != nil {
 		return err
 	}
