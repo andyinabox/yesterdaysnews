@@ -20,7 +20,7 @@ docker-build-server:
 
 .PHONY: docker-run-server
 docker-run-server:
-	docker run --env YN_OBJECTSTORE_URL=https://s3.pub1.infomaniak.cloud/object/v1/AUTH_b28bee57175648379ec940f55adfe842/yesterdaysnews/current -p 8080:8080 andyinabox/yesterdaysnews-server
+	docker run --env YN_OBJECTSTORE_URL=https://sos-ch-dk-2.exo.io/yesterdaysnews -p 8080:8080 andyinabox/yesterdaysnews-server
 
 .PHONY: docker-push-server
 docker-push-server:

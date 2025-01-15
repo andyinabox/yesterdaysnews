@@ -29,7 +29,7 @@ func init() {
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Warn("error loading .env file: %s", err)
+		log.Warnf("error loading .env file: %s", err)
 	}
 
 	flag.BoolVar(&verbose, "v", false, "verbose logging")
@@ -70,6 +70,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("error parsing manifest interval %s: %s", manifestCheckIntervalStr, err)
 	}
+
+	// for {
+	// 	if os.Getenv("YN_OBJECTSTORE_URL") != "" {
+	// 		break
+	// 	}
+	// 	log.Warn("env var %q is not yet set, retrying shortly...", "YN_OBJECTSTORE_URL")
+	// 	time.Sleep(500 * time.Millisecond)
+	// }
 
 	cfg := &server.Config{
 		ObjectStoreUrl:        os.Getenv("YN_OBJECTSTORE_URL"),
