@@ -31,12 +31,12 @@ func (s *Server) Start(ctx context.Context) error {
 		return fmt.Errorf("error loading buildID on startup: %w", err)
 	}
 
-	s.manifest, err = s.getManifest(ctx)
+	s.manifest, err = s.getManifest(ctx, s.buildID)
 	if err != nil {
 		return fmt.Errorf("error loading manifest on startup: %w", err)
 	}
 
-	s.cg, err = s.makeCaptionGenerator(ctx)
+	s.cg, err = s.makeCaptionGenerator(ctx, s.buildID)
 	if err != nil {
 		return fmt.Errorf("error making caption generator on startup: %w", err)
 	}
@@ -52,28 +52,28 @@ func (s *Server) Start(ctx context.Context) error {
 
 				log.Debug("checking build id")
 
-				buildID, err := s.getCurrentBuildID(ctx)
+				newBuildID, err := s.getCurrentBuildID(ctx)
 				if err != nil {
 					log.Errorf("error loading current buildID: %s", err)
 					continue
 				}
 
-				log.Debug("comparing buildID", "current", s.buildID, "new", buildID)
-				if buildID != s.buildID {
+				log.Debug("comparing buildID", "current", s.buildID, "new", newBuildID)
+				if newBuildID != s.buildID {
 					log.Info("buildID is updated, reloading...")
 
-					manifest, err := s.getManifest(ctx)
+					manifest, err := s.getManifest(ctx, newBuildID)
 					if err != nil {
 						log.Errorf("error loading manifest: %s", err)
 						continue
 					}
 
 					s.mu.Lock()
-					s.buildID = buildID
+					s.buildID = newBuildID
 					s.manifest = manifest
 					s.mu.Unlock()
 
-					cg, err := s.makeCaptionGenerator(ctx)
+					cg, err := s.makeCaptionGenerator(ctx, newBuildID)
 					if err != nil {
 						log.Errorf("error making new text processor: %s", err)
 						continue
@@ -93,8 +93,8 @@ func (s *Server) Start(ctx context.Context) error {
 	return s.srv.ListenAndServe()
 }
 
-func (s *Server) makeCaptionGenerator(ctx context.Context) (domain.CaptionGenerator, error) {
-	model, err := s.getModel(ctx)
+func (s *Server) makeCaptionGenerator(ctx context.Context, buildID string) (domain.CaptionGenerator, error) {
+	model, err := s.getModel(ctx, buildID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting model for caption generator: %w", err)
 	}
@@ -113,12 +113,12 @@ func (s *Server) makeCaptionGenerator(ctx context.Context) (domain.CaptionGenera
 	return cg, nil
 }
 
-func (s *Server) getModel(ctx context.Context) ([]byte, error) {
-	return s.getObjectStoreFile(ctx, fmt.Sprintf("%s/%s", s.buildID, s.manifest.Files.ModelFile))
+func (s *Server) getModel(ctx context.Context, buildID string) ([]byte, error) {
+	return s.getObjectStoreFile(ctx, fmt.Sprintf("%s/%s", buildID, s.manifest.Files.ModelFile))
 }
 
-func (s *Server) getManifest(ctx context.Context) (*domain.Manifest, error) {
-	data, err := s.getObjectStoreFile(ctx, fmt.Sprintf("%s/%s", s.buildID, domain.ManifestFileName))
+func (s *Server) getManifest(ctx context.Context, buildID string) (*domain.Manifest, error) {
+	data, err := s.getObjectStoreFile(ctx, fmt.Sprintf("%s/%s", buildID, domain.ManifestFileName))
 	if err != nil {
 		return nil, err
 	}
