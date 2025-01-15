@@ -14,5 +14,5 @@
   "CaptionNewsCorpusWeight": 1,
   "CaptionHospitalCorpusWeight": 1,
   "TotalBuildsToKeep": 2,
-  "RemoveFilesOnCompletion": false
+  "RemoveFilesOnCompletion": true
 }
