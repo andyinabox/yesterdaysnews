@@ -7,16 +7,17 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
-func (c *Client) UploadFile(ctx context.Context, containerName, fileKey string, reader io.Reader, contentType string, multipart bool) (string, error) {
+func (c *Client) UploadPublicFile(ctx context.Context, containerName, fileKey string, reader io.Reader, contentType string, multipart bool) (string, error) {
 	if multipart {
-		return c.uploadFileMultipart(ctx, containerName, fileKey, reader, contentType)
+		return c.uploadPublicFileMultipart(ctx, containerName, fileKey, reader, contentType)
 	}
 
-	return c.uploadFile(ctx, containerName, fileKey, reader, contentType)
+	return c.uploadPublicFile(ctx, containerName, fileKey, reader, contentType)
 }
-func (c *Client) uploadFile(ctx context.Context, containerName, fileKey string, reader io.Reader, contentType string) (string, error) {
+func (c *Client) uploadPublicFile(ctx context.Context, containerName, fileKey string, reader io.Reader, contentType string) (string, error) {
 
 	client, err := c.getClient(ctx)
 	if err != nil {
@@ -28,6 +29,7 @@ func (c *Client) uploadFile(ctx context.Context, containerName, fileKey string, 
 		Key:         aws.String(fileKey),
 		Body:        reader,
 		ContentType: aws.String(contentType),
+		ACL:         types.ObjectCannedACLPublicRead,
 	})
 	if err != nil {
 		return "", fmt.Errorf("error putting file %q: %w", fileKey, err)
@@ -36,7 +38,7 @@ func (c *Client) uploadFile(ctx context.Context, containerName, fileKey string, 
 	return fileKey, nil
 }
 
-func (c *Client) uploadFileMultipart(ctx context.Context, containerName, fileKey string, reader io.Reader, contentType string) (string, error) {
+func (c *Client) uploadPublicFileMultipart(ctx context.Context, containerName, fileKey string, reader io.Reader, contentType string) (string, error) {
 
 	uploader, err := c.getUploader(ctx)
 	if err != nil {
@@ -48,7 +50,11 @@ func (c *Client) uploadFileMultipart(ctx context.Context, containerName, fileKey
 		Key:         aws.String(fileKey),
 		Body:        reader,
 		ContentType: aws.String(contentType),
+		ACL:         types.ObjectCannedACLPublicRead,
 	})
+	if err != nil {
+		return "", fmt.Errorf("error uploading file %q: %w", fileKey, err)
+	}
 
 	return fileKey, nil
 }

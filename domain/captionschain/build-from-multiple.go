@@ -18,6 +18,7 @@ func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {
 
 	// iterate through sources
 	for _, source := range sources {
+		log.Debugf("processing text from source %q", source.FileGlob)
 		files, err := filepath.Glob(source.FileGlob)
 		if err != nil {
 			return fmt.Errorf("error resolving file glob: %s: %w", source.FileGlob, err)
@@ -27,6 +28,7 @@ func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {
 
 		// iterate through files
 		for _, f := range files {
+			log.Debugf("processing file %q", f)
 			var err error
 			var parsedContent string
 
@@ -53,6 +55,8 @@ func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {
 		}
 
 	}
+
+	log.Debug(combined)
 
 	c.BasicChain.Build(strings.NewReader(combined))
 

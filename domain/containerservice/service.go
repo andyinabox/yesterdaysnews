@@ -1,7 +1,6 @@
 package containerservice
 
 import (
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
 )
 
@@ -10,6 +9,7 @@ type Config struct {
 	S3Endpoint  string
 	S3AccessKey string
 	S3SecretKey string
+	S3Region    string
 
 	// upload config
 	ContainerName string
@@ -17,7 +17,6 @@ type Config struct {
 
 type Service struct {
 	osclient *objectstoreclient.Client
-	eh       domain.ErrorHandler
 	cfg      *Config
 }
 
@@ -27,6 +26,7 @@ func New(cfg *Config) *Service {
 			Endpoint:  cfg.S3Endpoint,
 			AccessKey: cfg.S3AccessKey,
 			SecretKey: cfg.S3SecretKey,
+			Region:    cfg.S3Region,
 		}),
 		cfg: cfg,
 	}

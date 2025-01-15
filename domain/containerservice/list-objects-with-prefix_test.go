@@ -18,7 +18,8 @@ func TestListObjectsWithPrefix(t *testing.T) {
 		S3Endpoint:    os.Getenv("YN_S3_ENDPOINT"),
 		S3AccessKey:   os.Getenv("YN_S3_ACCESS_KEY"),
 		S3SecretKey:   os.Getenv("YN_S3_SECRET_ACCESS_KEY"),
-		ContainerName: "test",
+		S3Region:      os.Getenv("YN_S3_REGION"),
+		ContainerName: "yesterdaysnewstest",
 	})
 
 	ctx := context.Background()
