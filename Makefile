@@ -1,6 +1,6 @@
 .PHONY: upload
 build: clean
-	go run ./cmd/build/main.go -d 10
+	go run ./cmd/build/main.go --keepoutput
 
 .PHONY: clean
 clean:

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -20,15 +21,48 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
-var verbose bool
-var downloadCountPerPlaylist int
-var buildPhase string
+const defaultPlaylists = "UUupvZG-5ko_eiXAupbDfxWw,UUaXkIU1QidjPwiAYu6GcHjg,UUXIJgqnII2ZOINSWNOGFThA"
+
+var (
+	verbose    bool
+	buildPhase string
+
+	playlistIDs              string
+	objectStoreContainerName string
+	outputDir                string
+
+	maxVideoSize                                         int
+	downloadCountPerPlaylist                             int
+	minClipLengthSeconds, maxClipLengthSeconds           int
+	captionPrefixLength                                  int
+	captionNewsCorpusWeight, captionHospitalCorpusWeight int
+	totalBuildsToKeep                                    int
+
+	removeFilesOnCompletion bool
+)
 
 func init() {
+	// meta flags
 	flag.BoolVar(&verbose, "v", false, "verbose output")
 	flag.StringVar(&buildPhase, "b", "all", "build phase to execute")
 
-	flag.IntVar(&downloadCountPerPlaylist, "d", 10, "download count per playlist")
+	// config flags
+	flag.StringVar(&playlistIDs, "playlistids", defaultPlaylists, "comma-separated list of playlists to download")
+	flag.StringVar(&objectStoreContainerName, "containername", "yesterdaysnews", "object storage container name")
+	flag.StringVar(&outputDir, "output", "dist", "dir to output build artifacts to")
+
+	flag.IntVar(&maxVideoSize, "maxvideosize", 52428800, "max video download size in bytes")
+	flag.IntVar(&downloadCountPerPlaylist, "count", 10, "download count per playlist")
+	flag.IntVar(&minClipLengthSeconds, "mincliplength", 5, "minimum clip length in seconds")
+	flag.IntVar(&maxClipLengthSeconds, "maxcliplength", 15, "maximum clip length in seconds")
+	flag.IntVar(&captionPrefixLength, "prefixlength", 2, "caption chain prefix length")
+	flag.IntVar(&captionNewsCorpusWeight, "newsweight", 1, "weight for the news corpus in chain")
+	flag.IntVar(&captionHospitalCorpusWeight, "hospitalweight", 1, "weight for the hospital corpus in chain")
+	flag.IntVar(&totalBuildsToKeep, "buildstokeep", 2, "total completed builds to keep when cleaning up")
+
+	// just to clarify, by default this WILL remove files but adding the --keepoutput flag will cancel cleanup
+	flag.BoolVar(&removeFilesOnCompletion, "keepoutput", true, "keep artifacts after successful build")
+
 	flag.Parse()
 
 	// log.SetReportCaller(true)
@@ -52,8 +86,22 @@ func main() {
 	defer eh.Report()
 
 	// load config
-	config := builder.Config{}
-	err := configloader.LoadJSONFile(&config, "builder.config.json")
+	config := builder.Config{
+		PlaylistIDs:                 strings.Split(playlistIDs, ","),
+		ObjectStoreContainerName:    objectStoreContainerName,
+		OutputDir:                   outputDir,
+		MaxVideoSize:                uint(maxVideoSize),
+		DownloadCountPerPlaylist:    downloadCountPerPlaylist,
+		MinClipLengthSeconds:        minClipLengthSeconds,
+		MaxClipLengthSeconds:        maxClipLengthSeconds,
+		CaptionPrefixLength:         captionPrefixLength,
+		CaptionNewsCorpusWeight:     captionNewsCorpusWeight,
+		CaptionHospitalCorpusWeight: captionHospitalCorpusWeight,
+		TotalBuildsToKeep:           totalBuildsToKeep,
+		RemoveFilesOnCompletion:     removeFilesOnCompletion,
+	}
+	// auto-load env vars
+	err := configloader.Load(&config)
 	if err != nil {
 		log.Fatal(err)
 	}

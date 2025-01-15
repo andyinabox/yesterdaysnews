@@ -17,17 +17,17 @@ type Config struct {
 
 	// config variables
 	PlaylistIDs                 []string
-	DownloadCountPerPlaylist    int
 	ObjectStoreContainerName    string
 	OutputDir                   string
 	MaxVideoSize                uint
+	DownloadCountPerPlaylist    int
 	MinClipLengthSeconds        int
 	MaxClipLengthSeconds        int
 	CaptionPrefixLength         int
 	CaptionNewsCorpusWeight     int
 	CaptionHospitalCorpusWeight int
-	RemoveFilesOnCompletion     bool
 	TotalBuildsToKeep           int
+	RemoveFilesOnCompletion     bool
 }
 
 type Builder struct {
