@@ -12,6 +12,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/server"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
 )
 
 //go:embed index.html.tmpl
@@ -54,6 +55,8 @@ func init() {
 func main() {
 	var assetsFs fs.FS
 
+	ctx := context.Background()
+
 	// load assets from filesystem for development
 	if loadAssetsFromFs {
 		assetsFs = os.DirFS("assets")
@@ -71,16 +74,7 @@ func main() {
 		log.Fatalf("error parsing manifest interval %s: %s", manifestCheckIntervalStr, err)
 	}
 
-	// for {
-	// 	if os.Getenv("YN_OBJECTSTORE_URL") != "" {
-	// 		break
-	// 	}
-	// 	log.Warn("env var %q is not yet set, retrying shortly...", "YN_OBJECTSTORE_URL")
-	// 	time.Sleep(500 * time.Millisecond)
-	// }
-
 	cfg := &server.Config{
-		ObjectStoreUrl:        os.Getenv("YN_OBJECTSTORE_URL"),
 		Templates:             template.Must(template.New("index.html.tmpl").Parse(indexTemplate)),
 		Assets:                assetsFs,
 		Port:                  port,
@@ -91,9 +85,15 @@ func main() {
 		ManifestCheckInterval: manifestCheckInterval,
 	}
 
-	log.Info("creating new server", "config", cfg)
+	err = configloader.Load(cfg)
+	if err != nil {
+		log.Fatalf("error loading env vars: %s", err)
+	}
+
+	log.Info("creating new server")
+	log.Infof("%#v", cfg)
 
 	s := server.New(cfg)
 
-	log.Fatal(s.Start(context.Background()))
+	log.Fatal(s.Start(ctx))
 }

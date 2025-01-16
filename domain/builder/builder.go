@@ -9,11 +9,14 @@ import (
 
 type Config struct {
 	// env variables
-	GoogleAPIKey string `env:"GOOGLE_API_KEY" required:"true"`
-	S3Endpoint   string `env:"YN_S3_ENDPOINT" required:"true"`
-	S3AccessKey  string `env:"YN_S3_ACCESS_KEY" required:"true"`
-	S3SecretKey  string `env:"YN_S3_SECRET_ACCESS_KEY" required:"true"`
-	S3Region     string `env:"YN_S3_REGION" required:"true"`
+	GoogleAPIKey   string `env:"YN_GOOGLE_API_KEY" required:"true"`
+	S3Endpoint     string `env:"YN_S3_ENDPOINT" required:"true"`
+	S3AccessKey    string `env:"YN_S3_ACCESS_KEY" required:"true"`
+	S3SecretKey    string `env:"YN_S3_SECRET_ACCESS_KEY" required:"true"`
+	S3Region       string `env:"YN_S3_REGION" required:"true"`
+	BinPathYTDLP   string `env:"YN_YT_DLP_PATH"`
+	BinPathFFMPEG  string `env:"YN_FFMPEG_PATH"`
+	BinPathFFPROBE string `env:"YN_FFPROBE_PATH"`
 
 	// config variables
 	PlaylistIDs                 []string
@@ -43,9 +46,13 @@ func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 
 	yt := youtubeservice.New(&youtubeservice.Config{
 		GoogleAPIKey: cfg.GoogleAPIKey,
+		BinPathYTDLP: cfg.BinPathYTDLP,
 	})
 
-	vp := videoprocessor.New(&videoprocessor.Config{})
+	vp := videoprocessor.New(&videoprocessor.Config{
+		FFMpegBinPath:  cfg.BinPathFFMPEG,
+		FFProbeBinPath: cfg.BinPathFFPROBE,
+	})
 
 	cs := containerservice.New(&containerservice.Config{
 		S3Endpoint:    cfg.S3Endpoint,
