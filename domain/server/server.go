@@ -13,7 +13,8 @@ import (
 )
 
 type Config struct {
-	ObjectStoreUrl        string
+	ObjectStoreUrl        string `env:"YN_OBJECTSTORE_URL" required:"true"`
+	CDNUrl                string `env:"YN_CDN_URL" required:"true"`
 	Templates             *template.Template
 	Assets                fs.FS
 	Port                  int

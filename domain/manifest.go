@@ -3,9 +3,10 @@ package domain
 import "time"
 
 type Manifest struct {
-	Date  time.Time     `json:"date"`
-	ID    string        `json:"id"`
-	Files ManifestFiles `json:"files"`
+	BuildDate   time.Time     `json:"buildDate"`
+	ContentDate time.Time     `json:"contentDate"`
+	ID          string        `json:"id"`
+	Files       ManifestFiles `json:"files"`
 }
 
 type ManifestFiles struct {
