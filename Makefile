@@ -40,7 +40,7 @@ docker-build-server:
 
 .PHONY: docker-run-server
 docker-run-server:
-	docker run --env YN_OBJECTSTORE_URL=https://sos-ch-dk-2.exo.io/yesterdaysnews -p 8080:8080 andyinabox/yesterdaysnews-server
+	docker run --env-file .env -p 8080:8080 andyinabox/yesterdaysnews-server
 
 .PHONY: docker-push-server
 docker-push-server:

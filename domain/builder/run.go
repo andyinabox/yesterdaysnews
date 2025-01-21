@@ -4,12 +4,10 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
-	"time"
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 func (b *Builder) Run(ctx context.Context) error {
@@ -32,18 +30,16 @@ func (b *Builder) Run(ctx context.Context) error {
 
 	// create additional build vars
 	manifest := b.createManifest()
-	yesterday := util.Yesterday()
-	uploadDir := util.Timestamp(yesterday)
 
 	log.Info("building video clips...")
-	manifest.Files.Clips, err = b.VideoClips(ctx, yesterday, uploadDir)
+	manifest.Files.Clips, err = b.VideoClips(ctx, manifest.ContentDate, manifest.ID)
 	if err != nil {
 		return fmt.Errorf("error during VideoClips phase: %w", err)
 	}
 	log.Infof("processed %d clips", len(manifest.Files.Clips))
 
 	log.Info("building model...")
-	modelFile, err := b.Model(ctx, uploadDir, []domain.Corpus{
+	modelFile, err := b.Model(ctx, manifest.ID, []domain.Corpus{
 		{
 			Type:     domain.CorpusTypeVTT,
 			FileGlob: filepath.Join(b.cfg.OutputDir, "*.vtt"),
@@ -62,29 +58,18 @@ func (b *Builder) Run(ctx context.Context) error {
 	log.Infof("successfully uploaded %q", modelFile)
 
 	log.Info("uploading manifest...")
-	manifestKey, err := b.Manifest(ctx, uploadDir, manifest)
+	manifestKey, err := b.Manifest(ctx, manifest.ID, manifest)
 	if err != nil {
 		return fmt.Errorf("error during Manifest phase: %w", err)
 	}
 	log.Infof("successfully uploaded %q", manifestKey)
 
 	log.Info("promoting uploaded files to current...")
-	err = b.Promote(ctx, uploadDir)
+	err = b.Promote(ctx, manifest.ID)
 	if err != nil {
 		return fmt.Errorf("error during Promote phase: %w", err)
 	}
-	log.Infof("promoted %q to current", uploadDir)
+	log.Infof("promoted %q to current", manifest.ID)
 
 	return nil
-}
-
-func (b *Builder) createManifest() *domain.Manifest {
-	now := time.Now()
-	return &domain.Manifest{
-		Date: now,
-		ID:   util.Timestamp(now),
-		Files: domain.ManifestFiles{
-			Clips: []string{},
-		},
-	}
 }
