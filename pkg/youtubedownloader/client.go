@@ -38,6 +38,11 @@ func New(binPath string) *Client {
 
 func (c *Client) Execute(ctx context.Context, url string, req Request) ([]byte, error) {
 
+	err := c.CheckVersion(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	if url == "" {
 		return nil, ErrNoURLProvided
 	}
