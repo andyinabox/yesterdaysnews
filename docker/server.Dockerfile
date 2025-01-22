@@ -1,6 +1,4 @@
-# We are using this distro to be compatable with
-# jelastic cloud *shrug*
-FROM jelastic/golang:1.23.4-almalinux-9 AS builder
+FROM golang:1.22.4 AS build
 
 # Set the working directory
 WORKDIR /app
@@ -15,13 +13,13 @@ RUN go mod download
 EXPOSE 8080
 
 # Build the Go binary
-RUN go build -o /main .
+RUN GOOS=linux GOARCH=amd64 go build -o /main .
 
 FROM jelastic/almalinuxvps:9.3
 
 WORKDIR /
 
-COPY --from=builder /main /main
+COPY --from=build /main /main
 
 # Run the applicatio
 CMD ["/main"]
