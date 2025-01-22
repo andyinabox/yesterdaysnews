@@ -16,7 +16,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
 )
 
-func (s *Service) GetPlaylistVideoIDs(ctx context.Context, date time.Time, maxSize uint, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
+func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Error, date time.Time, maxSize uint, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var resp *response.PlaylistItemsListResponse
@@ -56,7 +56,7 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, date time.Time, maxSi
 					return
 				}
 
-				log.Errorf("skipping video %q: error getting video info: %s", id, err)
+				errs <- errorhandler.Err(domain.ErrTypeGetVideoID, fmt.Errorf("skipping video %q: error getting video info: %s", id, err))
 				return
 			}
 
@@ -110,11 +110,11 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 				log.Infof("fetch video ids for %q", playlistId)
 
 				if totalRequests >= maxRequests {
-					errs <- errorhandler.Err(domain.ErrTypeGetVideoID, fmt.Errorf("reached max requests for playlist %q, aborting", playlistId))
+					log.Warnf("reached max requests for playlist %q, aborting", playlistId)
 					return
 				}
 
-				ids, pageToken, err = s.GetPlaylistVideoIDs(ctx, date, maxSize, playlistId, pageToken)
+				ids, pageToken, err = s.GetPlaylistVideoIDs(ctx, errs, date, maxSize, playlistId, pageToken)
 				totalRequests++
 				if err != nil {
 					errs <- errorhandler.Err(domain.ErrTypeGetVideoID, err)

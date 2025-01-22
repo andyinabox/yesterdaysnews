@@ -3,7 +3,6 @@ package builder
 import (
 	"context"
 	"fmt"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -13,13 +12,14 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 func (b *Builder) Cleanup(ctx context.Context, toKeep int) ([]string, error) {
 
 	if !b.cfg.KeepOutputFiles {
-		log.Infof("removing dir %q", b.cfg.OutputDir)
-		err := os.RemoveAll(b.cfg.OutputDir)
+		log.Infof("removing contents of dir %q", b.cfg.OutputDir)
+		err := util.RemoveContents(b.cfg.OutputDir)
 		if err != nil {
 			return nil, fmt.Errorf("error removing %q from filesystem: %w", b.cfg.OutputDir, err)
 		}

@@ -8,21 +8,26 @@ import (
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 func (b *Builder) Setup(ctx context.Context) error {
-	dir := filepath.Join(b.cfg.OutputDir, domain.ClipsDirName)
+	var err error
 
-	log.Infof("removing dir %q if it exists", dir)
-	err := os.RemoveAll(dir)
-	if err != nil {
-		return fmt.Errorf("error removing dir %q: %w", dir, err)
+	if util.DoesFileExist(b.cfg.OutputDir) {
+		log.Infof("removing contents of dir %q", b.cfg.OutputDir)
+		err = util.RemoveContents(b.cfg.OutputDir)
+		if err != nil {
+			return fmt.Errorf("error removing dir %q: %w", b.cfg.OutputDir, err)
+		}
 	}
 
-	log.Infof("creating dir %q", dir)
-	err = os.MkdirAll(dir, os.ModePerm)
+	clipsDir := filepath.Join(b.cfg.OutputDir, domain.ClipsDirName)
+
+	log.Infof("creating dir %q", clipsDir)
+	err = os.MkdirAll(clipsDir, os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("error creating dir %q: %w", dir, err)
+		return fmt.Errorf("error creating dir %q: %w", clipsDir, err)
 	}
 	return nil
 }

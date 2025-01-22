@@ -24,7 +24,7 @@ build-cleanup:
 
 .PHONY: clean
 clean:
-	-rm -rf dist
+	-rm -rf dist/*
 
 .PHONY: objectstoremock
 objectstoremock:
@@ -45,3 +45,17 @@ docker-run-server:
 .PHONY: docker-push-server
 docker-push-server:
 	docker push andyinabox/yesterdaysnews-server
+
+
+
+.PHONY: docker-build-builder
+docker-build-builder:
+	docker buildx build --platform linux/arm64 -f docker/builder.Dockerfile -t andyinabox/yesterdaysnews-builder .
+
+.PHONY: docker-run-builder
+docker-run-builder:
+	docker run --env-file .env  -v dist:/dist andyinabox/yesterdaysnews-builder
+
+.PHONY: docker-push-builder
+docker-push-builder:
+	docker push andyinabox/yesterdaysnews-builder

@@ -127,7 +127,7 @@ func main() {
 		}
 	}
 
-	log.Info("running %q", buildPhase)
+	log.Infof("running %q", buildPhase)
 
 	switch domain.BuildPhase(buildPhase) {
 	case domain.BuildPhaseAll:
