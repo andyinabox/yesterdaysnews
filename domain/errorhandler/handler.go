@@ -76,7 +76,8 @@ func New(ctx context.Context, cfg *Config) domain.ErrorHandler {
 		// check threshold
 		limit, found := h.thresholds[err.Type()]
 		if found && h.Count(typ) > limit {
-			h.fatalFunc(err.Type(), fmt.Errorf("recieved %d %q errors, limit is %d: %w", h.Count(typ), typ, limit, h.err))
+			h.Report()
+			h.fatalFunc(err.Type(), fmt.Errorf("recieved %d %q errors, limit is %d: %w", h.Count(typ), typ, limit, err))
 			return
 		}
 

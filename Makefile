@@ -54,7 +54,8 @@ docker-build-builder:
 
 .PHONY: docker-run-builder
 docker-run-builder:
-	docker run --env-file .env  -v dist:/dist andyinabox/yesterdaysnews-builder
+	mkdir -p dist
+	docker run --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder
 
 .PHONY: docker-push-builder
 docker-push-builder:

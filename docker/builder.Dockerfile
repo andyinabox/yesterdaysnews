@@ -31,4 +31,4 @@ COPY --from=build /main /main
 EXPOSE 80
 
 # Run the applicatio
-CMD ["/main", "-b", "video-clips", "-count", "1", "-v"]
+CMD ["/main", "--output", "/dist"]

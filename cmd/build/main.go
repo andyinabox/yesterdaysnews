@@ -176,6 +176,11 @@ func buildSetup(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 func buildVideoClips(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
+	err := b.Setup(ctx)
+	if err != nil {
+		return err
+	}
+
 	yesterday := util.Yesterday()
 	uploadDir := util.Timestamp(yesterday)
 	clips, err := b.VideoClips(ctx, yesterday, uploadDir)
