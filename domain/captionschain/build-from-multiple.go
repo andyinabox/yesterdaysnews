@@ -18,6 +18,19 @@ func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {
 
 	// iterate through sources
 	for _, source := range sources {
+
+		// handle straightforward string corpus
+		if source.Type == domain.CorpusTypeString {
+			log.Debug("processing text from string")
+			if source.Content == "" {
+				return fmt.Errorf("corpus type %q has no content", domain.CorpusTypeString)
+			}
+
+			combined = combined + "\n" + source.Content
+			continue
+		}
+
+		// handle file-based corpus
 		log.Debugf("processing text from source %q", source.FileGlob)
 		files, err := filepath.Glob(source.FileGlob)
 		if err != nil {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -22,6 +23,9 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
+
+//go:embed hospital.txt
+var hospitalText string
 
 const defaultPlaylists = "UUupvZG-5ko_eiXAupbDfxWw,UUaXkIU1QidjPwiAYu6GcHjg,UUXIJgqnII2ZOINSWNOGFThA"
 
@@ -111,6 +115,7 @@ func main() {
 		CaptionHospitalCorpusWeight: captionHospitalCorpusWeight,
 		TotalBuildsToKeep:           totalBuildsToKeep,
 		KeepOutputFiles:             keepOutputFiles,
+		HospitalCorpus:              hospitalText,
 	}
 	// auto-load env vars
 	err := configloader.Load(&config)

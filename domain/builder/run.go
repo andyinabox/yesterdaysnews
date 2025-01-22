@@ -46,9 +46,9 @@ func (b *Builder) Run(ctx context.Context) error {
 			Weight:   b.cfg.CaptionNewsCorpusWeight,
 		},
 		{
-			Type:     domain.CorpusTypeText,
-			FileGlob: "hospital.txt",
-			Weight:   b.cfg.CaptionHospitalCorpusWeight,
+			Type:    domain.CorpusTypeString,
+			Content: b.cfg.HospitalCorpus,
+			Weight:  b.cfg.CaptionHospitalCorpusWeight,
 		},
 	})
 	if err != nil {
