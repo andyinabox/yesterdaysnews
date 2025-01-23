@@ -16,6 +16,7 @@ Todo list can be found in the [GitLab Issues](https://gitlab.com/andyinabox/yest
 Below is a command dump to track what I've done to the builder server:
 
 ```bash
+# logged in at /root
 
 # ------------------------------------------------------
 # via https://docs.docker.com/engine/install/ubuntu/
@@ -44,6 +45,8 @@ mkdir dist
 vim .env
 # added env variables
 
+# this should run the build but it isn't working yet
+docker run --rm --env-file .env -v /root/dist:/dist andyinabox/yesterdaysnews-builder --output /dist -v
 
 ```
 
