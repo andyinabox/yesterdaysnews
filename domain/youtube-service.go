@@ -6,6 +6,7 @@ import (
 )
 
 type YouTubeService interface {
+	Setup(ctx context.Context) error
 	DownloadVideo(ctx context.Context, id, outDir string) (string, error)
 	DownloadVideoStream(ctx context.Context, errs chan<- Error, ids <-chan string, outDir string) <-chan string
 	GetPlaylistVideoIDs(ctx context.Context, errs chan<- Error, date time.Time, maxSize uint, playlistId, pageToken string) (ids []string, nextPageToken string, err error)

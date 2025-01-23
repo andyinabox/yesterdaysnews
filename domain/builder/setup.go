@@ -14,6 +14,11 @@ import (
 func (b *Builder) Setup(ctx context.Context) error {
 	var err error
 
+	err = b.yt.Setup(ctx)
+	if err != nil {
+		return err
+	}
+
 	if util.DoesFileExist(b.cfg.OutputDir) {
 		log.Infof("removing contents of dir %q", b.cfg.OutputDir)
 		err = util.RemoveContents(b.cfg.OutputDir)
