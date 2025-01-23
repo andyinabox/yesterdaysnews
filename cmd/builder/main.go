@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -22,6 +23,9 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
+
+//go:embed hospital.txt
+var hospitalText string
 
 const defaultPlaylists = "UUupvZG-5ko_eiXAupbDfxWw,UUaXkIU1QidjPwiAYu6GcHjg,UUXIJgqnII2ZOINSWNOGFThA"
 
@@ -111,6 +115,7 @@ func main() {
 		CaptionHospitalCorpusWeight: captionHospitalCorpusWeight,
 		TotalBuildsToKeep:           totalBuildsToKeep,
 		KeepOutputFiles:             keepOutputFiles,
+		HospitalCorpus:              hospitalText,
 	}
 	// auto-load env vars
 	err := configloader.Load(&config)
@@ -127,7 +132,7 @@ func main() {
 		}
 	}
 
-	log.Info("running %q", buildPhase)
+	log.Infof("running %q", buildPhase)
 
 	switch domain.BuildPhase(buildPhase) {
 	case domain.BuildPhaseAll:
@@ -175,6 +180,11 @@ func buildSetup(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 
 func buildVideoClips(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
+
+	err := b.Setup(ctx)
+	if err != nil {
+		return err
+	}
 
 	yesterday := util.Yesterday()
 	uploadDir := util.Timestamp(yesterday)

@@ -34,7 +34,7 @@ func (s *Service) DownloadVideoStream(ctx context.Context, errs chan<- domain.Er
 
 	// wait for existing
 	cleanup := func() {
-		log.Info("cleaning up video download stream")
+		log.Debug("cleaning up video download stream")
 		wg.Wait()
 		close(downloadPaths)
 	}

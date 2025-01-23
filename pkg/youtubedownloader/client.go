@@ -28,6 +28,8 @@ func New(binPath string) *Client {
 		binPath = sh.MustGetBinaryPath("yt-dlp")
 	}
 
+	log.Debug("create new youtubedownloader", "binPath", binPath)
+
 	return &Client{
 		binPath: binPath,
 		shell:   sh,

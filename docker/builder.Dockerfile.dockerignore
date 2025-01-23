@@ -1,0 +1,11 @@
+assets
+dist
+docker
+test
+Makefile
+.git
+.env*
+.DS_Store
+main.go
+*.tmpl
+*.md

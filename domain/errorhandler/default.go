@@ -13,6 +13,7 @@ func DefaultErrorHandler(ctx context.Context, totalDownloadTargets int) domain.E
 			domain.ErrTypeMoveObject:    totalDownloadTargets / 3,
 			domain.ErrTypeDownloadVideo: totalDownloadTargets / 3,
 			domain.ErrTypeCutVideo:      totalDownloadTargets / 3,
+			domain.ErrTypeGetVideoID:    totalDownloadTargets / 3,
 		},
 	})
 }
