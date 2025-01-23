@@ -1,35 +1,39 @@
 #
-# stage 1
+# build stage
 #
-FROM jelastic/golang:1.22.11-almalinux-9 AS builder-base
+FROM golang:1.22.11-alpine3.21 AS build
 
-# install ffmpeg
-RUN dnf install -y epel-release
-RUN dnf config-manager --set-enabled crb
-RUN dnf install --nogpgcheck https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-$(rpm -E %rhel).noarch.rpm -y
-RUN dnf install --nogpgcheck https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-$(rpm -E %rhel).noarch.rpm -y
-RUN dnf install -y ffmpeg
+# # Set the working directory
+WORKDIR /app
 
-# install yt-dlp from binary
-RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
-RUN chmod a+rx /usr/local/bin/yt-dlp
-RUN /usr/local/bin/yt-dlp -U
-ENV YN_YT_DLP_PATH=/usr/local/bin/yt-dlp
+# # Copy the Go source code
+COPY . .
 
+# # download dependencies
+RUN go mod download
+
+# # Build the Go binary
+RUN go build -o /main ./cmd/builder/main.go
 
 #
-# stage 2
+# base stage (installs dependencies)
+#
+FROM alpine:3.21.2 AS builder-base
+
+RUN apk update
+RUN apk add ffmpeg
+RUN apk add yt-dlp
+
+#
+# final stage
 #
 FROM builder-base
 
-# Copy the source code
-COPY . .
+WORKDIR /
 
-# download dependencies and build
-RUN go mod download
-RUN go build -o /usr/local/bin/builder ./cmd/builder/main.go
+COPY --from=build /main /main
 
 EXPOSE 80
 
-CMD ["/usr/local/bin/builder", "--output", "/dist", "-v"]
-
+# Run the applicatio
+ENTRYPOINT ["/main"]
