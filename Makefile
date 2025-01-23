@@ -50,7 +50,7 @@ docker-push-server:
 
 .PHONY: docker-build-builder
 docker-build-builder:
-	docker buildx build --platform linux/arm64 -f docker/builder.Dockerfile -t andyinabox/yesterdaysnews-builder .
+	docker buildx build --platform linux/amd64 -f docker/builder.Dockerfile -t andyinabox/yesterdaysnews-builder .
 
 .PHONY: docker-run-builder
 docker-run-builder:
