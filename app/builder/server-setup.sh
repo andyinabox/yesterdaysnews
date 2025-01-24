@@ -7,5 +7,7 @@ fi
 
 HOST=$1
 
+make bin/builder-linux-amd64
+
 scp .env yesterdaysnews@$HOST:.env
 scp bin/builder-linux-amd64 yesterdaysnews@$HOST:builder
