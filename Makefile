@@ -28,7 +28,7 @@ clean:
 
 .PHONY: objectstoremock
 objectstoremock:
-	go run ./cmd/objectstoremock/main.go -v
+	go run ./cmd/objectstoremock/main.go
 
 .PHONY: serve
 serve:
