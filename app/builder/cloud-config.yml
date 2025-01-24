@@ -1,0 +1,14 @@
+#cloud-config
+users:
+  - name: yesterdaysnews
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAJwCKDg+3l+aq1ku7b95cQwMOqHoaGlDhr0V08bU+zm amdayton@silverbullet
+package_upgrade: true
+packages:
+  - curl
+  - ffmpeg
+runcmd:
+  - curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+  - chmod a+rx /usr/local/bin/yt-dlp
