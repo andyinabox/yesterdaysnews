@@ -1,12 +1,16 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/assetshandler"
 )
 
 var port int
@@ -37,15 +41,44 @@ func main() {
 	// Check if the directory exists
 	_, err := os.Stat(dir)
 	if os.IsNotExist(err) {
-		log.Fatalf("Directory '%s' not found.\n", dir)
+		log.Fatalf("directory %q not found.\n", dir)
 	}
 
+	data, err := os.ReadFile(filepath.Join(dir, domain.ManifestFileName))
+	if err != nil {
+		log.Fatalf("problem reading manifest file: %s", err)
+	}
+
+	manifest := domain.Manifest{}
+	err = json.Unmarshal(data, &manifest)
+	if err != nil {
+		log.Fatalf("problem unmarshaling manifest file: %s", err)
+	}
+
+	if manifest.ID == "" {
+		log.Fatal("no build ID found")
+	}
+
+	buildID := manifest.ID
+
 	// Create a file server handler to serve the directory's contents
-	fileServer := http.FileServer(http.Dir(dir))
+	// fileServer := http.FileServer(http.Dir(dir))
+
+	handler := assetshandler.New(
+		&assetshandler.Config{
+			AssetsUrlPath:     "/" + buildID,
+			AssetsFS:          os.DirFS(dir),
+			StripAssetsPrefix: true,
+		},
+	)
+
+	handler.AddRoute("/"+domain.CurrentBuildIDFileName, func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(buildID))
+	})
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
-		Handler: cors(fileServer),
+		Handler: cors(handler),
 	}
 
 	// // configure cert
