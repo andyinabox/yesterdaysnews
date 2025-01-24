@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
@@ -25,6 +26,11 @@ func (b *Builder) Model(ctx context.Context, uploadDir string, corpi []domain.Co
 	err = os.WriteFile(modelFilePath, data, os.ModePerm)
 	if err != nil {
 		return "", fmt.Errorf("error saving model file %s: %w", domain.ModelFileName, err)
+	}
+
+	if b.cfg.SkipUpload {
+		log.Info("SkipUpload is true, skipping model upload")
+		return strings.TrimPrefix(modelFilePath, b.cfg.OutputDir+"/"), nil
 	}
 
 	modelFileKey := filepath.Join(uploadDir, domain.ModelFileName)

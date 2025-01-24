@@ -44,7 +44,7 @@ var (
 	captionNewsCorpusWeight, captionHospitalCorpusWeight int
 	totalBuildsToKeep                                    int
 
-	keepOutputFiles bool
+	keepOutputFiles, skipUpload bool
 )
 
 func init() {
@@ -68,6 +68,7 @@ func init() {
 
 	// just to clarify, by default this WILL remove files but adding the --keepoutput flag will cancel cleanup
 	flag.BoolVar(&keepOutputFiles, "keepoutput", false, "keep artifacts after successful build")
+	flag.BoolVar(&skipUpload, "skipupload", false, "skip upload step for builds")
 
 	flag.Parse()
 
@@ -115,6 +116,7 @@ func main() {
 		CaptionHospitalCorpusWeight: captionHospitalCorpusWeight,
 		TotalBuildsToKeep:           totalBuildsToKeep,
 		KeepOutputFiles:             keepOutputFiles,
+		SkipUpload:                  skipUpload,
 		HospitalCorpus:              hospitalText,
 	}
 	// auto-load env vars

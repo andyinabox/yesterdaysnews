@@ -24,6 +24,16 @@ func (b *Builder) VideoClips(ctx context.Context, date time.Time, uploadDir stri
 	// get stream of video clip paths
 	clips := b.videoCutStream(ctx, paths)
 
+	if b.cfg.SkipUpload {
+		log.Info("SkipUpload is true, skipping video uploads")
+
+		clipPaths := streams.StringTransformStream(ctx, clips, func(s string) string {
+			return strings.TrimPrefix(s, b.cfg.OutputDir+"/")
+		})
+
+		return streams.StringSlice(ctx, clipPaths), nil
+	}
+
 	// take clip paths amd make stream of upload paths
 	uploadPaths := streams.StringStreamTo2StringSliceStream(ctx, clips, func(s string) [2]string {
 		// first string is the file name, second is the the object key
