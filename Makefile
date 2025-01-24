@@ -1,42 +1,49 @@
-.PHONY: upload
-build: clean
-	go run ./cmd/builder/main.go --keepoutput
 
-.PHONY: build-setup
-build-setup:
-	go run ./cmd/builder/main.go -v -b setup
+#
+# builder
+# 
 
-.PHONY: build-video-clips
-build-video-clips:
-	go run ./cmd/builder/main.go -v -b video-clips --playlistids UUaXkIU1QidjPwiAYu6GcHjg --count 1
+.PHONY: build
+build:
+	go run ./app/builder/main.go --keepoutput
 
-.PHONY: build-model
-build-model:
-	go run ./cmd/builder/main.go -v -b model
+#
+# server
+# 
 
-.PHONY: build-promote
-build-promote:
-	go run ./cmd/builder/main.go -v -b promote
+.PHONY: serve
+serve:	go run ./app/server/main.go -a -v -m 20s
 
-.PHONY: build-cleanup
-build-cleanup:
-	go run ./cmd/builder/main.go -v -b cleanup
 
-.PHONY: clean
-clean:
-	-rm -rf dist/*
+#
+# utils
+# 
 
 .PHONY: objectstoremock
 objectstoremock:
 	go run ./cmd/objectstoremock/main.go
 
-.PHONY: serve
-serve:
-	go run . -a -v -m 20s
+.PHONY: clean-dist clean-bin
+clean:
+
+.PHONY: clean-dist
+clean-dist:
+	-rm -rf dist/*
+
+.PHONY: clean-bin
+clean-bin:
+	-rm -rf bin/*
+
+.PHONY: clean-bin binaries
+binaries: bin/server-linux-amd64 bin/builder-linux-amd64
+
+#
+# docker
+# 
 
 .PHONY: docker-build-server
-docker-build-server:
-	docker build -f docker/server.Dockerfile -t andyinabox/yesterdaysnews-server .
+docker-build-server: bin/server-linux-amd64
+	docker build -f app/server/Dockerfile -t andyinabox/yesterdaysnews-server .
 
 .PHONY: docker-run-server
 docker-run-server:
@@ -47,16 +54,27 @@ docker-push-server:
 	docker push andyinabox/yesterdaysnews-server
 
 
+#
+# file-based targets
+# 
 
-.PHONY: docker-build-builder
-docker-build-builder:
-	docker buildx build --platform linux/arm64 -f docker/builder.Dockerfile -t andyinabox/yesterdaysnews-builder .
+bin/server-linux-amd64:
+	GOOS=linux GOARCH=amd64 go build -o $@ ./app/server/main.go
 
-.PHONY: docker-run-builder
-docker-run-builder:
-	mkdir -p dist
-	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder --output /dist -v
+bin/builder-linux-amd64:
+	GOOS=linux GOARCH=amd64 go build -o $@ ./app/builder/main.go
 
-.PHONY: docker-push-builder
-docker-push-builder:
-	docker push andyinabox/yesterdaysnews-builder
+
+
+# .PHONY: docker-build-builder
+# docker-build-builder:
+# 	docker buildx build --platform linux/arm64 -f docker/builder.Dockerfile -t andyinabox/yesterdaysnews-builder .
+
+# .PHONY: docker-run-builder
+# docker-run-builder:
+# 	mkdir -p dist
+# 	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder --output /dist -v
+
+# .PHONY: docker-push-builder
+# docker-push-builder:
+# 	docker push andyinabox/yesterdaysnews-builder
