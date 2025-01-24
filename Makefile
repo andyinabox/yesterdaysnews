@@ -1,18 +1,20 @@
+.PHONY: clean-bin build
+build: bin/server-linux-amd64 bin/builder-linux-amd64
 
 #
 # builder
 # 
 
-.PHONY: build
-build:
+.PHONY: builder
+builder:
 	go run ./app/builder/main.go --keepoutput
 
 #
 # server
 # 
 
-.PHONY: serve
-serve:	go run ./app/server/main.go -a -v -m 20s
+.PHONY: server
+server:	go run ./app/server/main.go -a -v -m 20s
 
 
 #
@@ -33,9 +35,6 @@ clean-dist:
 .PHONY: clean-bin
 clean-bin:
 	-rm -rf bin/*
-
-.PHONY: clean-bin binaries
-binaries: bin/server-linux-amd64 bin/builder-linux-amd64
 
 #
 # docker
