@@ -12,3 +12,7 @@ packages:
 runcmd:
   - curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
   - chmod a+rx /usr/local/bin/yt-dlp
+write_files:
+  - owner: root:root
+    path: /etc/cron.d/yesterdaysnews
+    content: 0 9 * * * yesterdaysnews /home/yesterdaysnews/builder
