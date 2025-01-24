@@ -25,6 +25,11 @@ func (b *Builder) Cleanup(ctx context.Context, toKeep int) ([]string, error) {
 		}
 	}
 
+	if b.cfg.SkipUpload {
+		log.Info("SkipUpload is true, skipping ObjectStore cleanup")
+		return []string{}, nil
+	}
+
 	deletedObjects, err := b.cleanupObjectStore(ctx, toKeep)
 	if err != nil {
 		return nil, fmt.Errorf("error cleaning up object store: %w", err)

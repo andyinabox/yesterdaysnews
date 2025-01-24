@@ -31,6 +31,7 @@ type Config struct {
 	CaptionHospitalCorpusWeight int
 	TotalBuildsToKeep           int
 	KeepOutputFiles             bool
+	SkipUpload                  bool
 
 	// other
 	HospitalCorpus string
