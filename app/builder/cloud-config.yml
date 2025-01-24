@@ -15,4 +15,4 @@ runcmd:
 write_files:
   - owner: root:root
     path: /etc/cron.d/yesterdaysnews
-    content: 0 9 * * * yesterdaysnews /home/yesterdaysnews/builder
+    content: 5 9 * * * yesterdaysnews /home/yesterdaysnews/builder
