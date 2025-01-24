@@ -1,6 +1,3 @@
-.PHONY: clean-bin build
-build: bin/server-linux-amd64 bin/builder-linux-amd64
-
 #
 # builder
 # 
