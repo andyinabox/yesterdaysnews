@@ -6,6 +6,11 @@
 builder:
 	go run ./app/builder/main.go --keepoutput
 
+.PHONY: builder-local
+builder-local:
+	go run ./app/builder/main.go --keepoutput --skipupload
+
+
 #
 # server
 # 
