@@ -67,12 +67,10 @@ Dependencies:
 
 To get usage info, run `go run ./app/builder/main.go -h`.
 
-Run the build and save artifacts:
+Run the default build and save artifacts:
 
 ```bash
 make builder
-# or 
-go run ./app/builder/main.go --keepoutput
 ```
 
 Test the build without uploading artifacts (helpful if you want to populate "dist" for use with `objectstoremock`):
