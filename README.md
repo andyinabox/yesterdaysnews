@@ -55,6 +55,30 @@ Usage of server:
 
 ## Builder
 
+Builder will download videos from YouTube, cut them up, build a markov model, and upload everything to an S3-compatible Object Store.
+
+### Server setup
+
+I am currently running this on a server with the following attributes:
+
+ - Linux Ubuntu 24.04 LTS 64-bit
+ - 16GB RAM
+ - 50GB Disk
+ - 4 CPUs
+ - Cloud-init: [cloud-config.yml](app/builder/cloud-config.yml)
+
+I initially tried running it on a smallar instance but found it froze up.
+
+After you have provisioned the server, grab the IPv4 and run
+
+```
+./app/builder/setup.sh <server IP>
+```
+
+This will copy the remaining necessary files to the server.
+
+### Usage
+
 To get usage info, run `go run ./app/builder/main.go -h`. For example:
 
 ```
