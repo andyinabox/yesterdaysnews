@@ -2,13 +2,23 @@ package server
 
 import (
 	"fmt"
+	"html/template"
 	"math/rand"
 	"net/http"
 )
 
+const metaCommentTmpl = `
+<!--
+  BuildDate: %s
+  ContentDate: %s
+  BuildID: %s
+-->
+`
+
 type IndexRenderContext struct {
 	PageTitle      string
 	InitialClipURL string
+	MetaComment    template.HTML
 }
 
 func (s *Server) Index() http.HandlerFunc {
@@ -27,9 +37,17 @@ func (s *Server) Index() http.HandlerFunc {
 			title = s.manifest.ContentDate.Format("Monday, January 2, 2006")
 		}
 
+		metaComment := template.HTML(fmt.Sprintf(
+			metaCommentTmpl,
+			s.manifest.BuildDate,
+			s.manifest.ContentDate,
+			s.manifest.ID,
+		))
+
 		data := IndexRenderContext{
 			PageTitle:      title,
 			InitialClipURL: clipUrl,
+			MetaComment:    metaComment,
 		}
 
 		s.cfg.Templates.ExecuteTemplate(w, "index.html.tmpl", data)

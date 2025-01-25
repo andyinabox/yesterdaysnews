@@ -123,7 +123,7 @@ func (s *Server) getManifest(ctx context.Context, buildID string) (*domain.Manif
 		return nil, err
 	}
 
-	log.Debug(string(data))
+	// log.Debug(string(data))
 
 	log.Debug("unmarshal manifest data")
 	manifest := domain.Manifest{}
