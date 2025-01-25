@@ -20,16 +20,17 @@ class VideoPlayer {
   async preloadNextClip() {
     // get the next url
     const url = this.clips.pop()
-    console.log('start preloading clip ' + url)
+    // console.log('start preloading clip ' + url)
     // fetch the video
     const resp = await fetch(url)
     // get the video data as array buffer
     const data = await resp.arrayBuffer()
     // add to array of preloaded videos
-    this.preloaded.push(
-      URL.createObjectURL(new Blob([data], { type: 'video/webm' }))
-    )
-    console.log('done preloading clip ' + url)
+    this.preloaded.push({
+      url,
+      objectURL: URL.createObjectURL(new Blob([data], { type: 'video/webm' })),
+    })
+    // console.log('done preloading clip ' + url)
   }
 
   async loadClips() {
@@ -66,7 +67,9 @@ class VideoPlayer {
     let next
     if (this.preloaded.length) {
       // console.log('getting preloaded ObjectURL')
-      next = this.preloaded.pop()
+      const nextData = this.preloaded.pop()
+      console.log('returning ObjectURL for video ' + nextData.url)
+      next = nextData.objectURL
     } else {
       // console.log('get next clip URL')
       next = this.clips.pop()

@@ -47,7 +47,7 @@ clean-bin:
 # 
 
 .PHONY: docker-build-server
-docker-build-server: bin/server-linux-amd64
+docker-build-server: clean-bin bin/server-linux-amd64
 	docker build -f app/server/Dockerfile -t andyinabox/yesterdaysnews-server .
 
 .PHONY: docker-run-server
