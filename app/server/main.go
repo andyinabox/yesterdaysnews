@@ -59,7 +59,7 @@ func main() {
 
 	// load assets from filesystem for development
 	if loadAssetsFromFs {
-		assetsFs = os.DirFS("assets")
+		assetsFs = os.DirFS("app/server/assets")
 		// load assets from embedded data
 	} else {
 		var err error

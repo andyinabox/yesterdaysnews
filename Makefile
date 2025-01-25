@@ -10,8 +10,17 @@ builder:
 # server
 # 
 
+# run server, using object store credential in .env
 .PHONY: server
-server:	go run ./app/server/main.go -a -v -m 20s
+server:
+	go run ./app/server/main.go -a -v -m 20s
+
+
+# run server using objectstoremock
+# (need to already be running objectstoremock)
+.PHONY: server-local
+server-local:
+	YN_OBJECTSTORE_URL=http://localhost:9000 YN_CDN_URL=http://localhost:9000 go run ./app/server/main.go -a -v -m 20s
 
 
 #
