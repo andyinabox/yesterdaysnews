@@ -72,9 +72,6 @@ func init() {
 
 	flag.Parse()
 
-	// log.SetReportCaller(true)
-	log.SetReportTimestamp(false)
-
 	if verbose {
 		log.SetLevel(log.DebugLevel)
 	}
