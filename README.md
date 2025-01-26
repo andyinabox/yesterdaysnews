@@ -89,13 +89,15 @@ You can find the proper name for each build step in [domain/builder.go](domain/b
 
 ```go
 const (
-	BuildPhaseAll        BuildPhase = "all"
-	BuildPhaseSetup      BuildPhase = "setup"
-	BuildPhaseVideoClips BuildPhase = "video-clips"
-	BuildPhaseModel      BuildPhase = "model"
-	BuildPhaseManifest   BuildPhase = "manifest"
-	BuildPhasePromote    BuildPhase = "promote"
-	BuildPhaseCleanup    BuildPhase = "cleanup"
+	BuildPhaseAll            BuildPhase = "all"
+	BuildPhaseSetup          BuildPhase = "setup"
+	BuildPhaseDownloadVideos BuildPhase = "download-videos"
+	BuildPhaseCutVideos      BuildPhase = "cut-videos"
+	BuildPhaseUploadVideos   BuildPhase = "upload-videos"
+	BuildPhaseModel          BuildPhase = "model"
+	BuildPhaseManifest       BuildPhase = "manifest"
+	BuildPhasePromote        BuildPhase = "promote"
+	BuildPhaseCleanup        BuildPhase = "cleanup"
 )
 ```
 
@@ -114,7 +116,7 @@ I initially tried running it on a smallar instance but found it froze up.
 After you have provisioned the server, grab the IPv4 and run
 
 ```
-./app/builder/setup.sh <server IP>
+./app/builder/deploy.sh <server IP>
 ```
 
 This will copy the remaining necessary files to the server.

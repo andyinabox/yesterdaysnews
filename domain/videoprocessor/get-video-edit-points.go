@@ -10,8 +10,12 @@ import (
 	"golang.org/x/exp/rand"
 )
 
+const EditPointsDurationTrim = 2 * time.Second
+
 func (p *Processor) GetVideoEditPoints(ctx context.Context, videoFile string, minClipLength, maxClipLength time.Duration) ([]domain.VideoEdit, error) {
 	totalDuration, err := p.mt.GetVideoLength(ctx, videoFile)
+	// trim a second off the duration, this helps avoid some errors
+	trimmedDuration := totalDuration - mediatool.Duration(EditPointsDurationTrim)
 	if err != nil {
 		return nil, fmt.Errorf("error getting video duration for %q: %w", videoFile, err)
 	}
@@ -32,12 +36,13 @@ func (p *Processor) GetVideoEditPoints(ctx context.Context, videoFile string, mi
 		start := playhead
 		duration := getRandDuration()
 
-		if start >= totalDuration {
+		if start >= trimmedDuration {
 			break
 		}
 
-		if start+duration > totalDuration {
-			duration = totalDuration - start
+		if start+duration > trimmedDuration {
+			break
+			// duration = trimmedDuration - start
 		}
 
 		// log.Debugf("new edit: %v, %v", start, duration)

@@ -7,18 +7,10 @@ import (
 
 const (
 	// larger build phases
-	ErrTypeGetVideoID               = "ErrTypeGetVideoID"
-	ErrTypeDownloadVideo            = "ErrTypeDownloadVideo"
-	ErrTypeCutVideo                 = "ErrTypeCutVideo"
-	ErrTypeGetVideoEditPoints       = "ErrTypeGetVideoEditPoints"
-	ErrTypeUploadVideo              = "ErrTypeUploadVideo"
-	ErrTypeBuildModel               = "ErrTypeBuildModel"
-	ErrTypeSaveModel                = "ErrTypeSaveModel"
-	ErrTypeUploadModel              = "ErrTypeUploadModel"
-	ErrTypeSaveManifest             = "ErrTypeSaveManifest"
-	ErrTypeUploadManifest           = "ErrTypeUploadManifest"
-	ErrTypeGetCurrentManifestPrefix = "ErrTypeGetCurrentManifestPrefix"
-	ErrTypeCleanup                  = "ErrTypeCleanup"
+	ErrTypeGetVideoID    = "ErrTypeGetVideoID"
+	ErrTypeDownloadVideo = "ErrTypeDownloadVideo"
+	ErrTypeCutVideo      = "ErrTypeCutVideo"
+	ErrTypeCleanup       = "ErrTypeCleanup"
 
 	// object store
 	ErrTypeCopyObject   = "ErrTypeCopyObject"
