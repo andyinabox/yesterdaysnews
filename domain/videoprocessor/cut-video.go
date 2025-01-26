@@ -23,6 +23,11 @@ func (p *Processor) CutVideo(ctx context.Context, inFile, outFile string, edit d
 		return "", fmt.Errorf("error cutting video segment for %q: %v: %w", inFile, edit, err)
 	}
 
+	err = p.mt.Validate(ctx, progressFile)
+	if err != nil {
+		return "", fmt.Errorf("error validating %q: %w", progressFile, err)
+	}
+
 	err = os.Rename(progressFile, outFile)
 	if err != nil {
 		return "", fmt.Errorf("error renaming %q to %q: %w", progressFile, outFile, err)

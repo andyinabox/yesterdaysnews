@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -21,6 +22,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
@@ -142,8 +144,16 @@ func main() {
 		err = buildSetup(ctx, &config, eh)
 		handleBuildPhaseErr(err)
 
-	case domain.BuildPhaseVideoClips:
-		err = buildVideoClips(ctx, &config, eh)
+	case domain.BuildPhaseDownloadVideos:
+		err = downloadVideos(ctx, &config, eh)
+		handleBuildPhaseErr(err)
+
+	case domain.BuildPhaseCutVideos:
+		err = cutVideos(ctx, &config, eh)
+		handleBuildPhaseErr(err)
+
+	case domain.BuildPhaseUploadVideos:
+		err = uploadVideos(ctx, &config, eh)
 		handleBuildPhaseErr(err)
 
 	case domain.BuildPhaseModel:
@@ -177,7 +187,7 @@ func buildSetup(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 	return b.Setup(ctx)
 }
 
-func buildVideoClips(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
+func downloadVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
 	err := b.Setup(ctx)
@@ -186,14 +196,71 @@ func buildVideoClips(ctx context.Context, config *builder.Config, eh domain.Erro
 	}
 
 	yesterday := util.Yesterday()
-	uploadDir := util.Timestamp(yesterday)
-	clips, err := b.VideoClips(ctx, yesterday, uploadDir)
-	if err != nil {
-		return err
-	}
-	log.Infof("finished processing %d clips", len(clips))
+	videosStream := b.DownloadVideos(ctx, yesterday)
+
+	videos := streams.StringSlice(ctx, videosStream)
+	log.Infof("finished downloading %d videos", len(videos))
 	return nil
 }
+
+func cutVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
+	b := builder.New(config, eh)
+
+	paths, err := filepath.Glob("dist/*.webm")
+	if err != nil {
+		return fmt.Errorf("error getting video paths: %w", err)
+	}
+	if len(paths) == 0 {
+		return errors.New("no videos found")
+	}
+
+	videoPathsStream := streams.StringStreamThrottled(ctx, time.Millisecond, paths...)
+	clipsStream := b.CutVideos(ctx, videoPathsStream)
+
+	clips := streams.StringSlice(ctx, clipsStream)
+	log.Infof("finished processing %d clips", len(clips))
+
+	return nil
+}
+
+func uploadVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
+	b := builder.New(config, eh)
+
+	clips, err := filepath.Glob("dist/clips/*.webm")
+	if err != nil {
+		return fmt.Errorf("error getting clip paths: %w", err)
+	}
+	if len(clips) == 0 {
+		return errors.New("no clip found")
+	}
+
+	uploadDir := util.Timestamp(time.Now())
+	clipsStream := streams.StringStreamThrottled(ctx, time.Millisecond, clips...)
+	uploadsStream := b.UploadVideos(ctx, uploadDir, clipsStream)
+
+	uploads := streams.StringSlice(ctx, uploadsStream)
+	log.Infof("finished uploading %d clips", len(uploads))
+
+	return nil
+}
+
+// func buildVideoClips(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
+// 	b := builder.New(config, eh)
+
+// 	err := b.Setup(ctx)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	yesterday := util.Yesterday()
+// 	uploadDir := util.Timestamp(yesterday)
+// 	clips, err := b.VideoClips(ctx, yesterday, uploadDir)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	log.Infof("finished processing %d clips", len(clips))
+// 	return nil
+// }
 
 func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)

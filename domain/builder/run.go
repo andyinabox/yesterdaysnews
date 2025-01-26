@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
 )
 
 func (b *Builder) Run(ctx context.Context) error {
@@ -32,9 +34,20 @@ func (b *Builder) Run(ctx context.Context) error {
 	manifest := b.createManifest()
 
 	log.Info("building video clips...")
-	manifest.Files.Clips, err = b.VideoClips(ctx, manifest.ContentDate, manifest.ID)
-	if err != nil {
-		return fmt.Errorf("error during VideoClips phase: %w", err)
+	downloadPathStream := b.DownloadVideos(ctx, manifest.ContentDate)
+	clipPathsStream := b.CutVideos(ctx, downloadPathStream)
+
+	// skip uploading files
+	if b.cfg.SkipUpload {
+		clipPathsStream = streams.StringTransformStream(ctx, clipPathsStream, func(s string) string {
+			return strings.TrimPrefix(s, b.cfg.OutputDir+"/")
+		})
+		manifest.Files.Clips = streams.StringSlice(ctx, clipPathsStream)
+
+		// upload files
+	} else {
+		uploadPathsStream := b.UploadVideos(ctx, manifest.ID, clipPathsStream)
+		manifest.Files.Clips = streams.StringSlice(ctx, uploadPathsStream)
 	}
 	log.Infof("processed %d clips", len(manifest.Files.Clips))
 
