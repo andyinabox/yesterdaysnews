@@ -18,6 +18,8 @@ This is really two projects in one
 
 ## Server
 
+Server serves the actual video player, and generates captions using the model JSON file. The metadata and model are fetched from a remote Object Store by the server, and video clips from the Object Store are loaded via a CDN. 
+
 Dependencies:
 
  - Go 1.22.10
@@ -54,7 +56,7 @@ make docker-push-server
 
 ## Builder
 
-Builder will download videos from YouTube, cut them up, build a markov model, and upload everything to an S3-compatible Object Store. Some helpful commands:
+Builder will download videos from YouTube, cut them up, build a markov model, and upload everything to an S3-compatible Object Store.
 
 Dependencies:
 
