@@ -18,6 +18,7 @@ type Config struct {
 	ObjectStoreUrl        string `env:"YN_OBJECTSTORE_URL" required:"true"`
 	CDNUrl                string `env:"YN_CDN_URL" required:"true"`
 	Templates             *template.Template
+	AboutContent          string
 	Assets                fs.FS
 	Port                  int
 	MinCaptionDelay       float64
