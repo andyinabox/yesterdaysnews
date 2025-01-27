@@ -17,22 +17,30 @@
     <script src="/assets/reloader.js"></script>
 
   </head>
-  <body data-resource-url="/reload">
+  <body>
 
     <main id="main">
       <video muted autoplay id="video" data-resource-url="/clips">
         <source type="video/webm" src="{{ .InitialClipURL }}">
       </video>
       <caption-display resource-url="/captions"></caption-display>
-      <nav>
-        <button id="btn-about" class="icon about" title="About this project">❓</button>
-        <button id="btn-fullscreen" class="icon fullscreen" title="Enter fullscreen mode">🖥️</button>
-      </nav>
     </main>
+
+    <nav>
+      <button id="btn-about" class="icon about" title="About this project">❓</button>
+      <button id="btn-fullscreen" class="icon fullscreen" title="Enter fullscreen mode">🖥️</button>
+    </nav>
+
+    <dialog id="about">
+      <button id="btn-about-close" title="Close this window">❌</button>
+      <h1>yesterday's news</h1>
+      <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+    </dialog>
+
 
     <script>
       ;(function(){
-        const main = new Main('main')
+        const main = new Main('main', 'about', 'btn-about', 'btn-about-close', 'btn-fullscreen')
         const videoPlayer = new VideoPlayer('video')
         const reloader = new Reloader("/reload")
       })()

@@ -2,12 +2,14 @@ package server
 
 import (
 	"fmt"
+	"html/template"
 	"io/fs"
 	"net/http"
 	"sync"
-	"text/template"
 	"time"
 
+	"github.com/charmbracelet/log"
+	"github.com/russross/blackfriday/v2"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/assetshandler"
 )
@@ -60,4 +62,10 @@ func New(cfg *Config) *Server {
 	}
 
 	return s
+}
+
+func parseMarkdown(b []byte) template.HTML {
+	data := blackfriday.Run(b, blackfriday.WithExtensions(blackfriday.CommonExtensions|blackfriday.Footnotes))
+	log.Debugf("parsed markdown: %s", string(data))
+	return template.HTML(string(data))
 }

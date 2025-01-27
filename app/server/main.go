@@ -4,9 +4,9 @@ import (
 	"context"
 	"embed"
 	"flag"
+	"html/template"
 	"io/fs"
 	"os"
-	"text/template"
 	"time"
 
 	"github.com/charmbracelet/log"

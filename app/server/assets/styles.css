@@ -10,6 +10,13 @@ body {
   display: flex;
   align-items: center;
   background-color: black;
+  font-family: monospace;
+}
+
+button {
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
 }
 
 main {
@@ -20,8 +27,8 @@ main {
 
 nav {
   z-index: 2;
-  position: absolute;
-  height: 1rem;
+  position: fixed;
+  height: 1.5rem;
   width: 100%;
   left: 0;
   bottom: 0;
@@ -31,14 +38,11 @@ nav {
 }
 
 nav > button {
-  cursor: pointer;
   font-size: 0.75rem;
-  margin: 0.25em;
-  background-color: transparent;
-  border: none;
+  margin: 0.5em;
 }
 
-main.fullscreen > nav {
+body.fullscreen > nav {
   display: none;
 }
 
@@ -66,4 +70,25 @@ caption-display {
 caption-display > .word {
   background-color: black;
   padding: 0.2em;
+}
+
+dialog {
+  position: relative;
+  z-index: 3;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  border: none;
+  font-size: 0.75rem;
+  margin: auto 1rem;
+}
+
+dialog > button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0.5rem;
+}
+
+h1 {
+  font-size: 1rem;
 }
