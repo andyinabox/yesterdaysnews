@@ -31,6 +31,11 @@ class VideoPlayer {
       objectURL: URL.createObjectURL(new Blob([data], { type: 'video/webm' })),
     })
     // console.log('done preloading clip ' + url)
+
+    // continue preloading until 3 clips are loaded
+    if (this.preloaded.length < 3) {
+      this.preloadNextClip()
+    }
   }
 
   async loadClips() {
