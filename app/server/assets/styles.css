@@ -13,10 +13,10 @@ body {
   font-family: monospace;
 }
 
-button {
+event-button {
   cursor: pointer;
-  background-color: transparent;
-  border: none;
+  /* background-color: transparent;
+  border: none; */
 }
 
 main {
@@ -37,7 +37,7 @@ nav {
   align-items: center;
 }
 
-nav > button {
+nav > event-button {
   font-size: 0.75rem;
   margin: 0.5em;
 }
@@ -82,7 +82,7 @@ dialog {
   margin: auto 1rem;
 }
 
-dialog > button {
+dialog > event-button {
   position: absolute;
   top: 0;
   right: 0;
