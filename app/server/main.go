@@ -4,19 +4,23 @@ import (
 	"context"
 	"embed"
 	"flag"
+	"html/template"
 	"io/fs"
 	"os"
-	"text/template"
 	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
+	"github.com/russross/blackfriday/v2"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/server"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
 )
 
 //go:embed index.html.tmpl
 var indexTemplate string
+
+//go:embed about.md
+var aboutContentMarkdown []byte
 
 //go:embed assets/*
 var assets embed.FS
@@ -74,8 +78,11 @@ func main() {
 		log.Fatalf("error parsing manifest interval %s: %s", manifestCheckIntervalStr, err)
 	}
 
+	aboutContent := blackfriday.Run(aboutContentMarkdown, blackfriday.WithExtensions(blackfriday.CommonExtensions|blackfriday.Footnotes))
+
 	cfg := &server.Config{
 		Templates:             template.Must(template.New("index.html.tmpl").Parse(indexTemplate)),
+		AboutContent:          string(aboutContent),
 		Assets:                assetsFs,
 		Port:                  port,
 		MinCaptionDelay:       minCaptionDelay,
