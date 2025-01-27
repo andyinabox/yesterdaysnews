@@ -1,54 +1,34 @@
-class Main {
-  constructor(
-    mainElementID,
-    aboutDialogID,
-    aboutBtnID,
-    closeAboutBtnID,
-    fullscreenBtnID
-  ) {
-    this.body = document.body
-    this.main = document.getElementById(mainElementID)
-    this.about = document.getElementById(aboutDialogID)
-    this.aboutBtn = document.getElementById(aboutBtnID)
-    this.closeAboutBtn = document.getElementById(closeAboutBtnID)
-    this.fullscreenBtn = document.getElementById(fullscreenBtnID)
+;(function () {
+  new VideoPlayer('video')
 
-    this.main.addEventListener(
-      'fullscreenchange',
-      this.onFullscreenChange.bind(this)
-    )
+  const body = document.body
+  const mainViewer = document.getElementById('main')
+  const aboutModal = document.getElementById('about')
 
-    this.aboutBtn.addEventListener('click', this.onAboutBtnClick.bind(this))
-    this.closeAboutBtn.addEventListener(
-      'click',
-      this.onCloseAboutBtnClick.bind(this)
-    )
+  body.addEventListener('yn-open-about', () => {
+    aboutModal.showModal()
+  })
 
-    this.fullscreenBtn.addEventListener(
-      'click',
-      this.onFullscreenBtnClick.bind(this)
-    )
-  }
+  body.addEventListener('yn-close-about', () => {
+    aboutModal.close()
+  })
 
-  onFullscreenChange(evt) {
+  body.addEventListener('yn-enter-fullscreen', () => {
+    mainViewer.requestFullscreen()
+  })
+
+  body.addEventListener('fullscreenchange', () => {
     if (!!document.fullscreenElement) {
-      this.body.classList.add('fullscreen')
+      body.classList.add('fullscreen')
     } else {
-      this.body.classList.remove('fullscreen')
+      body.classList.remove('fullscreen')
     }
-  }
+  })
 
-  onAboutBtnClick(evt) {
-    this.about.showModal()
-  }
-
-  onCloseAboutBtnClick(evt) {
-    console.log('close about button click')
-    this.about.close()
-  }
-
-  onFullscreenBtnClick(evt) {
-    console.log('fullscreen button click')
-    this.main.requestFullscreen()
-  }
-}
+  // register reload event source
+  const eventSource = new EventSource('/reload')
+  eventSource.addEventListener('message', () => {
+    eventSource.close()
+    window.location.reload()
+  })
+})()

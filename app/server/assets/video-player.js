@@ -92,10 +92,4 @@ class VideoPlayer {
       console.log(`error loading video ${url}`, err)
     }
   }
-
-  disconnectedCallback() {
-    this.video.removeEventListener('ended', this.onVideoEnded.bind(this))
-    this.video.removeEventListener('error', this.onVideoError.bind(this))
-  }
 }
-customElements.define('video-player', VideoPlayer)

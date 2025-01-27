@@ -11,13 +11,19 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="stylesheet" href="/assets/styles.css" />
-    <script src="/assets/main.js"></script>
     <script src="/assets/video-player.js"></script>
+    <script src="/assets/event-button.js"></script>
     <script src="/assets/caption-display.js"></script>
     <script src="/assets/reloader.js"></script>
 
   </head>
   <body>
+
+    <template id="yn-video-player-tpl">
+      <video muted autoplay id="video">
+        <source type="video/webm">
+      </video>
+    </template>
 
     <main id="main">
       <video muted autoplay id="video" data-resource-url="/clips">
@@ -27,22 +33,16 @@
     </main>
 
     <nav>
-      <button id="btn-about" class="icon about" title="About this project">❓</button>
-      <button id="btn-fullscreen" class="icon fullscreen" title="Enter fullscreen mode">🖥️</button>
+      <event-button event-name="yn-open-about" title="About this project">❓</event-button>
+      <event-button event-name="yn-enter-fullscreen" title="About this project">🖥️</event-button>
     </nav>
 
     <dialog id="about">
-      <button id="btn-about-close" title="Close this window">❌</button>
+      <event-button event-name="yn-close-about" title="Close about">❌</event-button>
       {{ .AboutContent }}
     </dialog>
 
 
-    <script>
-      ;(function(){
-        const main = new Main('main', 'about', 'btn-about', 'btn-about-close', 'btn-fullscreen')
-        const videoPlayer = new VideoPlayer('video')
-        const reloader = new Reloader("/reload")
-      })()
-    </script>
+    <script src="/assets/main.js"></script>
   </body>
 </html>
