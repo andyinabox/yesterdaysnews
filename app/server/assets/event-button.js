@@ -1,24 +1,22 @@
-export class EventButton extends HTMLElement {
+import { EventElement } from '/assets/event-element.js'
+export class EventButton extends EventElement {
   constructor() {
     super()
   }
 
   connectedCallback() {
-    this.innerHTML = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><use href="#yn-icon-${this.iconName}" /></svg> `
+    const button = document.createElement('button')
+    button.innerHTML = this.innerHTML
 
-    this.addEventListener('click', this.sendEvent.bind(this))
-  }
+    this.innerHTML = ''
+    if (this.hasAttribute('autofocus')) {
+      this.removeAttribute('autofocus')
+      button.toggleAttribute('autofocus', true)
+    }
 
-  sendEvent() {
-    this.dispatchEvent(new CustomEvent(this.eventName, { bubbles: true }))
-  }
+    this.appendChild(button)
 
-  get eventName() {
-    return this.getAttribute('event-name')
-  }
-
-  get iconName() {
-    return this.getAttribute('icon-name')
+    button.addEventListener('click', this.sendEvent.bind(this))
   }
 
   static register() {

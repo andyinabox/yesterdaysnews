@@ -23,13 +23,13 @@
     </main>
 
     <nav>
-      <event-button event-name="yn-open-about" tabindex="0" role="button" icon-name="about" title="About this project">❓</event-button>
-      <event-button event-name="yn-enter-fullscreen" tabindex="0" role="button" icon-name="fullscreen" title="Enter fullscreen mode">🖥️</event-button>
+      <event-icon event-name="yn-open-about" icon-name="about" title="About this project">❓</event-icon>
+      <event-icon event-name="yn-enter-fullscreen" tabindex="0" role="button" icon-name="fullscreen" title="Enter fullscreen mode">🖥️</event-icon>
     </nav>
 
     <dialog id="about">
       <div class="content">{{ .AboutContent }}</div>
-      <div class="footer"><button autofocus onclick="this.dispatchEvent(new CustomEvent('yn-close-about', { bubbles: true }))">Ok</button></div>
+      <div class="footer"><event-button autofocus event-name="yn-close-about">Ok</event-button></div>
     </dialog>
 
 

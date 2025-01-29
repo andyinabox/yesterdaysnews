@@ -55,7 +55,7 @@ button {
   text-transform: uppercase;
 }
 
-event-button {
+event-icon {
   width: var(--yn-icon-width);
   height: var(--yn-icon-height);
   display: block;
@@ -63,14 +63,14 @@ event-button {
   overflow: hidden;
 }
 
-event-button > svg {
+event-icon > svg {
   fill: var(--yn-color-foreground);
   display: block;
   width: 100%;
   height: 100%;
   stroke: none;
 }
-event-button:hover > svg {
+event-icon:hover > svg {
   fill: var(--yn-color-highlight);
 }
 
@@ -91,7 +91,7 @@ nav {
   align-items: center;
 }
 
-nav > event-button {
+nav > event-icon {
   margin: 0.5rem;
 }
 
