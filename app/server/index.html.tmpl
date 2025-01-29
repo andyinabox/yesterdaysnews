@@ -11,8 +11,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="stylesheet" href="/assets/styles.css" />
+
   </head>
   <body>
+
+    {{ .SVGSymbols }}
 
     <main id="main">
       <video-player resource-url="/clips" initial-clip-url="{{ .InitialClipURL }}"></video-player>
@@ -20,12 +23,12 @@
     </main>
 
     <nav>
-      <event-button event-name="yn-open-about" title="About this project">❓</event-button>
-      <event-button event-name="yn-enter-fullscreen" title="About this project">🖥️</event-button>
+      <event-button event-name="yn-open-about" icon-name="about" title="About this project">❓</event-button>
+      <event-button event-name="yn-enter-fullscreen" icon-name="fullscreen" title="About this project">🖥️</event-button>
     </nav>
 
     <dialog id="about">
-      <event-button event-name="yn-close-about" title="Close about">❌</event-button>
+      <event-button event-name="yn-close-about" icon-name="close" title="Close about">❌</event-button>
       {{ .AboutContent }}
     </dialog>
 
