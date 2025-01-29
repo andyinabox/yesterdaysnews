@@ -1,16 +1,21 @@
-class EventButton extends HTMLElement {
+export class EventButton extends HTMLElement {
   constructor() {
     super()
   }
 
   connectedCallback() {
-    this.eventName = this.getAttribute('event-name')
     this.addEventListener('click', this.sendEvent.bind(this))
   }
 
   sendEvent(originalEvent) {
     this.dispatchEvent(new CustomEvent(this.eventName, { bubbles: true }))
   }
-}
 
-customElements.define('event-button', EventButton)
+  get eventName() {
+    return this.getAttribute('event-name')
+  }
+
+  static register() {
+    customElements.define('event-button', EventButton)
+  }
+}

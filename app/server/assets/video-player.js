@@ -1,20 +1,30 @@
-class VideoPlayer {
+export class VideoPlayer extends HTMLElement {
   clips = []
   preloaded = []
 
-  constructor(videoId) {
+  constructor() {
+    super()
+    this.loadClips()
+  }
+
+  connectedCallback() {
     // create video element
-    this.video = document.getElementById(videoId)
-    this.video.addEventListener('ended', this.onVideoEnded.bind(this))
-    this.video.addEventListener('error', this.onVideoError.bind(this))
+    const video = document.createElement('video')
+    video.setAttribute('muted', true)
+    video.setAttribute('autoplay', true)
+    video.addEventListener('ended', this.onVideoEnded.bind(this))
+    video.addEventListener('error', this.onVideoError.bind(this))
 
     // create source element
-    this.videoSource = this.video.querySelector('source')
+    const videoSource = document.createElement('source')
+    videoSource.setAttribute('type', 'video/webm')
+    videoSource.setAttribute('src', this.initialClipUrl)
 
-    this.resourceUrl = this.video.getAttribute('data-resource-url')
+    video.appendChild(videoSource)
 
-    // load the list of clips
-    this.clipsLoading = this.loadClips()
+    this.video = video
+    this.videoSource = videoSource
+    this.appendChild(video)
   }
 
   async preloadNextClip() {
@@ -98,5 +108,17 @@ class VideoPlayer {
     } catch (err) {
       console.log(`error loading video ${url}`, err)
     }
+  }
+
+  get resourceUrl() {
+    return this.getAttribute('resource-url')
+  }
+
+  get initialClipUrl() {
+    return this.getAttribute('initial-clip-url')
+  }
+
+  static register() {
+    customElements.define('video-player', VideoPlayer)
   }
 }
