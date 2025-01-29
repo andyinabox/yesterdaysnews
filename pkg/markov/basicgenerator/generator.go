@@ -2,19 +2,21 @@ package markov
 
 import (
 	"strings"
+
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
 )
 
-type BasicGenerator struct {
-	chain     Chain
+type Generator struct {
+	chain     markov.Chain
 	minLength int
 	maxLength int
 }
 
-func NewBasicGenerator(chain Chain, minLength int, maxLength int) *BasicGenerator {
-	return &BasicGenerator{chain, minLength, maxLength}
+func New(chain markov.Chain, minLength int, maxLength int) *Generator {
+	return &Generator{chain, minLength, maxLength}
 }
 
-func (g *BasicGenerator) Sentence(p Prefix) string {
+func (g *Generator) Sentence(p markov.Prefix) string {
 
 	if p == nil {
 		p = g.chain.Start()
