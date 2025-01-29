@@ -1,15 +1,5 @@
 package basicchain
 
-import (
-	"math/rand"
-	"strings"
-	"unicode"
-
-	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov/basicprefix"
-)
-
 const modelVersion = 1
 
 type model struct {
@@ -43,62 +33,4 @@ func New(prefixLength int) *Chain {
 		startPrefixes: []string{},
 		endChain:      make(map[string][]string),
 	}
-}
-
-func (c *Chain) Next(p markov.Prefix) string {
-
-	// validate length
-	if p.Length() != c.prefixLength {
-		log.Fatal(markov.ErrPrefixWrongLength)
-	}
-
-	options, ok := c.chain[p.String()]
-	if !ok {
-		return ""
-	}
-	return options[rand.Intn(len(options))]
-}
-
-func (c *Chain) PrefixLength() int {
-	return c.prefixLength
-}
-
-func (c *Chain) NewPrefix(s string) markov.Prefix {
-
-	p := basicprefix.New(s)
-
-	if p.Length() != c.PrefixLength() {
-		log.Fatal(markov.ErrPrefixWrongLength)
-	}
-
-	return p
-}
-
-func (c *Chain) Start() markov.Prefix {
-	return basicprefix.New(c.prefixes[rand.Intn(len(c.prefixes))])
-}
-
-func (c *Chain) End(p markov.Prefix) string {
-	// validate length
-	if p.Length() != c.prefixLength {
-		log.Fatal(markov.ErrPrefixWrongLength)
-	}
-
-	options, ok := c.endChain[p.String()]
-	if !ok {
-		return ""
-	}
-
-	return options[rand.Intn(len(options))]
-}
-
-func (c *Chain) isStartPrefix(s string) bool {
-	if len(s) == 0 {
-		return false
-	}
-	return unicode.IsUpper([]rune(s)[0])
-}
-
-func (c *Chain) isEndToken(s string) bool {
-	return strings.HasSuffix(s, ".")
 }
