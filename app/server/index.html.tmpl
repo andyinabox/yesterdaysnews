@@ -28,10 +28,12 @@
     </nav>
 
     <dialog id="about">
-      <div class="content">{{ .AboutContent }}</div>
-      <div class="footer"><event-button autofocus event-name="yn-close-about">Ok</event-button></div>
+      <article>{{ .AboutContent }}</article>
+      <footer>
+        <div>&mdash;<a target="_blank" href="https://andydayton.com">Andy</a></div>
+        <event-button autofocus event-name="yn-close-about">Ok</event-button>
+      </footer>
     </dialog>
-
 
     <script type="module" src="/assets/main.js"></script>
   </body>

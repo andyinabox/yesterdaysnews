@@ -141,16 +141,12 @@ dialog {
   padding: 2rem;
 }
 
-dialog .footer {
+dialog > footer {
   text-align: right;
   margin-top: 1rem;
-}
-
-dialog p:first-of-type {
-  margin-top: 0px;
-}
-dialog p:last-of-type {
-  margin-bottom: 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 dialog::backdrop {
@@ -164,6 +160,31 @@ dialog > event-button {
   top: 0;
   right: 0;
   margin: 0.75rem;
+}
+
+dialog > article {
+  line-height: 1.2em;
+  text-align: justify;
+}
+
+@media (min-width: 1280px) {
+  dialog > article {
+    columns: 2;
+    column-gap: 2rem;
+  }
+}
+
+dialog > article p:first-of-type {
+  margin-top: 0px;
+}
+dialog > article p:last-of-type {
+  margin-bottom: 0px;
+}
+
+dialog > article blockquote {
+  font-style: italic;
+  margin-left: 0px;
+  margin-right: 0px;
 }
 
 h1 {
