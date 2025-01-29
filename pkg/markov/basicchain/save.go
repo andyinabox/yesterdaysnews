@@ -1,7 +1,15 @@
 package basicchain
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 func (c *Chain) Save() ([]byte, error) {
-	return json.Marshal(c.model)
+	model := Model{
+		Version:      c.version,
+		PrefixLength: c.prefixLength,
+		Chain:        c.chain,
+	}
+
+	return json.Marshal(model)
 }

@@ -9,14 +9,16 @@ import (
 
 func (c *Chain) Load(data []byte) error {
 
-	v := struct{ version int }{}
+	v := struct {
+		Version int `json:"version"`
+	}{}
 
 	// load based on version. we are ignoring errors here
 	// because failure to parse probably means version 0
 	json.Unmarshal(data, &v)
 
-	m := model{}
-	switch v.version {
+	m := Model{}
+	switch v.Version {
 	case 1:
 		err := json.Unmarshal(data, &m)
 		if err != nil {
@@ -24,14 +26,16 @@ func (c *Chain) Load(data []byte) error {
 		}
 	// probably the old, unversioned model
 	default:
-		m.chain = map[string][]string{}
-		err := json.Unmarshal(data, &m.chain)
+		m.Chain = map[string][]string{}
+		err := json.Unmarshal(data, &m.Chain)
 		if err != nil {
 			return err
 		}
 	}
 
-	c.model = m
+	c.version = m.Version
+	c.prefixLength = m.PrefixLength
+	c.chain = m.Chain
 
 	// re-initializing these to be safe
 	c.prefixes = make([]string, len(c.chain))

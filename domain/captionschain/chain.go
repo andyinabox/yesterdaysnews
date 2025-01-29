@@ -1,13 +1,15 @@
 package captionschain
 
-import "gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
+import (
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov/basicchain"
+)
 
 type Chain struct {
-	markov.BasicChain
+	basicchain.Chain
 }
 
 func New(prefixLength int) *Chain {
 	return &Chain{
-		BasicChain: *markov.NewBasicChain(prefixLength),
+		Chain: *basicchain.New(prefixLength),
 	}
 }

@@ -71,7 +71,7 @@ func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {
 
 	log.Debug(combined)
 
-	c.BasicChain.Build(strings.NewReader(combined))
+	c.Chain.Build(strings.NewReader(combined))
 
 	return nil
 }

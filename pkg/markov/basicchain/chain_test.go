@@ -13,7 +13,7 @@ func TestBasicChainJSONMarshaling(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 	log.SetReportCaller(true)
 
-	f, err := os.Open("../../test/corpus.txt")
+	f, err := os.Open("../../../test/corpus.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
