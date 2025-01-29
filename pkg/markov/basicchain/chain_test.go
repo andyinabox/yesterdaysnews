@@ -1,4 +1,4 @@
-package markov
+package basicchain
 
 import (
 	"bytes"
@@ -13,12 +13,12 @@ func TestBasicChainJSONMarshaling(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 	log.SetReportCaller(true)
 
-	f, err := os.Open("../../test/corpus.txt")
+	f, err := os.Open("../../../test/corpus.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	chain1 := *NewBasicChain(2)
+	chain1 := *New(2)
 	chain1.Build(f)
 
 	data1, err := chain1.Save()
@@ -30,7 +30,7 @@ func TestBasicChainJSONMarshaling(t *testing.T) {
 		t.Error("json data is empty")
 	}
 
-	chain2 := *NewBasicChain(2)
+	chain2 := *New(2)
 	err = chain2.Load(data1)
 	if err != nil {
 		t.Fatal(err)
@@ -66,7 +66,7 @@ func TestBasicChainJSONMarshaling(t *testing.T) {
 func TestBasicChainStartAndEndWords(t *testing.T) {
 	corpus := "This is a very short text."
 
-	chain := NewBasicChain(2)
+	chain := New(2)
 	chain.Build(strings.NewReader(corpus))
 
 	if chain.startPrefixes[0] != "This is" {

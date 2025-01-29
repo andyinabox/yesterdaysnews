@@ -265,6 +265,11 @@ func uploadVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHa
 func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
+	data, err := os.ReadFile("app/builder/hospital.txt")
+	if err != nil {
+		return err
+	}
+
 	uploadDir := getBuildID(config)
 
 	fileName, err := b.Model(ctx, uploadDir, []domain.Corpus{
@@ -274,16 +279,16 @@ func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 			Weight:   config.CaptionNewsCorpusWeight,
 		},
 		{
-			Type:     domain.CorpusTypeText,
-			FileGlob: "hospital.txt",
-			Weight:   config.CaptionHospitalCorpusWeight,
+			Type:    domain.CorpusTypeString,
+			Content: string(data),
+			Weight:  config.CaptionHospitalCorpusWeight,
 		},
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	data, err := os.ReadFile(filepath.Join(config.OutputDir, fileName))
+	data, err = os.ReadFile(filepath.Join(config.OutputDir, fileName))
 	if err != nil {
 		log.Fatal(err)
 	}

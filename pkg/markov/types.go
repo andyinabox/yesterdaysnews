@@ -27,7 +27,3 @@ type Chain interface {
 	Save() ([]byte, error)
 	Load([]byte) error
 }
-
-type Generator interface {
-	Sentence(Prefix) string
-}

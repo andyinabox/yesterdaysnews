@@ -14,6 +14,8 @@ import (
 
 func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {
 
+	// log.Debugf("build from multiple: %+v", sources)
+
 	combined := ""
 
 	// iterate through sources
@@ -25,6 +27,8 @@ func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {
 			if source.Content == "" {
 				return fmt.Errorf("corpus type %q has no content", domain.CorpusTypeString)
 			}
+
+			// log.Debug(source.Content)
 
 			combined = combined + "\n" + source.Content
 			continue
@@ -69,9 +73,9 @@ func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {
 
 	}
 
-	log.Debug(combined)
+	// log.Debug(combined)
 
-	c.BasicChain.Build(strings.NewReader(combined))
+	c.Chain.Build(strings.NewReader(combined))
 
 	return nil
 }
@@ -81,6 +85,8 @@ func (c *Chain) parseTextFile(filePath string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error reading file %q: %w", filePath, err)
 	}
+
+	// log.Debugf("content of %s: %s", filePath, string(content))
 
 	return string(content), nil
 }
@@ -134,7 +140,7 @@ scanloop:
 
 	output := strings.Join(lines, " ")
 
-	log.Debug(output)
+	// log.Debug(output)
 
 	return output, nil
 }

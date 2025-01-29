@@ -14,6 +14,7 @@ import (
 
 func (b *Builder) Model(ctx context.Context, uploadDir string, corpi []domain.Corpus) (string, error) {
 	cc := captionschain.New(b.cfg.CaptionPrefixLength)
+
 	cc.BuildFromMultiple(corpi)
 
 	data, err := cc.Save()

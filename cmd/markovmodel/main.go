@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/charmbracelet/log"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov/basicchain"
 )
 
 var prefixLength int
@@ -36,7 +36,7 @@ func main() {
 	}
 	defer file.Close()
 
-	chain := markov.NewBasicChain(prefixLength)
+	chain := basicchain.New(prefixLength)
 	chain.Build(file)
 
 	model, err := chain.Save()
