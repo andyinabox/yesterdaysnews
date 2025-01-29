@@ -1,3 +1,5 @@
-# yesterday's news
+The videos you are seeing are a random reshuffling of news clips from yesterday. The text is generated from the captions of yesterday's news, alongside a transcribed journal from November of 2016. The videos are purely random, but the text follows its own internal logic. 
 
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+Every day a new cycle, and we are meant to believe that yesterday's news is no longer relevant. But every day leaves its mark, and finds its way back into the story as we continue on. Every day follows another, and is inexplicably linked to the one that came before it.
+
+You can see the source code for this project [here](https://gitlab.com/andyinabox/yesterdaysnews).
