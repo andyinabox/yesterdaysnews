@@ -1,9 +1,8 @@
-class CaptionDisplay extends HTMLElement {
+export class CaptionDisplay extends HTMLElement {
   constructor() {
     super()
   }
   connectedCallback() {
-    this.resourceUrl = this.getAttribute('resource-url')
     this.eventSource = new EventSource(this.resourceUrl)
     this.eventSource.addEventListener('message', this.handleMessage.bind(this))
   }
@@ -21,5 +20,12 @@ class CaptionDisplay extends HTMLElement {
       this.handleMessage.bind(this)
     )
   }
+
+  get resourceUrl() {
+    return this.getAttribute('resource-url')
+  }
+
+  static register() {
+    customElements.define('caption-display', CaptionDisplay)
+  }
 }
-customElements.define('caption-display', CaptionDisplay)

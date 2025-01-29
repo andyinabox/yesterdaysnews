@@ -11,17 +11,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="stylesheet" href="/assets/styles.css" />
-    <script src="/assets/video-player.js"></script>
-    <script src="/assets/event-button.js"></script>
-    <script src="/assets/caption-display.js"></script>
-
   </head>
   <body>
 
     <main id="main">
-      <video muted autoplay id="video" data-resource-url="/clips">
-        <source type="video/webm" src="{{ .InitialClipURL }}">
-      </video>
+      <video-player resource-url="/clips" initial-clip-url="{{ .InitialClipURL }}"></video-player>
       <caption-display resource-url="/captions"></caption-display>
     </main>
 
@@ -36,6 +30,6 @@
     </dialog>
 
 
-    <script src="/assets/main.js"></script>
+    <script type="module" src="/assets/main.js"></script>
   </body>
 </html>

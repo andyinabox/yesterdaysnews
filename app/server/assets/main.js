@@ -1,5 +1,10 @@
+import { EventButton } from '/assets/event-button.js'
+import { CaptionDisplay } from '/assets/caption-display.js'
+import { VideoPlayer } from '/assets/video-player.js'
 ;(function () {
-  new VideoPlayer('video')
+  EventButton.register()
+  CaptionDisplay.register()
+  VideoPlayer.register()
 
   const body = document.body
   const mainViewer = document.getElementById('main')
