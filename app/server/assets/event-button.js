@@ -4,6 +4,8 @@ export class EventButton extends HTMLElement {
   }
 
   connectedCallback() {
+    this.innerHTML = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><use href="#yn-icon-${this.iconName}" /></svg> `
+
     this.addEventListener('click', this.sendEvent.bind(this))
   }
 
@@ -13,6 +15,10 @@ export class EventButton extends HTMLElement {
 
   get eventName() {
     return this.getAttribute('event-name')
+  }
+
+  get iconName() {
+    return this.getAttribute('icon-name')
   }
 
   static register() {

@@ -22,6 +22,9 @@ var indexTemplate string
 //go:embed about.md
 var aboutContentMarkdown []byte
 
+//go:embed svg-symbols.svg
+var svgSymbols string
+
 //go:embed assets/*
 var assets embed.FS
 
@@ -83,6 +86,7 @@ func main() {
 	cfg := &server.Config{
 		Templates:             template.Must(template.New("index.html.tmpl").Parse(indexTemplate)),
 		AboutContent:          string(aboutContent),
+		SVGSymbols:            svgSymbols,
 		Assets:                assetsFs,
 		Port:                  port,
 		MinCaptionDelay:       minCaptionDelay,

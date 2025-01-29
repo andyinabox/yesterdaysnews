@@ -1,3 +1,8 @@
+:root {
+  --yn-icon-width: 0.75rem;
+  --yn-icon-height: var(--yn-icon-width);
+}
+
 html {
   font-size: 3.5vw;
 }
@@ -14,9 +19,19 @@ body {
 }
 
 event-button {
+  display: block;
   cursor: pointer;
-  /* background-color: transparent;
-  border: none; */
+  width: var(--yn-icon-width);
+  height: var(--yn-icon-height);
+  overflow: hidden;
+}
+
+event-button > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: white;
+  stroke: none;
 }
 
 main {
@@ -28,7 +43,7 @@ main {
 nav {
   z-index: 2;
   position: fixed;
-  height: 1.5rem;
+  /* height: 1.5rem; */
   width: 100%;
   left: 0;
   bottom: 0;
@@ -38,8 +53,7 @@ nav {
 }
 
 nav > event-button {
-  font-size: 0.75rem;
-  margin: 0.5em;
+  margin: 0.5rem;
 }
 
 body.fullscreen > nav {
@@ -95,4 +109,8 @@ dialog > event-button {
 
 h1 {
   font-size: 1rem;
+}
+
+#svg-symbols {
+  display: none;
 }
