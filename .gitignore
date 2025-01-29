@@ -3,3 +3,4 @@ bin
 errors.*.json
 .env
 .DS_Store
+*.log
