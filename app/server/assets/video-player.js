@@ -12,6 +12,7 @@ export class VideoPlayer extends HTMLElement {
     const video = document.createElement('video')
     video.setAttribute('muted', true)
     video.setAttribute('autoplay', true)
+    video.setAttribute('tabindex', '-1')
     video.addEventListener('ended', this.onVideoEnded.bind(this))
     video.addEventListener('error', this.onVideoError.bind(this))
 

@@ -1,32 +1,45 @@
 import { EventButton } from '/assets/event-button.js'
+import { EventIcon } from '/assets/event-icon.js'
 import { CaptionDisplay } from '/assets/caption-display.js'
 import { VideoPlayer } from '/assets/video-player.js'
 ;(function () {
   EventButton.register()
+  EventIcon.register()
   CaptionDisplay.register()
   VideoPlayer.register()
 
-  const body = document.body
   const mainViewer = document.getElementById('main')
   const aboutModal = document.getElementById('about')
 
-  body.addEventListener('yn-open-about', () => {
+  document.addEventListener('yn-open-about', () => {
     aboutModal.showModal()
   })
 
-  body.addEventListener('yn-close-about', () => {
+  document.addEventListener('yn-close-about', () => {
     aboutModal.close()
   })
 
-  body.addEventListener('yn-enter-fullscreen', () => {
+  document.addEventListener('yn-enter-fullscreen', () => {
     mainViewer.requestFullscreen()
   })
 
-  body.addEventListener('fullscreenchange', () => {
+  document.addEventListener('fullscreenchange', () => {
     if (!!document.fullscreenElement) {
-      body.classList.add('fullscreen')
+      document.body.classList.add('fullscreen')
     } else {
-      body.classList.remove('fullscreen')
+      document.body.classList.remove('fullscreen')
+    }
+  })
+
+  document.addEventListener('keydown', (event) => {
+    if (
+      document.activeElement &&
+      document.activeElement.getAttribute('role') === 'button'
+    ) {
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        document.activeElement.click()
+      }
     }
   })
 

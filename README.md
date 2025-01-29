@@ -6,6 +6,11 @@ Every day a new cycle, and we are meant to believe that _yesterday's news_ is no
 
 —[Andy](https://andydayton.com)
 
+## Icons
+
+ - [Fullscreen icon by Q.P. at the Noun Project](https://thenounproject.com/icon/fullscreen-6938590/)
+ - [About icon by Mas Dhimas at the Noun Project](https://thenounproject.com/icon/about-6264304/)
+
 ## Contents
 
 This is really two projects in one
