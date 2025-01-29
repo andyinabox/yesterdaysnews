@@ -1,37 +1,77 @@
 :root {
-  --yn-icon-width: 0.75rem;
+  --yn-document-font-size: calc(75% + 2vmin);
+
+  --yn-icon-width: 1.5rem;
   --yn-icon-height: var(--yn-icon-width);
+
+  --yn-close-icon-width: 1rem;
+  --yn-close-icon-height: 1rem;
+
+  --yn-caption-font-size: 3.5vw;
+
+  --yn-z-index-captions: 1;
+  --yn-z-index-nav: 2;
+  --yn-z-index-dialog: 3;
+
+  --yn-color-background: black;
+  --yn-color-foreground: white;
+  --yn-color-highlight: red;
+  --yn-color-dialog-background: rgb(0 0 0 / 90%);
+  --yn-color-dialog-backdrop: rgb(0 0 0 / 80%);
 }
 
 html {
-  font-size: 3.5vw;
+  font-size: var(--yn-document-font-size);
 }
 
 body {
+  background-color: var(--yn-color-background);
+  color: var(--yn-color-foreground);
   height: 100vh;
   margin: 0;
   padding: 0;
   overflow: hidden;
   display: flex;
   align-items: center;
-  background-color: black;
   font-family: monospace;
 }
 
-event-button {
-  display: block;
+a,
+a:visited {
+  text-decoration: none;
+  color: var(--yn-color-highlight);
+  border-bottom: 1px dotted var(--yn-color-highlight);
+}
+
+button {
+  color: var(--yn-color-foreground);
+  background-color: var(--yn-color-background);
+  border: 1px solid var(--yn-color-foreground);
   cursor: pointer;
+  border-radius: 0px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  padding: 0.5em;
+  text-transform: uppercase;
+}
+
+event-button {
   width: var(--yn-icon-width);
   height: var(--yn-icon-height);
+  display: block;
+  cursor: pointer;
   overflow: hidden;
 }
 
 event-button > svg {
+  fill: var(--yn-color-foreground);
   display: block;
   width: 100%;
   height: 100%;
-  fill: white;
   stroke: none;
+}
+event-button:hover > svg {
+  fill: var(--yn-color-highlight);
 }
 
 main {
@@ -41,9 +81,8 @@ main {
 }
 
 nav {
-  z-index: 2;
+  z-index: var(--yn-z-index-nav);
   position: fixed;
-  /* height: 1.5rem; */
   width: 100%;
   left: 0;
   bottom: 0;
@@ -70,15 +109,14 @@ video-player > video {
 }
 
 caption-display {
-  z-index: 1;
+  z-index: var(--yn-z-index-captions);
+  font-size: var(--yn-caption-font-size);
   position: absolute;
   left: 50%;
   width: 80%;
   bottom: 0.5rem;
   transform: translateX(-50%);
   text-align: center;
-  color: white;
-  font-size: 1rem;
   font-family: monospace;
   display: flex;
   flex-wrap: wrap;
@@ -86,25 +124,46 @@ caption-display {
 }
 
 caption-display > .word {
-  background-color: black;
+  color: var(--yn-color-foreground);
+  background-color: var(--yn-color-background);
   padding: 0.2em;
 }
 
 dialog {
+  z-index: var(--yn-z-index-dialog);
+  background-color: var(--yn-color-dialog-background);
+  color: var(--yn-color-foreground);
+
   position: relative;
-  z-index: 3;
-  background-color: rgba(0, 0, 0, 0.9);
-  color: white;
   border: none;
-  font-size: 0.75rem;
+  font-size: 1rem;
   margin: auto 1rem;
+  padding: 2rem;
+}
+
+dialog .footer {
+  text-align: right;
+  margin-top: 1rem;
+}
+
+dialog p:first-of-type {
+  margin-top: 0px;
+}
+dialog p:last-of-type {
+  margin-bottom: 0px;
+}
+
+dialog::backdrop {
+  backdrop-filter: invert(100%) blur(10px);
 }
 
 dialog > event-button {
+  width: var(--yn-close-icon-width);
+  height: var(--yn-close-icon-height);
   position: absolute;
   top: 0;
   right: 0;
-  margin: 0.5rem;
+  margin: 0.75rem;
 }
 
 h1 {

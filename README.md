@@ -1,5 +1,15 @@
 # Yesterday's News
 
+The videos you are seeing are a random reshuffling of news clips from the day before today. The text is generated from the captions of those news clips, alongside a journal of mine from late October to early November 2016. The videos are purely random, but the text follows its own internal logic. 
+
+Every day a new cycle, and we are meant to believe that _yesterday's news_ is no longer relevant. But every day leaves its mark, and finds its way back into the story as we continue forward. Every day follows another, and is inextricably linked to the one that came before it.
+
+You can see the source code for this project with additional information [here](https://gitlab.com/andyinabox/yesterdaysnews).
+
+—[Andy](https://andydayton.com)
+
+## Contents
+
 This is really two projects in one
 
  - A Go port of [yesterdays-news-py](https://github.com/andyinabox/yesterdays-news-py/). The goal is to build assets and them push them to an object store.

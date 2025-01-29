@@ -9,7 +9,7 @@ export class EventButton extends HTMLElement {
     this.addEventListener('click', this.sendEvent.bind(this))
   }
 
-  sendEvent(originalEvent) {
+  sendEvent() {
     this.dispatchEvent(new CustomEvent(this.eventName, { bubbles: true }))
   }
 
