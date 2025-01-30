@@ -15,7 +15,9 @@
   </head>
   <body>
 
-    {{ .SVGSymbols }}
+    <div class="hidden">
+        {{ .SVGSymbols }}
+    </div>
 
     <main id="main">
       <video-player resource-url="/clips" initial-clip-url="{{ .InitialClipURL }}"></video-player>
@@ -23,13 +25,23 @@
     </main>
 
     <nav>
-      <event-icon event-name="yn-open-about" icon-name="about" title="About this project">❓</event-icon>
-      <event-icon event-name="yn-enter-fullscreen" icon-name="fullscreen" title="Enter fullscreen mode">🖥️</event-icon>
+      <event-icon event-name="yn-open-about" icon-name="about" title="About this project"></event-icon>
+      <event-icon event-name="yn-enter-fullscreen" icon-name="fullscreen" title="Enter fullscreen mode"></event-icon>
     </nav>
 
     <dialog id="about">
-      <div class="content">{{ .AboutContent }}</div>
-      <div class="footer"><event-button autofocus event-name="yn-close-about">Ok</event-button></div>
+      <article>{{ .AboutContent }}</article>
+      <footer>
+        <div>&mdash;<a target="_blank" href="https://andydayton.com">Andy</a></div>
+        <event-button autofocus event-name="yn-close-about">Ok</event-button>
+      </footer>
+    </dialog>
+
+    <dialog id="orientation">
+      <article>Fullscreen mode is best viewed in landscape orientation"</article>
+      <footer>
+        <event-button autofocus event-name="yn-close-orientation">Ok</event-button>
+      </footer>
     </dialog>
 
 

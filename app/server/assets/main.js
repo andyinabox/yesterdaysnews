@@ -2,32 +2,76 @@ import { EventButton } from '/assets/event-button.js'
 import { EventIcon } from '/assets/event-icon.js'
 import { CaptionDisplay } from '/assets/caption-display.js'
 import { VideoPlayer } from '/assets/video-player.js'
-;(function () {
+
+// events
+const ABOUT_OPEN_EVENT = 'yn-open-about'
+const ABOUT_CLOSE_EVENT = 'yn-close-about'
+const ORIENTATION_CLOSE_EVENT = 'yn-close-orientation'
+const FULLSCREEN_ENTER_EVENT = 'yn-enter-fullscreen'
+
+// classes
+const FULLSCREEN_BODY_CLASS = 'fullscreen'
+
+// ids
+const MAIN_VIEWER_ID = 'main'
+const ABOUT_MODAL_ID = 'about'
+const ORIENTATION_MODAL_ID = 'orientation'
+
+function registerComponents() {
   EventButton.register()
   EventIcon.register()
   CaptionDisplay.register()
   VideoPlayer.register()
+}
 
-  const mainViewer = document.getElementById('main')
-  const aboutModal = document.getElementById('about')
+function isFullScreen() {
+  return document.body.classList.contains(FULLSCREEN_BODY_CLASS)
+}
 
-  document.addEventListener('yn-open-about', () => {
+function checkOrientation() {
+  const orientationModal = document.getElementById(ORIENTATION_MODAL_ID)
+
+  if (!isFullScreen()) {
+    orientationModal.close()
+    return
+  }
+
+  if (screen.orientation.type.includes('portrait')) {
+    orientationModal.showModal()
+  } else {
+    orientationModal.close()
+  }
+}
+
+function registerEventListeners() {
+  const mainViewer = document.getElementById(MAIN_VIEWER_ID)
+  const aboutModal = document.getElementById(ABOUT_MODAL_ID)
+  const orientationModal = document.getElementById(ORIENTATION_MODAL_ID)
+
+  document.addEventListener(ABOUT_OPEN_EVENT, () => {
     aboutModal.showModal()
   })
 
-  document.addEventListener('yn-close-about', () => {
+  document.addEventListener(ABOUT_CLOSE_EVENT, () => {
     aboutModal.close()
   })
 
-  document.addEventListener('yn-enter-fullscreen', () => {
+  document.addEventListener(FULLSCREEN_ENTER_EVENT, () => {
     mainViewer.requestFullscreen()
+  })
+
+  document.addEventListener(ORIENTATION_CLOSE_EVENT, () => {
+    orientationModal.close()
   })
 
   document.addEventListener('fullscreenchange', () => {
     if (!!document.fullscreenElement) {
-      document.body.classList.add('fullscreen')
+      document.body.classList.add(FULLSCREEN_BODY_CLASS)
+      checkOrientation()
+      // we only want to use the dialog in full screen mode
     } else {
-      document.body.classList.remove('fullscreen')
+      document.body.classList.remove(FULLSCREEN_BODY_CLASS)
+      checkOrientation()
     }
   })
 
@@ -43,10 +87,22 @@ import { VideoPlayer } from '/assets/video-player.js'
     }
   })
 
-  // register reload event source
+  // orientation events
+  screen.orientation.addEventListener('change', checkOrientation)
+  checkOrientation()
+}
+
+function registerReloadEventSource() {
   const eventSource = new EventSource('/reload')
   eventSource.addEventListener('message', () => {
     eventSource.close()
     window.location.reload()
   })
+}
+
+// go!
+;(function () {
+  registerComponents()
+  registerEventListeners()
+  registerReloadEventSource()
 })()

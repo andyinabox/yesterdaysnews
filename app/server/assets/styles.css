@@ -1,175 +1,134 @@
-:root {
-  --yn-document-font-size: calc(75% + 2vmin);
+@layer vars, base, component;
 
-  --yn-icon-width: 1.5rem;
-  --yn-icon-height: var(--yn-icon-width);
+/* load vars  */
+@import '/assets/vars.css' layer(vars);
 
-  --yn-close-icon-width: 1rem;
-  --yn-close-icon-height: 1rem;
+/* load components */
+@import '/assets/caption-display.css' layer(component);
+@import '/assets/event-icon.css' layer(component);
+@import '/assets/video-player.css' layer(component);
 
-  --yn-caption-font-size: 3.5vw;
+/* base styles */
+@layer base {
+  html {
+    font-size: var(--yn-document-font-size);
+  }
 
-  --yn-z-index-captions: 1;
-  --yn-z-index-nav: 2;
-  --yn-z-index-dialog: 3;
+  body {
+    background-color: var(--yn-color-background);
+    color: var(--yn-color-foreground);
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    font-family: monospace;
+  }
 
-  --yn-color-background: black;
-  --yn-color-foreground: white;
-  --yn-color-highlight: red;
-  --yn-color-dialog-background: rgb(0 0 0 / 90%);
-  --yn-color-dialog-backdrop: rgb(0 0 0 / 80%);
-}
+  a,
+  a:visited {
+    text-decoration: none;
+    color: var(--yn-color-highlight);
+    border-bottom: 1px dotted var(--yn-color-highlight);
+  }
 
-html {
-  font-size: var(--yn-document-font-size);
-}
+  button {
+    color: var(--yn-color-foreground);
+    background-color: var(--yn-color-background);
+    border: 1px solid var(--yn-color-foreground);
+    cursor: pointer;
+    border-radius: 0px;
+    font-family: monospace;
+    font-size: 0.75rem;
+    padding: 0.5em;
+    text-transform: uppercase;
+  }
 
-body {
-  background-color: var(--yn-color-background);
-  color: var(--yn-color-foreground);
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  font-family: monospace;
-}
+  main {
+    position: relative;
+    width: 100vw;
+    height: 56vw;
+  }
 
-a,
-a:visited {
-  text-decoration: none;
-  color: var(--yn-color-highlight);
-  border-bottom: 1px dotted var(--yn-color-highlight);
-}
+  nav {
+    z-index: var(--yn-z-index-nav);
+    position: fixed;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-button {
-  color: var(--yn-color-foreground);
-  background-color: var(--yn-color-background);
-  border: 1px solid var(--yn-color-foreground);
-  cursor: pointer;
-  border-radius: 0px;
-  font-family: monospace;
-  font-size: 0.75rem;
-  padding: 0.5em;
-  text-transform: uppercase;
-}
+  nav > event-icon {
+    margin: 0.5rem;
+  }
 
-event-icon {
-  width: var(--yn-icon-width);
-  height: var(--yn-icon-height);
-  display: block;
-  cursor: pointer;
-  overflow: hidden;
-}
+  body.fullscreen > nav {
+    display: none;
+  }
 
-event-icon > svg {
-  fill: var(--yn-color-foreground);
-  display: block;
-  width: 100%;
-  height: 100%;
-  stroke: none;
-}
-event-icon:hover > svg {
-  fill: var(--yn-color-highlight);
-}
+  dialog {
+    z-index: var(--yn-z-index-dialog);
+    background-color: var(--yn-color-dialog-background);
+    color: var(--yn-color-foreground);
 
-main {
-  position: relative;
-  width: 100vw;
-  height: 56vw;
-}
+    position: relative;
+    border: none;
+    font-size: 1rem;
+    margin: auto 1rem;
+    padding: 2rem;
+  }
 
-nav {
-  z-index: var(--yn-z-index-nav);
-  position: fixed;
-  width: 100%;
-  left: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  dialog > footer {
+    text-align: right;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-nav > event-icon {
-  margin: 0.5rem;
-}
+  dialog::backdrop {
+    backdrop-filter: invert(100%) blur(10px);
+  }
 
-body.fullscreen > nav {
-  display: none;
-}
+  dialog > event-button {
+    width: var(--yn-close-icon-width);
+    height: var(--yn-close-icon-height);
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0.75rem;
+  }
 
-video-player {
-  width: 100%;
-  height: 100%;
-}
-video-player > video {
-  width: 100%;
-  height: 100%;
-}
+  dialog > article {
+    line-height: 1.2em;
+    text-align: justify;
+  }
 
-caption-display {
-  z-index: var(--yn-z-index-captions);
-  font-size: var(--yn-caption-font-size);
-  position: absolute;
-  left: 50%;
-  width: 80%;
-  bottom: 0.5rem;
-  transform: translateX(-50%);
-  text-align: center;
-  font-family: monospace;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
+  @media (min-width: 1280px) {
+    dialog > article {
+      columns: 2;
+      column-gap: 2rem;
+    }
+  }
 
-caption-display > .word {
-  color: var(--yn-color-foreground);
-  background-color: var(--yn-color-background);
-  padding: 0.2em;
-}
+  dialog > article p:first-of-type {
+    margin-top: 0px;
+  }
+  dialog > article p:last-of-type {
+    margin-bottom: 0px;
+  }
 
-dialog {
-  z-index: var(--yn-z-index-dialog);
-  background-color: var(--yn-color-dialog-background);
-  color: var(--yn-color-foreground);
+  dialog > article blockquote {
+    font-style: italic;
+    margin-left: 0px;
+    margin-right: 0px;
+  }
 
-  position: relative;
-  border: none;
-  font-size: 1rem;
-  margin: auto 1rem;
-  padding: 2rem;
-}
-
-dialog .footer {
-  text-align: right;
-  margin-top: 1rem;
-}
-
-dialog p:first-of-type {
-  margin-top: 0px;
-}
-dialog p:last-of-type {
-  margin-bottom: 0px;
-}
-
-dialog::backdrop {
-  backdrop-filter: invert(100%) blur(10px);
-}
-
-dialog > event-button {
-  width: var(--yn-close-icon-width);
-  height: var(--yn-close-icon-height);
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin: 0.75rem;
-}
-
-h1 {
-  font-size: 1rem;
-}
-
-#svg-symbols {
-  display: none;
+  .hidden {
+    display: none;
+  }
 }
