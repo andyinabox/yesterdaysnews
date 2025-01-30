@@ -4,3 +4,20 @@
   align-items: center;
   background-color: black;
 }
+
+nav {
+  z-index: 1;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav > * {
+  cursor: pointer;
+  font-size: calc(75% + 3vmin);
+  margin: 0.5em;
+}

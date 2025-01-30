@@ -45,6 +45,20 @@ export class YesterdaysNewsPlayer extends HTMLElement {
     this.setCanvasSize()
     this.shadow.appendChild(this.canvas)
 
+    // setup nav
+    this.nav = document.createElement('nav')
+    this.aboutBtn = document.createElement('a')
+    this.aboutBtn.setAttribute('target', '_blank')
+    this.aboutBtn.href = '/about'
+    this.aboutBtn.innerHTML = 'about'
+    this.fullscreenBtn = document.createElement('button')
+    this.fullscreenBtn.addEventListener('click', () => {
+      this.requestFullscreen()
+    })
+    this.fullscreenBtn.innerHTML = 'fullscreen'
+    this.nav.appendChild(this.aboutBtn)
+    this.nav.appendChild(this.fullscreenBtn)
+    this.shadow.append(this.nav)
     // add window resize listener
     // TODO: add throttling
     window.addEventListener('resize', this.setCanvasSize.bind(this))
