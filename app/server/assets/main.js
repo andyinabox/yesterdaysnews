@@ -2,32 +2,49 @@ import { EventButton } from '/assets/event-button.js'
 import { EventIcon } from '/assets/event-icon.js'
 import { CaptionDisplay } from '/assets/caption-display.js'
 import { VideoPlayer } from '/assets/video-player.js'
-;(function () {
+import { OrientationDialog } from '/assets/orientation-dialog.js'
+
+// events
+const ABOUT_OPEN_EVENT = 'yn-open-about'
+const ABOUT_CLOSE_EVENT = 'yn-close-about'
+const FULLSCREEN_ENTER_EVENT = 'yn-enter-fullscreen'
+
+// classes
+const FULLSCREEN_BODY_CLASS = 'fullscreen'
+
+// ids
+const MAIN_VIEWER_ID = 'main'
+const ABOUT_MODAL_ID = 'about'
+
+function registerComponents() {
   EventButton.register()
   EventIcon.register()
   CaptionDisplay.register()
   VideoPlayer.register()
+  OrientationDialog.register()
+}
 
-  const mainViewer = document.getElementById('main')
-  const aboutModal = document.getElementById('about')
+function registerEventListeners() {
+  const mainViewer = document.getElementById(MAIN_VIEWER_ID)
+  const aboutModal = document.getElementById(ABOUT_MODAL_ID)
 
-  document.addEventListener('yn-open-about', () => {
+  document.addEventListener(ABOUT_OPEN_EVENT, () => {
     aboutModal.showModal()
   })
 
-  document.addEventListener('yn-close-about', () => {
+  document.addEventListener(ABOUT_CLOSE_EVENT, () => {
     aboutModal.close()
   })
 
-  document.addEventListener('yn-enter-fullscreen', () => {
+  document.addEventListener(FULLSCREEN_ENTER_EVENT, () => {
     mainViewer.requestFullscreen()
   })
 
   document.addEventListener('fullscreenchange', () => {
     if (!!document.fullscreenElement) {
-      document.body.classList.add('fullscreen')
+      document.body.classList.add(FULLSCREEN_BODY_CLASS)
     } else {
-      document.body.classList.remove('fullscreen')
+      document.body.classList.remove(FULLSCREEN_BODY_CLASS)
     }
   })
 
@@ -42,11 +59,19 @@ import { VideoPlayer } from '/assets/video-player.js'
       }
     }
   })
+}
 
-  // register reload event source
+function registerReloadEventSource() {
   const eventSource = new EventSource('/reload')
   eventSource.addEventListener('message', () => {
     eventSource.close()
     window.location.reload()
   })
+}
+
+// go!
+;(function () {
+  registerComponents()
+  registerEventListeners()
+  registerReloadEventSource()
 })()
