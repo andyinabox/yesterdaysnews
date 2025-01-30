@@ -4,7 +4,14 @@ import { CaptionLoader } from '/assets/caption-loader.js'
 const ASPECT_RATIO = 720 / 1280
 
 export class YesterdaysNewsPlayer extends HTMLElement {
-  static css = ``
+  static css = `
+    :host {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: black;
+    }
+  `
 
   #currentCaption = ''
 
@@ -22,12 +29,12 @@ export class YesterdaysNewsPlayer extends HTMLElement {
   connectedCallback() {
     // connect to caption loader
     this.captionLoader.connect()
-    // this.shadow = this.attachShadow({ mode: 'open' })
+    this.shadow = this.attachShadow({ mode: 'open' })
 
     // set styles
     const sheet = new CSSStyleSheet()
     sheet.replaceSync(YesterdaysNewsPlayer.css)
-    this.adoptedStyleSheets = [sheet]
+    this.shadow.adoptedStyleSheets = [sheet]
 
     this.canvas = document.createElement('canvas')
     this.onResize()
@@ -47,7 +54,7 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
     this.video.play()
 
-    this.appendChild(this.canvas)
+    this.shadow.appendChild(this.canvas)
 
     window.addEventListener('resize', this.onResize.bind(this))
 
@@ -56,7 +63,12 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
   drawCanvas() {
     this.clearCanvas()
-    this.drawVideo()
+    // this.setRotation()
+    if (this.video.paused || this.video.ended) {
+      this.drawStatic()
+    } else {
+      this.drawVideo()
+    }
     this.drawCaption()
     window.requestAnimationFrame(this.drawCanvas.bind(this))
   }
@@ -65,6 +77,14 @@ export class YesterdaysNewsPlayer extends HTMLElement {
     this.ctx.fillStyle = 'rgb(0 0 0)'
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
     // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+  }
+
+  setRotation() {
+    this.ctx.resetTransform()
+    if (true) {
+      this.ctx.translate(this.canvas.width / 2, -this.canvas.height / 2)
+      this.ctx.rotate((90 * Math.PI) / 180)
+    }
   }
 
   drawCaption() {
@@ -108,6 +128,23 @@ export class YesterdaysNewsPlayer extends HTMLElement {
     const [x, y, width, height] = this.calcVideoDimensionsAndLocation()
 
     this.ctx.drawImage(this.video, x, y, width, height)
+  }
+
+  drawStatic() {
+    const [videoX, videoY, videoWidth, videoHeight] =
+      this.calcVideoDimensionsAndLocation()
+    const imageData = this.ctx.createImageData(videoWidth, videoHeight)
+    const data = imageData.data
+
+    for (let i = 0; i < data.length; i += 4) {
+      const value = Math.random() * 64
+      data[i] = value // red
+      data[i + 1] = value // green
+      data[i + 2] = value // blue
+      data[i + 3] = 255 // alpha
+    }
+
+    this.ctx.putImageData(imageData, videoX, videoY)
   }
 
   calcVideoDimensions() {
