@@ -1,15 +1,38 @@
 export class ClipLoader {
   #clips = []
   #preloaded = []
+  #video = null
+  #videoSource = null
 
-  constructor(resourceUrl) {
+  constructor(resourceUrl, initialClipURL) {
+    // fetch video urls
     this.resourceUrl = resourceUrl
-    this.fetchClipURLs()
+    this.#fetchClipURLs()
+
+    // set up video element for loading videos
+    this.#video = document.createElement('video')
+    this.#video.setAttribute('muted', true) // this is required to allow autoplay
+    this.#video.addEventListener('ended', () => {
+      this.#loadNewVideo()
+    })
+    this.#video.addEventListener('error', (err) => {
+      console.error(err)
+      this.#loadNewVideo()
+    })
+    this.#videoSource = document.createElement('source')
+    this.#videoSource.setAttribute('type', 'video/webm')
+    this.#videoSource.setAttribute('src', initialClipURL)
+
+    this.#video.appendChild(this.#videoSource)
   }
 
-  next() {
+  get video() {
+    return this.#video
+  }
+
+  #nextClip() {
     if (this.#clips.length < 10) {
-      this.fetchClipURLs()
+      this.#fetchClipURLs()
     }
 
     let next
@@ -29,7 +52,7 @@ export class ClipLoader {
     return next
   }
 
-  async fetchClipURLs() {
+  async #fetchClipURLs() {
     try {
       const resp = await fetch(this.resourceUrl)
 
@@ -43,6 +66,19 @@ export class ClipLoader {
       this.#preloadNextClip()
     } catch (err) {
       console.error(err)
+    }
+  }
+
+  #loadNewVideo() {
+    try {
+      this.#video.pause()
+
+      this.#videoSource.setAttribute('src', this.#nextClip())
+
+      this.#video.load()
+      this.#video.play()
+    } catch (err) {
+      console.log(`error loading video ${url}`, err)
     }
   }
 
