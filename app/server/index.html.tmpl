@@ -19,7 +19,15 @@
         {{ .SVGSymbols }}
     </div>
 
-    <main id="main">
+    <yesterdays-news-player
+      captions-resource-url="/captions"
+      clips-resource-url="/clips"
+      initial-clip-url="{{ .InitialClipURL }}"
+    >
+    </yesterdays-news-player>
+
+
+    {{/* <main id="main">
       <video-player resource-url="/clips" initial-clip-url="{{ .InitialClipURL }}"></video-player>
       <caption-display resource-url="/captions"></caption-display>
     </main>
@@ -43,7 +51,7 @@
         <event-button autofocus event-name="yn-close-orientation">Ok</event-button>
       </footer>
     </dialog>
-
+ */}}
 
     <script type="module" src="/assets/main.js"></script>
   </body>
