@@ -11,6 +11,7 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
   constructor() {
     super()
+    this._internals = this.attachInternals()
     // initialize video clip loader
     this.clipLoader = new ClipLoader(this.clipsResourceURL, this.initialClipURL)
     // initialize caption loader
@@ -65,6 +66,18 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
     // start canvas animation
     window.requestAnimationFrame(this.drawCanvas.bind(this))
+
+    document.addEventListener(
+      'fullscreenchange',
+      this.handleFullscreenChange.bind(this)
+    )
+
+    // handle orientation change
+    screen.orientation.addEventListener(
+      'change',
+      this.checkOrientation.bind(this)
+    )
+    this.checkOrientation()
   }
 
   loadStyles() {
@@ -235,6 +248,29 @@ export class YesterdaysNewsPlayer extends HTMLElement {
     return { x, y, width, height }
   }
 
+  handleFullscreenChange() {
+    if (document.fullscreenElement === this) {
+      this.fullscreen = true
+    } else {
+      this.fullscreen = false
+    }
+
+    this.checkOrientation()
+  }
+
+  checkOrientation() {
+    if (!this.fullscreen) {
+      this.#rotated = false
+      return
+    }
+
+    if (screen.orientation.type.includes('portrait')) {
+      this.#rotated = true
+    } else {
+      this.#rotated = false
+    }
+  }
+
   setCanvasSize() {
     const { width, height } = this.getBoundingClientRect()
     this.canvas.setAttribute('width', width + 'px')
@@ -243,6 +279,20 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
   disconnectedCallback() {
     this.captionLoader.disconnect()
+  }
+
+  get fullscreen() {
+    return this._internals.states.has('fullscreen')
+  }
+
+  set fullscreen(value) {
+    if (value) {
+      // Existence of identifier corresponds to "true"
+      this._internals.states.add('fullscreen')
+    } else {
+      // Absence of identifier corresponds to "false"
+      this._internals.states.delete('fullscreen')
+    }
   }
 
   get clipsResourceURL() {

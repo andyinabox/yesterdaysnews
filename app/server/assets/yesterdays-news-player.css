@@ -21,3 +21,7 @@ nav > * {
   font-size: calc(75% + 3vmin);
   margin: 0.5em;
 }
+
+:host(:state(fullscreen)) nav {
+  display: none;
+}
