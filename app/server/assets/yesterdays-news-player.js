@@ -1,5 +1,6 @@
 import { ClipLoader } from '/assets/clip-loader.js'
 import { CaptionLoader } from '/assets/caption-loader.js'
+import { CaptionFlow } from '/assets/caption-flow.js'
 
 const ASPECT_RATIO = 720 / 1280
 const STYLESHEET_URL = '/assets/yesterdays-news-player.css'
@@ -19,6 +20,8 @@ export class YesterdaysNewsPlayer extends HTMLElement {
         this.#currentCaption = caption
       }
     )
+
+    this.captionFlow = new CaptionFlow()
   }
 
   connectedCallback() {
@@ -89,28 +92,21 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
     // set canvas based on video width
     const fontSize = 0.04 * width
+    const fontFamily = 'monospace'
     const verticalPadding = 0.1 * fontSize
     const horizontalPadding = 0.2 * fontSize
+    const maxCaptionWidth = width - 4 * horizontalPadding
 
-    // get current caption
-    const caption = this.#currentCaption
-
-    // set font size and then use that to get text metricss
-    this.ctx.font = `${fontSize}px monospace`
-    let metrics = this.ctx.measureText(caption)
-
-    const lines = [caption]
-
-    // break into lines if necessart
-    if (metrics.width > width - 4 * horizontalPadding) {
-      const tokens = caption.split(' ')
-      const divider = Math.ceil(tokens.length / 2)
-      lines[0] = tokens.slice(0, divider).join(' ')
-      lines[1] = tokens.slice(divider).join(' ')
-    }
+    const lines = this.captionFlow.get(
+      this.ctx,
+      fontSize,
+      fontFamily,
+      maxCaptionWidth,
+      this.#currentCaption
+    )
 
     // go through the lines of text and draw
-    let textWidth, textHeight, textX, textY
+    let textWidth, textHeight, textX, textY, metrics
     for (let i = 0; i < lines.length; i++) {
       // update metrics
       metrics = this.ctx.measureText(lines[i])
