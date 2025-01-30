@@ -4,12 +4,7 @@ import { CaptionLoader } from '/assets/caption-loader.js'
 const ASPECT_RATIO = 720 / 1280
 
 export class YesterdaysNewsPlayer extends HTMLElement {
-  static css = `
-    canvas {
-      width: 100%;
-      height: 100%;
-    }
-  `
+  static css = ``
 
   #currentCaption = ''
 
@@ -35,10 +30,7 @@ export class YesterdaysNewsPlayer extends HTMLElement {
     this.adoptedStyleSheets = [sheet]
 
     this.canvas = document.createElement('canvas')
-    const { width, height } = this.getBoundingClientRect()
-    console.log('width, height', width, height)
-    this.canvas.setAttribute('width', width + 'px')
-    this.canvas.setAttribute('height', height + 'px')
+    this.onResize()
     this.ctx = this.canvas.getContext('2d')
 
     this.video = document.createElement('video')
@@ -56,6 +48,8 @@ export class YesterdaysNewsPlayer extends HTMLElement {
     this.video.play()
 
     this.appendChild(this.canvas)
+
+    window.addEventListener('resize', this.onResize.bind(this))
 
     window.requestAnimationFrame(this.drawCanvas.bind(this))
   }
@@ -78,18 +72,36 @@ export class YesterdaysNewsPlayer extends HTMLElement {
     const padding = 0.5 * fontSize
     const [videoX, videoY, videoWidth, videoHeight] =
       this.calcVideoDimensionsAndLocation()
+    const caption = this.#currentCaption
 
     this.ctx.font = `${fontSize}px monospace`
-    const metrics = this.ctx.measureText(this.#currentCaption)
+    let metrics = this.ctx.measureText(caption)
 
-    const x = this.canvas.width / 2 - metrics.width / 2
-    const y = videoY + videoHeight - fontSize
+    let lines = []
+    if (metrics.width > videoWidth) {
+      const tokens = caption.split(' ')
+      const divider = Math.ceil(tokens.length / 2)
+      lines[0] = tokens.slice(0, divider).join(' ')
+      lines[1] = tokens.slice(divider).join(' ')
+    } else {
+      lines = [caption]
+    }
 
-    this.ctx.fillStyle = 'rgb(0 0 0)'
-    this.ctx.fillRect(x, y - fontSize, metrics.width, fontSize)
+    for (let i = 0; i < lines.length; i++) {
+      metrics = this.ctx.measureText(lines[i])
+      const width = metrics.width
+      const height =
+        metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
 
-    this.ctx.fillStyle = 'rgb(255 255 255)'
-    this.ctx.fillText(this.#currentCaption, x, y)
+      const x = this.canvas.width / 2 - metrics.width / 2
+      const y = videoY + videoHeight - fontSize - height * i
+
+      this.ctx.fillStyle = 'rgb(0 0 0)'
+      this.ctx.fillRect(x, y - fontSize, width, height)
+
+      this.ctx.fillStyle = 'rgb(255 255 255)'
+      this.ctx.fillText(lines[i], x, y)
+    }
   }
 
   drawVideo() {
@@ -118,6 +130,12 @@ export class YesterdaysNewsPlayer extends HTMLElement {
   onVideoError() {
     console.error('video error')
     this.loadNewVideo()
+  }
+
+  onResize() {
+    const { width, height } = this.getBoundingClientRect()
+    this.canvas.setAttribute('width', width + 'px')
+    this.canvas.setAttribute('height', width * ASPECT_RATIO)
   }
 
   loadNewVideo() {
