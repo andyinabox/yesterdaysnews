@@ -19,7 +19,7 @@ export class CaptionRenderer {
     this.#eventSource.addEventListener('message', this.handleMessage.bind(this))
   }
 
-  update(rotated) {
+  update(rotated = false) {
     this.#rotated = rotated
   }
 
