@@ -14,9 +14,10 @@ type Route interface {
 }
 
 type Config struct {
-	AssetsUrlPath     string // url path ("/assets")
-	AssetsFS          fs.FS  // if using embed.FS, you will probably need to use `fs.Sub`
-	StripAssetsPrefix bool   // probably true
+	AssetsUrlPath           string // url path ("/assets")
+	AssetsFS                fs.FS  // if using embed.FS, you will probably need to use `fs.Sub`
+	StripAssetsPrefix       bool   // probably true
+	RedirectNotFoundToIndex bool
 }
 
 type Handler struct {
@@ -43,8 +44,12 @@ func New(cfg *Config) *Handler {
 func (h *Handler) AddRoute(path string, handler http.HandlerFunc) {
 	h.mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != path {
-			log.Infof("attempt to access path %q, redirecting", r.URL.Path)
-			http.Redirect(w, r, "/", http.StatusSeeOther)
+			log.Infof("attempt to access path %q", r.URL.Path)
+			if h.cfg.RedirectNotFoundToIndex {
+				http.Redirect(w, r, "/", http.StatusSeeOther)
+			} else {
+				http.NotFound(w, r)
+			}
 			return
 		}
 		handler(w, r)

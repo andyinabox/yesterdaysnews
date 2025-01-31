@@ -1,14 +1,73 @@
-@layer vars, base, component;
+:root {
+  --yn-document-font-size: calc(75% + 2vmin);
 
-/* load vars  */
-@import '/assets/vars.css' layer(vars);
+  --yn-icon-width: 1.5rem;
+  --yn-icon-height: var(--yn-icon-width);
 
-/* load components */
-@import '/assets/caption-display.css' layer(component);
-@import '/assets/event-icon.css' layer(component);
-@import '/assets/video-player.css' layer(component);
+  --yn-close-icon-width: 1rem;
+  --yn-close-icon-height: 1rem;
 
-/* base styles */
+  --yn-caption-font-size: 3.5vw;
+
+  --yn-z-index-captions: 1;
+  --yn-z-index-nav: 2;
+  --yn-z-index-dialog: 3;
+
+  --yn-color-background: black;
+  --yn-color-foreground: white;
+  --yn-color-highlight: red;
+  --yn-color-dialog-background: rgb(0 0 0 / 90%);
+  --yn-color-dialog-backdrop: rgb(0 0 0 / 80%);
+
+  --yn-content-max-width: 1280px;
+}
+
+body {
+  background-color: var(--yn-color-background);
+  color: var(--yn-color-foreground);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-size: var(--yn-document-font-size);
+  min-height: 100vh;
+}
+
+body.index {
+  height: 100vh;
+}
+
+body.about {
+}
+
+a,
+a:visited {
+  text-decoration: none;
+  color: var(--yn-color-highlight);
+  border-bottom: 1px dotted var(--yn-color-highlight);
+}
+
+article {
+  max-width: var(--yn-content-max-width);
+  margin: 2rem;
+}
+
+yesterdays-news {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* @layer vars, base, component;
+
+@import './css/vars.css' layer(vars);
+
+@import './css/caption-display.css' layer(component);
+@import './css/event-icon.css' layer(component);
+@import './css/video-player.css' layer(component);
+
 @layer base {
   html {
     font-size: var(--yn-document-font-size);
@@ -131,4 +190,4 @@
   .hidden {
     display: none;
   }
-}
+} */
