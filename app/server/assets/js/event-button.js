@@ -18,8 +18,5 @@ export class EventButton extends EventElement {
 
     button.addEventListener('click', this.sendEvent.bind(this))
   }
-
-  static register() {
-    customElements.define('event-button', EventButton)
-  }
 }
+customElements.define('event-button', EventButton)

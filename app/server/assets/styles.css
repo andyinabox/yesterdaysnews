@@ -1,14 +1,22 @@
-@layer vars, base, component;
+body {
+  margin: 0;
+  background-color: black;
+}
 
-/* load vars  */
+yesterdays-news {
+  /* display: block; */
+  width: 100vw;
+  height: 100vh;
+}
+
+/* @layer vars, base, component;
+
 @import './css/vars.css' layer(vars);
 
-/* load components */
 @import './css/caption-display.css' layer(component);
 @import './css/event-icon.css' layer(component);
 @import './css/video-player.css' layer(component);
 
-/* base styles */
 @layer base {
   html {
     font-size: var(--yn-document-font-size);
@@ -131,4 +139,4 @@
   .hidden {
     display: none;
   }
-}
+} */

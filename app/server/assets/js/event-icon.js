@@ -18,8 +18,5 @@ export class EventIcon extends EventElement {
   get iconName() {
     return this.getAttribute('icon-name')
   }
-
-  static register() {
-    customElements.define('event-icon', EventIcon)
-  }
 }
+customElements.define('event-icon', EventIcon)

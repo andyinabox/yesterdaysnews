@@ -15,7 +15,15 @@
   </head>
   <body>
 
-    <div class="hidden">
+
+    <yesterdays-news
+      clips-resource-url="/clips"
+      captions-resource-url="/captions"
+      about-page-url="/about"
+      initial-clip-url="{{.InitialClipURL}}"
+    ></yesterdays-news>
+
+    {{/* <div class="hidden">
         {{ .SVGSymbols }}
     </div>
 
@@ -29,20 +37,20 @@
       <event-icon event-name="yn-enter-fullscreen" icon-name="fullscreen" title="Enter fullscreen mode"></event-icon>
     </nav>
 
-    {{/* <dialog id="about">
+    <dialog id="about">
       <article>{{ .AboutContent }}</article>
       <footer>
         <div>&mdash;<a target="_blank" href="https://andydayton.com">Andy</a></div>
         <event-button autofocus event-name="yn-close-about">Ok</event-button>
       </footer>
-    </dialog> */}}
+    </dialog>
 
     <dialog id="orientation">
       <article>Fullscreen mode is best viewed in landscape orientation"</article>
       <footer>
         <event-button autofocus event-name="yn-close-orientation">Ok</event-button>
       </footer>
-    </dialog>
+    </dialog> */}}
 
 
     <script type="module" src="/assets/script.js"></script>
