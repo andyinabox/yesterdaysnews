@@ -15,46 +15,14 @@
   </head>
   <body>
 
-    <div class="hidden">
-        {{ .SVGSymbols }}
-    </div>
-
     <yesterdays-news
       captions-resource-url="/captions"
       clips-resource-url="/clips"
       initial-clip-url="{{ .InitialClipURL }}"
       video-aspect-ratio="0.5625"
       about-url="/about"
-    >
-    </yesterdays-news>
+    />
 
-
-    {{/* <main id="main">
-      <video-player resource-url="/clips" initial-clip-url="{{ .InitialClipURL }}"></video-player>
-      <caption-display resource-url="/captions"></caption-display>
-    </main>
-
-    <nav>
-      <event-icon event-name="yn-open-about" icon-name="about" title="About this project"></event-icon>
-      <event-icon event-name="yn-enter-fullscreen" icon-name="fullscreen" title="Enter fullscreen mode"></event-icon>
-    </nav>
-
-    <dialog id="about">
-      <article>{{ .AboutContent }}</article>
-      <footer>
-        <div>&mdash;<a target="_blank" href="https://andydayton.com">Andy</a></div>
-        <event-button autofocus event-name="yn-close-about">Ok</event-button>
-      </footer>
-    </dialog>
-
-    <dialog id="orientation">
-      <article>Fullscreen mode is best viewed in landscape orientation"</article>
-      <footer>
-        <event-button autofocus event-name="yn-close-orientation">Ok</event-button>
-      </footer>
-    </dialog>
- */}}
-
-    <script type="module" src="/assets/main.js"></script>
+    <script type="module" src="/assets/script.js"></script>
   </body>
 </html>

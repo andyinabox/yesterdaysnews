@@ -1,4 +1,4 @@
-import { SingleObjectCache } from '/assets/single-object-cache.js'
+import { SingleObjectCache } from './single-object-cache.js'
 
 export class CaptionRenderer {
   #resourceURL = ''

@@ -1,5 +1,49 @@
+import { css } from './util.js'
+
 export class YesterdaysNews extends HTMLElement {
-  static stylesheetURL = '/assets/yesterdays-news.css'
+  static css = css`
+    :host {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: black;
+    }
+
+    yesterdays-news-nav {
+      z-index: 1;
+      position: fixed;
+      width: 100%;
+      left: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    yesterdays-news-nav > a,
+    yesterdays-news-nav > button {
+      cursor: pointer;
+      font-size: calc(75% + 3vmin);
+      display: block;
+      border: none;
+      background-color: transparent;
+      width: 2em;
+      height: 2em;
+      margin: 0.5em;
+    }
+
+    yesterdays-news-nav svg {
+      fill: white;
+      stroke: none;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    :host(:state(fullscreen)) yesterdays-news-nav {
+      display: none;
+    }
+  `
 
   constructor() {
     super()
@@ -9,12 +53,10 @@ export class YesterdaysNews extends HTMLElement {
   connectedCallback() {
     this.shadow = this.attachShadow({ mode: 'open' })
 
-    // load stylesheet
-    const link = document.createElement('link')
-    link.setAttribute('href', YesterdaysNews.stylesheetURL)
-    link.setAttribute('rel', 'stylesheet')
-    link.setAttribute('type', 'text/css')
-    this.shadow.appendChild(link)
+    // setup styles
+    const style = document.createElement('style')
+    style.textContent = YesterdaysNews.css
+    this.shadow.appendChild(style)
 
     // setup player
     this.player = document.createElement('yesterdays-news-player')
