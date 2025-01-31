@@ -19,7 +19,6 @@ type IndexRenderContext struct {
 	PageTitle      string
 	InitialClipURL string
 	MetaComment    template.HTML
-	SVGSymbols     template.HTML
 }
 
 func (s *Server) Index() http.HandlerFunc {
@@ -49,7 +48,6 @@ func (s *Server) Index() http.HandlerFunc {
 			PageTitle:      title,
 			InitialClipURL: clipUrl,
 			MetaComment:    metaComment,
-			SVGSymbols:     template.HTML(s.cfg.SVGSymbols),
 		}
 
 		s.cfg.Templates.ExecuteTemplate(w, "index.html.tmpl", data)

@@ -22,9 +22,6 @@ var templates embed.FS
 //go:embed about.md
 var aboutContentMarkdown []byte
 
-//go:embed svg-symbols.svg
-var svgSymbols string
-
 //go:embed assets/*
 var assets embed.FS
 
@@ -86,7 +83,6 @@ func main() {
 	cfg := &server.Config{
 		Templates:             template.Must(template.ParseFS(templates, "tmpl/*")),
 		AboutContent:          string(aboutContent),
-		SVGSymbols:            svgSymbols,
 		Assets:                assetsFs,
 		Port:                  port,
 		MinCaptionDelay:       minCaptionDelay,
