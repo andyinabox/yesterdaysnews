@@ -1,7 +1,7 @@
-import { EventButton } from '/assets/event-button.js'
-import { EventIcon } from '/assets/event-icon.js'
-import { CaptionDisplay } from '/assets/caption-display.js'
-import { VideoPlayer } from '/assets/video-player.js'
+import { EventButton } from './js/event-button.js'
+import { EventIcon } from './js/event-icon.js'
+import { CaptionDisplay } from './js/caption-display.js'
+import { VideoPlayer } from './js/video-player.js'
 
 // events
 const ABOUT_OPEN_EVENT = 'yn-open-about'

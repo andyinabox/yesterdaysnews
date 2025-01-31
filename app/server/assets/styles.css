@@ -1,12 +1,12 @@
 @layer vars, base, component;
 
 /* load vars  */
-@import '/assets/vars.css' layer(vars);
+@import './css/vars.css' layer(vars);
 
 /* load components */
-@import '/assets/caption-display.css' layer(component);
-@import '/assets/event-icon.css' layer(component);
-@import '/assets/video-player.css' layer(component);
+@import './css/caption-display.css' layer(component);
+@import './css/event-icon.css' layer(component);
+@import './css/video-player.css' layer(component);
 
 /* base styles */
 @layer base {

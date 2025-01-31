@@ -1,4 +1,4 @@
-import { EventElement } from '/assets/event-element.js'
+import { EventElement } from './event-element.js'
 
 const VIEWBOX_WIDTH = 500
 const VIEWBOX_HEIGHT = 500

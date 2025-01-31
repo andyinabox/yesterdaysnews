@@ -1,4 +1,4 @@
-import { EventElement } from '/assets/event-element.js'
+import { EventElement } from './event-element.js'
 export class EventButton extends EventElement {
   constructor() {
     super()
