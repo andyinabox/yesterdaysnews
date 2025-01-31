@@ -1,6 +1,58 @@
+:root {
+  --yn-document-font-size: calc(75% + 2vmin);
+
+  --yn-icon-width: 1.5rem;
+  --yn-icon-height: var(--yn-icon-width);
+
+  --yn-close-icon-width: 1rem;
+  --yn-close-icon-height: 1rem;
+
+  --yn-caption-font-size: 3.5vw;
+
+  --yn-z-index-captions: 1;
+  --yn-z-index-nav: 2;
+  --yn-z-index-dialog: 3;
+
+  --yn-color-background: black;
+  --yn-color-foreground: white;
+  --yn-color-highlight: red;
+  --yn-color-dialog-background: rgb(0 0 0 / 90%);
+  --yn-color-dialog-backdrop: rgb(0 0 0 / 80%);
+
+  --yn-content-max-width: 1280px;
+}
+
 body {
-  padding: 0;
+  background-color: var(--yn-color-background);
+  color: var(--yn-color-foreground);
   margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-size: var(--yn-document-font-size);
+  min-height: 100vh;
+}
+
+body.index {
+  height: 100vh;
+}
+
+body.about {
+}
+
+a,
+a:visited {
+  text-decoration: none;
+  color: var(--yn-color-highlight);
+  border-bottom: 1px dotted var(--yn-color-highlight);
+}
+
+article {
+  max-width: var(--yn-content-max-width);
+  margin: 2rem;
 }
 
 yesterdays-news {
@@ -8,135 +60,3 @@ yesterdays-news {
   width: 100%;
   height: 100%;
 }
-
-/* @layer vars, base, component;
-
-@import '/assets/vars.css' layer(vars);
-
-@import '/assets/caption-display.css' layer(component);
-@import '/assets/event-icon.css' layer(component);
-@import '/assets/video-player.css' layer(component);
-
-@layer base {
-  html {
-    font-size: var(--yn-document-font-size);
-  }
-
-  body {
-    background-color: var(--yn-color-background);
-    color: var(--yn-color-foreground);
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    font-family: monospace;
-  }
-
-  a,
-  a:visited {
-    text-decoration: none;
-    color: var(--yn-color-highlight);
-    border-bottom: 1px dotted var(--yn-color-highlight);
-  }
-
-  button {
-    color: var(--yn-color-foreground);
-    background-color: var(--yn-color-background);
-    border: 1px solid var(--yn-color-foreground);
-    cursor: pointer;
-    border-radius: 0px;
-    font-family: monospace;
-    font-size: 0.75rem;
-    padding: 0.5em;
-    text-transform: uppercase;
-  }
-
-  main {
-    position: relative;
-    width: 100vw;
-    height: 56vw;
-  }
-
-  nav {
-    z-index: var(--yn-z-index-nav);
-    position: fixed;
-    width: 100%;
-    left: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  nav > event-icon {
-    margin: 0.5rem;
-  }
-
-  body.fullscreen > nav {
-    display: none;
-  }
-
-  dialog {
-    z-index: var(--yn-z-index-dialog);
-    background-color: var(--yn-color-dialog-background);
-    color: var(--yn-color-foreground);
-
-    position: relative;
-    border: none;
-    font-size: 1rem;
-    margin: auto 1rem;
-    padding: 2rem;
-  }
-
-  dialog > footer {
-    text-align: right;
-    margin-top: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  dialog::backdrop {
-    backdrop-filter: invert(100%) blur(10px);
-  }
-
-  dialog > event-button {
-    width: var(--yn-close-icon-width);
-    height: var(--yn-close-icon-height);
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 0.75rem;
-  }
-
-  dialog > article {
-    line-height: 1.2em;
-    text-align: justify;
-  }
-
-  @media (min-width: 1280px) {
-    dialog > article {
-      columns: 2;
-      column-gap: 2rem;
-    }
-  }
-
-  dialog > article p:first-of-type {
-    margin-top: 0px;
-  }
-  dialog > article p:last-of-type {
-    margin-bottom: 0px;
-  }
-
-  dialog > article blockquote {
-    font-style: italic;
-    margin-left: 0px;
-    margin-right: 0px;
-  }
-
-  .hidden {
-    display: none;
-  }
-} */

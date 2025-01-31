@@ -16,7 +16,6 @@ export class YesterdaysNewsNav extends HTMLElement {
 
     // about button
     this.aboutBtn = document.createElement('a')
-    this.aboutBtn.setAttribute('target', '_blank')
     this.aboutBtn.href = this.aboutURL
     this.aboutBtn.innerHTML = this.#svgIconString('about')
 
