@@ -3,7 +3,7 @@ import { component, useState, useEffect } from 'https://esm.sh/haunted'
 
 const ASPECT_RATIO = 0.5625
 
-function calcVideoDimensions(el, rotated = false) {
+function calcVideoDimensions(el, rotated = true) {
   const { width: containerWidth, height: containerHeight } =
     el.getBoundingClientRect()
 
@@ -41,11 +41,12 @@ function YesterdaysNews({
 }) {
   const [videoWidth, setVideoWidth] = useState(0)
   const [videoHeight, setVideoHeight] = useState(0)
+  const [rotated, setRotated] = useState(false)
 
   // update video dimensions when window resizes
   useEffect(() => {
     const handleResize = () => {
-      const { width, height } = calcVideoDimensions(this)
+      const { width, height } = calcVideoDimensions(this, rotated)
       console.log('videoDimensions', width, height)
       setVideoWidth(width)
       setVideoHeight(height)
@@ -55,10 +56,23 @@ function YesterdaysNews({
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  useEffect(() => {
+    if (rotated) {
+      this.style.setProperty('--yn-transform', 'rotate(90deg)')
+    } else {
+      this.style.setProperty('--yn-transform', 'none')
+    }
+  }, [rotated])
+
   return html`
     <style>
       :host {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      yesterdays-news-player {
+        transform: var(--yn-transform);
       }
     </style>
     <yesterdays-news-player
@@ -72,11 +86,14 @@ function YesterdaysNews({
   `
 }
 
-YesterdaysNews.observedAttributes = [
-  'clips-resource-url',
-  'initial-clip-url',
-  'captions-resource-url',
-  'about-page-url',
-]
-
-customElements.define('yesterdays-news', component(YesterdaysNews))
+customElements.define(
+  'yesterdays-news',
+  component(YesterdaysNews, {
+    observedAttributes: [
+      'clips-resource-url',
+      'initial-clip-url',
+      'captions-resource-url',
+      'about-page-url',
+    ],
+  })
+)

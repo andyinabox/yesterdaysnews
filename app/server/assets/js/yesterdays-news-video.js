@@ -87,10 +87,10 @@ export function YesterdaysNewsVideo({
   useEffect(fetchClips, [resourceUrl])
 
   // we want to avoid re-rendering so i think this will work?
-  useEffect(() => {
-    videoEl.value.setAttribute('width', width)
-    videoEl.value.setAttribute('height', height)
-  }, [width, height])
+  // useEffect(() => {
+  //   videoEl.value.setAttribute('width', width)
+  //   videoEl.value.setAttribute('height', height)
+  // }, [width, height])
 
   const onEnded = () => {
     changeVideoSource(nextVideo())
@@ -101,6 +101,15 @@ export function YesterdaysNewsVideo({
   }
 
   return html`
+    <style>
+      :host {
+        display: block;
+      }
+      video {
+        width: var(--width);
+        height: var(--height);
+      }
+    </style>
     <video
       ${ref(videoEl)}
       muted
@@ -117,7 +126,7 @@ customElements.define(
   'yesterdays-news-video',
   component(YesterdaysNewsVideo, {
     observedAttributes: ['resource-url', 'initial-clip-url'],
-    useShadowDOM: false,
+    // useShadowDOM: false,
   })
 )
 
