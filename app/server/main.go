@@ -16,8 +16,8 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
 )
 
-//go:embed index.html.tmpl
-var indexTemplate string
+//go:embed tmpl/*.tmpl
+var templates embed.FS
 
 //go:embed about.md
 var aboutContentMarkdown []byte
@@ -84,7 +84,7 @@ func main() {
 	aboutContent := blackfriday.Run(aboutContentMarkdown, blackfriday.WithExtensions(blackfriday.CommonExtensions|blackfriday.Footnotes))
 
 	cfg := &server.Config{
-		Templates:             template.Must(template.New("index.html.tmpl").Parse(indexTemplate)),
+		Templates:             template.Must(template.ParseFS(templates, "tmpl/*")),
 		AboutContent:          string(aboutContent),
 		SVGSymbols:            svgSymbols,
 		Assets:                assetsFs,

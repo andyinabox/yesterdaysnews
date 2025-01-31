@@ -56,6 +56,7 @@ func New(cfg *Config) *Server {
 	handler.AddRoute("/captions", s.Captions())
 	handler.AddRoute("/reload", s.Reload())
 	handler.AddRoute("/clips", s.Clips())
+	handler.AddRoute("/about", s.About())
 	handler.AddRoute("/", s.Index())
 
 	s.srv = &http.Server{
