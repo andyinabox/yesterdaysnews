@@ -34,7 +34,7 @@ export class YesterdaysNews extends HTMLElement {
     // set event listeners
     this.nav.addEventListener(
       'yn-fullscreenrequest',
-      this.handleFullscreenChange.bind(this)
+      this.handleFullscreenRequest.bind(this)
     )
     // TODO: add debounce for resize
     window.addEventListener('resize', this.handleWindowResize.bind(this))
@@ -70,7 +70,6 @@ export class YesterdaysNews extends HTMLElement {
 
   handleWindowResize() {
     const { width, height } = this.getBoundingClientRect()
-    console.log('set canvas dimenstions', width, height)
     this.player.setAttribute('width', width)
     this.player.setAttribute('height', height)
   }

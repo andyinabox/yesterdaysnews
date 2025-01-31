@@ -25,6 +25,7 @@ export class YesterdaysNewsPlayer extends HTMLElement {
     this.canvas = document.createElement('canvas')
     this.ctx = this.canvas.getContext('2d')
     this.appendChild(this.canvas)
+
     this.setup()
   }
 
@@ -55,10 +56,40 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
   draw() {
     const ctx = this.canvas.getContext('2d')
-    const { x, y, width, height } = this.#getVideoBoundingBox()
-    this.staticRenderer.draw(ctx, width, height)
-    this.videoRenderer.draw(ctx, x, y, width, height)
-    this.captionRenderer.draw(ctx, x, y, width, height)
+    const { width, height } = this.#getVideoDimensions()
+
+    // clear the frame
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+
+    // set transform
+    ctx.resetTransform()
+    this.setTranslation(ctx, width, height)
+    this.setRotation(ctx)
+
+    // draw parts
+    // this.staticRenderer.draw(ctx, width, height)
+    this.videoRenderer.draw(ctx, 0, 0, width, height)
+    this.captionRenderer.draw(ctx, 0, 0, width, height)
+  }
+
+  setTranslation(ctx, width, height) {
+    let x, y
+
+    if (this.rotated) {
+      x = ctx.canvas.width / 2 + height / 2
+      y = ctx.canvas.height / 2 - width / 2
+    } else {
+      x = (ctx.canvas.width - width) / 2
+      y = (ctx.canvas.height - height) / 2
+    }
+
+    ctx.translate(x, y)
+  }
+
+  setRotation(ctx) {
+    if (this.rotated) {
+      ctx.rotate((90 * Math.PI) / 180)
+    }
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -99,7 +130,6 @@ export class YesterdaysNewsPlayer extends HTMLElement {
   }
 
   get clipsResourceURL() {
-    console.log('clips-resource-url', this.getAttribute('clips-resource-url'))
     return this.getAttribute('clips-resource-url')
   }
 
@@ -138,25 +168,6 @@ export class YesterdaysNewsPlayer extends HTMLElement {
     }
 
     return { width, height }
-  }
-
-  // TODO: I think it should be possible to use transforms better
-  // so that this can be eliminated (x, y will just be 0, 0) and
-  // the transforms will ensure everything is positioned correctly
-  #getVideoBoundingBox() {
-    const { width, height } = this.#getVideoDimensions()
-
-    let x, y
-
-    if (this.rotated) {
-      x = (this.canvas.height - width) / 2
-      y = (this.canvas.width - height) / 2
-    } else {
-      x = (this.canvas.width - width) / 2
-      y = (this.canvas.height - height) / 2
-    }
-
-    return { x, y, width, height }
   }
 }
 

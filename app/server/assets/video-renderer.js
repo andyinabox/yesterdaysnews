@@ -13,8 +13,6 @@ export class VideoRenderer {
   constructor(resourceURL, initialClipURL) {
     this.#resourceURL = resourceURL
 
-    console.log('resourceURL', resourceURL)
-
     this.#fetchClipURLs()
 
     // set up video element for loading videos

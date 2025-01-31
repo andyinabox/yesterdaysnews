@@ -43,7 +43,7 @@ export class YesterdaysNewsNav extends HTMLElement {
 
   handleFullscreenClick() {
     this.dispatchEvent(
-      new CustomEvent('yn-fullscreenrequest', { bubbles: true })
+      new CustomEvent('yn-fullscreenrequest', { bubbles: true, composed: true })
     )
   }
 

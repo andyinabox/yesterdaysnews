@@ -39,11 +39,11 @@ export class CaptionRenderer {
       this.#caption,
       maxCaptionWidth,
       {
-        rotated: this.#rotated,
-        caption: this.#caption,
+        width,
+        height,
         fontSize,
         fontFamily,
-        maxCaptionWidth,
+        caption: this.#caption,
       }
     )
 
@@ -58,11 +58,7 @@ export class CaptionRenderer {
       textHeight =
         metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
 
-      if (this.#rotated) {
-        textX = ctx.canvas.height / 2 - metrics.width / 2
-      } else {
-        textX = ctx.canvas.width / 2 - metrics.width / 2
-      }
+      textX = width / 2 - metrics.width / 2
       textY = y + height - fontSize - (textHeight + 2 * verticalPadding) * i
 
       // draw black box
