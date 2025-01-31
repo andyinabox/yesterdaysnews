@@ -155,6 +155,7 @@ function YesterdaysNews({
         }
 
         yesterdays-news-nav {
+          z-index: 3;
           position: fixed;
           bottom: 0px;
           left: 0px;
