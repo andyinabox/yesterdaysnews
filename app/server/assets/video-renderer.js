@@ -8,9 +8,12 @@ export class VideoRenderer {
   #videoSource = null
 
   #rotated = false
+  #fullscreen = false
 
   constructor(resourceURL, initialClipURL) {
     this.#resourceURL = resourceURL
+
+    console.log('resourceURL', resourceURL)
 
     this.#fetchClipURLs()
 
@@ -33,8 +36,9 @@ export class VideoRenderer {
     this.#video.play()
   }
 
-  update(rotated = false) {
-    this.rotated = rotated
+  update(rotated = false, fullscreen = false) {
+    this.#rotated = rotated
+    this.#fullscreen = fullscreen
   }
 
   draw(ctx, x, y, width, height) {

@@ -21,18 +21,22 @@ export class YesterdaysNews extends HTMLElement {
     this.player.setAttribute('clips-resource-url', this.clipsResourceURL)
     this.player.setAttribute('captions-resource-url', this.captionsResourceURL)
     this.player.setAttribute('initial-clip-url', this.initialClipURL)
-    this.player.setup()
+    this.player.setAttribute('video-aspect-ratio', this.videoAspectRatio)
 
     // setup nav
-    this.nav = docyment.createElement('yesterdays-news-nav')
-    this.nav.setup()
+    this.nav = document.createElement('yesterdays-news-nav')
+    this.nav.setAttribute('about-url', this.aboutURL)
 
     // add to shadow dom
     this.shadow.appendChild(this.player)
     this.shadow.appendChild(this.nav)
 
     // set event listeners
-    // todo: add debounce for resize
+    this.nav.addEventListener(
+      'yn-fullscreenrequest',
+      this.handleFullscreenChange.bind(this)
+    )
+    // TODO: add debounce for resize
     window.addEventListener('resize', this.handleWindowResize.bind(this))
     document.addEventListener(
       'fullscreenchange',
@@ -43,11 +47,16 @@ export class YesterdaysNews extends HTMLElement {
       this.handleOrientationChange.bind(this)
     )
 
-    // do initial orientation check
+    // do initial checks
+    this.handleWindowResize()
     this.handleOrientationChange()
   }
 
   disconnectedCallback() {
+    this.nav.removeEventListener(
+      'yn-fullscreenrequest',
+      this.handleFullscreenChange.bind(this)
+    )
     window.removeEventListener('resize', this.handleWindowResize.bind(this))
     document.removeEventListener(
       'fullscreenchange',
@@ -61,8 +70,9 @@ export class YesterdaysNews extends HTMLElement {
 
   handleWindowResize() {
     const { width, height } = this.getBoundingClientRect()
-    this.canvas.setAttribute('width', width)
-    this.canvas.setAttribute('height', height)
+    console.log('set canvas dimenstions', width, height)
+    this.player.setAttribute('width', width)
+    this.player.setAttribute('height', height)
   }
 
   handleOrientationChange() {
@@ -76,6 +86,10 @@ export class YesterdaysNews extends HTMLElement {
     } else {
       this.rotated = false
     }
+  }
+
+  handleFullscreenRequest() {
+    this.requestFullscreen()
   }
 
   handleFullscreenChange() {
@@ -134,7 +148,13 @@ export class YesterdaysNews extends HTMLElement {
     return this.getAttribute('initial-clip-url')
   }
 
-  static register() {
-    customElements.define('yesterdays-news', YesterdaysNews)
+  get videoAspectRatio() {
+    return parseFloat(this.getAttribute('video-aspect-ratio'))
+  }
+
+  get aboutURL() {
+    return this.getAttribute('about-url')
   }
 }
+
+customElements.define('yesterdays-news', YesterdaysNews)

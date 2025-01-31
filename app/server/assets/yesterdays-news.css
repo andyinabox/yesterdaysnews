@@ -5,7 +5,7 @@
   background-color: black;
 }
 
-nav {
+yesterdays-news-nav {
   z-index: 1;
   position: fixed;
   width: 100%;
@@ -16,12 +16,12 @@ nav {
   align-items: center;
 }
 
-nav > * {
+yesterdays-news-nav > * {
   cursor: pointer;
   font-size: calc(75% + 3vmin);
   margin: 0.5em;
 }
 
-:host(:state(fullscreen)) nav {
+:host(:state(fullscreen)) yesterdays-news-nav {
   display: none;
 }

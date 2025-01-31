@@ -1,13 +1,14 @@
 import { SingleObjectCache } from '/assets/single-object-cache.js'
 
 export class CaptionRenderer {
-  #resourceURL
-  #eventSource
+  #resourceURL = ''
+  #eventSource = null
 
-  #caption
-  #captionLinesCache
+  #caption = ''
+  #captionLinesCache = []
 
   #rotated = false
+  #fullscreen = false
 
   constructor(resourceURL) {
     this.#resourceURL = resourceURL
@@ -19,8 +20,9 @@ export class CaptionRenderer {
     this.#eventSource.addEventListener('message', this.handleMessage.bind(this))
   }
 
-  update(rotated = false) {
+  update(rotated = false, fullscreen = false) {
     this.#rotated = rotated
+    this.#fullscreen = fullscreen
   }
 
   draw(ctx, x, y, width, height) {
@@ -31,6 +33,7 @@ export class CaptionRenderer {
     const horizontalPadding = 0.2 * fontSize
     const maxCaptionWidth = width - 4 * horizontalPadding
 
+    ctx.font = `${fontSize}px ${fontFamily}`
     const lineData = this.#getCaptionLineData(
       ctx,
       this.#caption,
@@ -55,16 +58,16 @@ export class CaptionRenderer {
       textHeight =
         metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
 
-      if (this.rotated) {
-        textX = this.canvas.height / 2 - metrics.width / 2
+      if (this.#rotated) {
+        textX = ctx.canvas.height / 2 - metrics.width / 2
       } else {
-        textX = this.canvas.width / 2 - metrics.width / 2
+        textX = ctx.canvas.width / 2 - metrics.width / 2
       }
       textY = y + height - fontSize - (textHeight + 2 * verticalPadding) * i
 
       // draw black box
-      this.ctx.fillStyle = 'rgb(0 0 0)'
-      this.ctx.fillRect(
+      ctx.fillStyle = 'rgb(0 0 0)'
+      ctx.fillRect(
         textX - horizontalPadding,
         textY - verticalPadding - fontSize,
         textWidth + 2 * horizontalPadding,
@@ -72,8 +75,8 @@ export class CaptionRenderer {
       )
 
       // draw text
-      this.ctx.fillStyle = 'rgb(255 255 255)'
-      this.ctx.fillText(line, textX, textY)
+      ctx.fillStyle = 'rgb(255 255 255)'
+      ctx.fillText(line, textX, textY)
     }
   }
 
@@ -104,30 +107,29 @@ export class CaptionRenderer {
     const lineData = []
     const tokens = caption.split(' ')
 
-    let line, metrics
     while (tokens.length) {
       // take next 1-3 words to start the next line
-      line = tokens.splice(0, 3).join(' ')
+      let line = tokens.splice(0, 3).join(' ')
       // get dimensions
-      metrics = ctx.measureText(line)
+      let metrics = ctx.measureText(line)
 
       // keep adding tokens until no tokens are left or the line
       // is larger than maxWidth
-      var nextToken, nextLine
       while (tokens.length) {
         // add another word to the line and get metrics
-        nextToken = tokens.shift()
-        nextLine = line + ' ' + nextToken
-        metrics = ctx.measureText(nextLine)
+        const nextToken = tokens.shift()
+        const nextLine = line + ' ' + nextToken
+        const nextMetrics = ctx.measureText(nextLine)
 
         // if too wide, replace the last word and finish loop
-        if (metrics.width > maxWidth) {
+        if (nextMetrics.width > maxWidth) {
           tokens.unshift(nextToken)
           break
         }
 
         // if not too wide, update value of line and run loop agein
         line = nextLine
+        metrics = nextMetrics
       }
 
       lineData.unshift({ line, metrics })

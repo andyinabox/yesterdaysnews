@@ -1,7 +1,6 @@
-import { YesterdaysNewsPlayer } from '/assets/yesterdays-news-player.js'
-;(function () {
-  YesterdaysNewsPlayer.register()
-})()
+import '/assets/yesterdays-news-player.js'
+import '/assets/yesterdays-news-nav.js'
+import '/assets/yesterdays-news.js'
 
 // import { EventButton } from '/assets/event-button.js'
 // import { EventIcon } from '/assets/event-icon.js'

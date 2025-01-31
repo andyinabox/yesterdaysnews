@@ -19,12 +19,14 @@
         {{ .SVGSymbols }}
     </div>
 
-    <yesterdays-news-player
+    <yesterdays-news
       captions-resource-url="/captions"
       clips-resource-url="/clips"
       initial-clip-url="{{ .InitialClipURL }}"
+      video-aspect-ratio="0.5625"
+      about-url="/about"
     >
-    </yesterdays-news-player>
+    </yesterdays-news>
 
 
     {{/* <main id="main">
