@@ -36,6 +36,11 @@ server-local:
 objectstoremock:
 	go run ./cmd/objectstoremock/main.go
 
+.PHONY: jstest
+jstest:
+	npx servor ./app/server js-tests.html 6006
+
+
 .PHONY: clean-dist clean-bin
 clean:
 

@@ -1,4 +1,5 @@
 export class CaptionFlow {
+  #rotated = false
   #fontSize = 0
   #fontFamily = ''
   #maxWidth = 0
@@ -7,8 +8,9 @@ export class CaptionFlow {
   #cachedLines = []
   constructor() {}
 
-  get(ctx, fontSize, fontFamily, maxWidth, text) {
+  get(ctx, rotated, fontSize, fontFamily, maxWidth, text) {
     if (
+      this.#rotated === rotated &&
       this.#fontSize === fontSize &&
       this.#fontFamily === fontFamily &&
       this.#maxWidth === maxWidth &&
@@ -49,6 +51,7 @@ export class CaptionFlow {
       lines.unshift(currentLine)
     }
 
+    this.#rotated = rotated
     this.#fontSize = fontSize
     this.#fontFamily = fontFamily
     this.#maxWidth = maxWidth

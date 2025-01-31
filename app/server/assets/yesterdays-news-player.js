@@ -7,7 +7,6 @@ const STYLESHEET_URL = '/assets/yesterdays-news-player.css'
 
 export class YesterdaysNewsPlayer extends HTMLElement {
   #currentCaption = ''
-  #rotated = false
 
   constructor() {
     super()
@@ -107,7 +106,7 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
   setRotation() {
     this.ctx.resetTransform()
-    if (this.#rotated) {
+    if (this.rotated) {
       this.ctx.translate(this.canvas.width, 0)
       this.ctx.rotate((90 * Math.PI) / 180)
     }
@@ -126,6 +125,7 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
     const lines = this.captionFlow.get(
       this.ctx,
+      this.rotated,
       fontSize,
       fontFamily,
       maxCaptionWidth,
@@ -143,7 +143,7 @@ export class YesterdaysNewsPlayer extends HTMLElement {
       textHeight =
         metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
 
-      if (this.#rotated) {
+      if (this.rotated) {
         textX = this.canvas.height / 2 - metrics.width / 2
       } else {
         textX = this.canvas.width / 2 - metrics.width / 2
@@ -174,7 +174,7 @@ export class YesterdaysNewsPlayer extends HTMLElement {
     const { width, height } = this.getVideoDimensions()
 
     let imageData
-    if (this.#rotated) {
+    if (this.rotated) {
       imageData = this.ctx.createImageData(height, width)
     } else {
       imageData = this.ctx.createImageData(width, height)
@@ -190,7 +190,7 @@ export class YesterdaysNewsPlayer extends HTMLElement {
     }
 
     let x, y
-    if (this.#rotated) {
+    if (this.rotated) {
       x = this.canvas.width / 2 - height / 2
       y = this.canvas.height / 2 - width / 2
     } else {
@@ -203,13 +203,13 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
   getVideoDimensions() {
     let width, height
-    // if (this.#rotated) {
+    // if (this.rotated) {
     //   width = this.canvas.height
     // } else {
     //   width = this.canvas.width
     // }
 
-    if (this.#rotated) {
+    if (this.rotated) {
       if (this.canvas.height * ASPECT_RATIO > this.canvas.width) {
         height = this.canvas.width
         width = height / ASPECT_RATIO
@@ -237,7 +237,7 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
     let x, y
 
-    if (this.#rotated) {
+    if (this.rotated) {
       x = (this.canvas.height - width) / 2
       y = (this.canvas.width - height) / 2
     } else {
@@ -260,14 +260,14 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
   checkOrientation() {
     if (!this.fullscreen) {
-      this.#rotated = false
+      this.rotated = false
       return
     }
 
     if (screen.orientation.type.includes('portrait')) {
-      this.#rotated = true
+      this.rotated = true
     } else {
-      this.#rotated = false
+      this.rotated = false
     }
   }
 
@@ -279,6 +279,20 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
   disconnectedCallback() {
     this.captionLoader.disconnect()
+  }
+
+  get rotated() {
+    return this._internals.states.has('rotated')
+  }
+
+  set rotated(value) {
+    if (value) {
+      // Existence of identifier corresponds to "true"
+      this._internals.states.add('rotated')
+    } else {
+      // Absence of identifier corresponds to "false"
+      this._internals.states.delete('rotated')
+    }
   }
 
   get fullscreen() {
