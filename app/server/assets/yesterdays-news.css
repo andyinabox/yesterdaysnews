@@ -16,10 +16,24 @@ yesterdays-news-nav {
   align-items: center;
 }
 
-yesterdays-news-nav > * {
+yesterdays-news-nav > a,
+yesterdays-news-nav > button {
   cursor: pointer;
   font-size: calc(75% + 3vmin);
+  display: block;
+  border: none;
+  background-color: transparent;
+  width: 2em;
+  height: 2em;
   margin: 0.5em;
+}
+
+yesterdays-news-nav svg {
+  fill: white;
+  stroke: none;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 :host(:state(fullscreen)) yesterdays-news-nav {

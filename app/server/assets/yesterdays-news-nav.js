@@ -1,3 +1,4 @@
+import svgSymbols from '/assets/svg-symbols.js'
 export class YesterdaysNewsNav extends HTMLElement {
   static observedAttributes = ['rotated', 'fullscreen']
   constructor() {
@@ -6,16 +7,21 @@ export class YesterdaysNewsNav extends HTMLElement {
   connectedCallback() {
     // TODO: add SVG symbols
 
+    this.svgSymbols = document.createElement('div')
+    this.svgSymbols.setAttribute('style', 'display: none;')
+    this.svgSymbols.innerHTML = svgSymbols
+    this.appendChild(this.svgSymbols)
+
     // about button
     this.aboutBtn = document.createElement('a')
     this.aboutBtn.setAttribute('target', '_blank')
     this.aboutBtn.href = this.aboutURL
-    this.aboutBtn.innerHTML = 'about'
+    this.aboutBtn.innerHTML = this.#svgIconString('about')
 
     // fullscreen button
     this.fullscreenBtn = document.createElement('button')
     this.fullscreenBtn.addEventListener('click', this.handleFullscreenClick)
-    this.fullscreenBtn.innerHTML = 'fullscreen'
+    this.fullscreenBtn.innerHTML = this.#svgIconString('fullscreen')
 
     // add to dom
     this.appendChild(this.aboutBtn)
@@ -42,18 +48,28 @@ export class YesterdaysNewsNav extends HTMLElement {
   }
 
   get rotated() {
-    return this.hasAttribute('rotated') && this.getAttribute('rotated') !== null
+    return (
+      this.hasAttribute('rotated') && this.getAttribute('rotated') !== 'false'
+    )
   }
 
   get fullscreen() {
     return (
       this.hasAttribute('fullscreen') &&
-      this.getAttribute('fullscreen') !== null
+      this.getAttribute('fullscreen') !== 'false'
     )
   }
 
   get aboutURL() {
     return this.getAttribute('about-url')
+  }
+
+  #svgIconString(name) {
+    return `
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 500 500">
+        <use href="#yn-icon-${name}" />
+      </svg>
+    `
   }
 }
 
