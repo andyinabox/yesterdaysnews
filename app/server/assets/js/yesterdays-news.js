@@ -64,10 +64,22 @@ export class YesterdaysNews extends HTMLElement {
     this.player.setAttribute('captions-resource-url', this.captionsResourceURL)
     this.player.setAttribute('initial-clip-url', this.initialClipURL)
     this.player.setAttribute('video-aspect-ratio', this.videoAspectRatio)
-
     // setup nav
     this.nav = document.createElement('yesterdays-news-nav')
     this.nav.setAttribute('about-url', this.aboutURL)
+
+    // setup dialog
+    this.dialog = document.createElement('dialog')
+    this.dialogBtn = document.createElement('button')
+    this.dialogBtn.toggleAttribute('autofocus', true)
+    this.dialogBtn.innerHTML = 'Ok'
+    this.dialogBtn.addEventListener('click', () => {
+      this.player.play()
+      this.dialog.close()
+    })
+    this.dialog.appendChild(this.dialogBtn)
+    this.shadow.appendChild(this.dialog)
+    this.dialog.showModal()
 
     // add to shadow dom
     this.shadow.appendChild(this.player)

@@ -30,8 +30,12 @@ export class VideoRenderer {
     this.#video.appendChild(this.#videoSource)
   }
 
-  setup() {
+  play() {
     this.#video.play()
+  }
+
+  setup() {
+    this.play()
   }
 
   update(rotated = false, fullscreen = false) {

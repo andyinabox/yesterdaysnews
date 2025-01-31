@@ -27,6 +27,10 @@ export class YesterdaysNewsPlayer extends HTMLElement {
 
   disconnectedCallback() {}
 
+  play() {
+    this.videoRenderer.play()
+  }
+
   // start playback
   setup() {
     this.captionRenderer.setup()
