@@ -15,11 +15,16 @@ import (
 )
 
 type Config struct {
-	ObjectStoreUrl        string `env:"YN_OBJECTSTORE_URL" required:"true"`
-	CDNUrl                string `env:"YN_CDN_URL" required:"true"`
-	Templates             *template.Template
-	AboutContent          string
-	Assets                fs.FS
+	ObjectStoreUrl string `env:"YN_OBJECTSTORE_URL" required:"true"`
+	CDNUrl         string `env:"YN_CDN_URL" required:"true"`
+	Templates      *template.Template
+	AboutContent   string
+
+	// see pkg/assetshandler for these options
+	AssetsDirFS         fs.FS
+	AssetsEmbeddedFS    fs.FS
+	UseFilesystemAssets bool
+
 	Port                  int
 	MinCaptionDelay       float64
 	MaxCaptionDelay       float64
@@ -46,9 +51,10 @@ func New(cfg *Config) *Server {
 
 	handler := assetshandler.New(
 		&assetshandler.Config{
-			AssetsUrlPath:     "/assets",
-			AssetsFS:          cfg.Assets,
-			StripAssetsPrefix: true,
+			AssetsRequestPathPrefix: "/assets",
+			AssetsEmbeddedFS:        cfg.AssetsEmbeddedFS,
+			AssetsDirFS:             cfg.AssetsDirFS,
+			UseFilesystemAssets:     cfg.UseFilesystemAssets,
 		},
 	)
 

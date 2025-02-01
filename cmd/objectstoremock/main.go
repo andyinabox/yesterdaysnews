@@ -61,14 +61,11 @@ func main() {
 
 	buildID := manifest.ID
 
-	// Create a file server handler to serve the directory's contents
-	// fileServer := http.FileServer(http.Dir(dir))
-
 	handler := assetshandler.New(
 		&assetshandler.Config{
-			AssetsUrlPath:     "/" + buildID,
-			AssetsFS:          os.DirFS(dir),
-			StripAssetsPrefix: true,
+			AssetsRequestPathPrefix: "/" + buildID,
+			AssetsDirFS:             os.DirFS(dir),
+			UseFilesystemAssets:     true,
 		},
 	)
 
@@ -81,21 +78,6 @@ func main() {
 		Handler: cors(handler),
 	}
 
-	// // configure cert
-	// serverTLSCert, err := tls.LoadX509KeyPair(".cert/localhost.crt", ".cert/localhost.key")
-	// if err != nil {
-	// 	log.Fatalf("Error loading certificate and key file: %v", err)
-	// }
-
-	// // configure server
-	// srv.TLSConfig = &tls.Config{
-	// 	Certificates: []tls.Certificate{serverTLSCert},
-	// }
-
-	// // Start the server on port 8080
-	// fmt.Printf("tls fileserver started at https://localhost:%d\n", port)
-	// log.Fatal(srv.ListenAndServeTLS("", ""))
-
-	fmt.Printf("fileserver started at http://localhost:%d\n", port)
+	fmt.Printf("fileserver started at http://localhost:%d with buildID %q \n", port, buildID)
 	log.Fatal(srv.ListenAndServe())
 }
