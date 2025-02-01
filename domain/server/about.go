@@ -6,6 +6,7 @@ import (
 )
 
 type AboutRenderContext struct {
+	RenderContext
 	PageTitle    string
 	AboutContent template.HTML
 }
@@ -16,8 +17,9 @@ func (s *Server) About() http.HandlerFunc {
 		title := "yesterday's news"
 
 		data := AboutRenderContext{
-			PageTitle:    title,
-			AboutContent: template.HTML(s.cfg.AboutContent),
+			RenderContext: s.renderContext(),
+			PageTitle:     title,
+			AboutContent:  template.HTML(s.cfg.AboutContent),
 		}
 
 		s.cfg.Templates.ExecuteTemplate(w, "about.html.tmpl", data)

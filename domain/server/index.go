@@ -16,6 +16,7 @@ const metaCommentTmpl = `
 `
 
 type IndexRenderContext struct {
+	RenderContext
 	PageTitle      string
 	InitialClipURL string
 	MetaComment    template.HTML
@@ -45,6 +46,7 @@ func (s *Server) Index() http.HandlerFunc {
 		))
 
 		data := IndexRenderContext{
+			RenderContext:  s.renderContext(),
 			PageTitle:      title,
 			InitialClipURL: clipUrl,
 			MetaComment:    metaComment,

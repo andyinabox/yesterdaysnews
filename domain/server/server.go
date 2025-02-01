@@ -8,10 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/charmbracelet/log"
-	"github.com/russross/blackfriday/v2"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/assetshandler"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 type Config struct {
@@ -34,24 +33,26 @@ type Config struct {
 }
 
 type Server struct {
-	cg       domain.CaptionGenerator
-	srv      *http.Server
-	buildID  string
-	manifest *domain.Manifest
-	cfg      *Config
-	reload   <-chan struct{}
-	mu       sync.Mutex
+	cg         domain.CaptionGenerator
+	srv        *http.Server
+	buildID    string
+	assetsPath string
+	manifest   *domain.Manifest
+	cfg        *Config
+	reload     <-chan struct{}
+	mu         sync.Mutex
 }
 
 func New(cfg *Config) *Server {
 
 	s := &Server{
-		cfg: cfg,
+		cfg:        cfg,
+		assetsPath: "/assets/" + util.TimestampBase64(time.Now(), false),
 	}
 
 	handler := assetshandler.New(
 		&assetshandler.Config{
-			AssetsRequestPathPrefix: "/assets",
+			AssetsRequestPathPrefix: s.assetsPath,
 			AssetsEmbeddedFS:        cfg.AssetsEmbeddedFS,
 			AssetsDirFS:             cfg.AssetsDirFS,
 			UseFilesystemAssets:     cfg.UseFilesystemAssets,
@@ -70,10 +71,4 @@ func New(cfg *Config) *Server {
 	}
 
 	return s
-}
-
-func parseMarkdown(b []byte) template.HTML {
-	data := blackfriday.Run(b, blackfriday.WithExtensions(blackfriday.CommonExtensions|blackfriday.Footnotes))
-	log.Debugf("parsed markdown: %s", string(data))
-	return template.HTML(string(data))
 }
