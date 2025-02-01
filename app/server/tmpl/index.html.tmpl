@@ -24,15 +24,7 @@
     ></yesterdays-news>
 
 
-    <script type="importmap">
-      {
-        "imports": {
-          "haunted": "https://esm.sh/haunted",
-          "lit": "https://esm.sh/lit",
-          "lit/directives/ref.js": "https://esm.sh/lit/directives/ref.js"
-        }
-      }
-    </script>
+    {{ .ImportMap }}
     <script type="module" src="{{ .AssetsPath }}/script.js"></script>
   </body>
 </html>

@@ -18,6 +18,7 @@ type Config struct {
 	CDNUrl         string `env:"YN_CDN_URL" required:"true"`
 	Templates      *template.Template
 	AboutContent   string
+	ImportMap      string
 
 	// see pkg/assetshandler for these options
 	AssetsDirFS         fs.FS

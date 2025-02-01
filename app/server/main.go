@@ -25,6 +25,9 @@ var aboutContentMarkdown []byte
 //go:embed .assets/*
 var assets embed.FS
 
+//go:embed importmap.json
+var importMap string
+
 var verbose, loadAssetsFromFs bool
 var port, prefixLength, minCaptionLength, maxCaptionLength int
 var maxCaptionDelay, minCaptionDelay float64
@@ -81,6 +84,7 @@ func main() {
 	cfg := &server.Config{
 		Templates:             template.Must(template.ParseFS(templates, "tmpl/*")),
 		AboutContent:          string(aboutContent),
+		ImportMap:             importMap,
 		AssetsDirFS:           os.DirFS(assetsDirPath),
 		AssetsEmbeddedFS:      assetsEmbeddedFs,
 		UseFilesystemAssets:   loadAssetsFromFs,
