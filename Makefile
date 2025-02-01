@@ -90,15 +90,15 @@ app/server/.assets/script.js:
 
 
 
-# .PHONY: docker-build-builder
-# docker-build-builder:
-# 	docker buildx build --platform linux/arm64 -f docker/builder.Dockerfile -t andyinabox/yesterdaysnews-builder .
+.PHONY: docker-build-builder
+docker-build-builder: clean-bin bin/builder-linux-amd64
+	docker buildx build --platform linux/arm64 -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder .
 
-# .PHONY: docker-run-builder
-# docker-run-builder:
-# 	mkdir -p dist
-# 	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder --output /dist -v
+.PHONY: docker-run-builder
+docker-run-builder:
+	mkdir -p dist
+	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder --output /dist -v
 
-# .PHONY: docker-push-builder
-# docker-push-builder:
-# 	docker push andyinabox/yesterdaysnews-builder
+.PHONY: docker-push-builder
+docker-push-builder:
+	docker push andyinabox/yesterdaysnews-builder
