@@ -14,9 +14,18 @@ type Route interface {
 }
 
 type Config struct {
-	AssetsUrlPath           string // url path ("/assets")
-	AssetsFS                fs.FS  // if using embed.FS, you will probably need to use `fs.Sub`
-	StripAssetsPrefix       bool   // probably true
+	// AssetsRequestPathPrefix is a request prefix that will be stripped when converting
+	// the URL to a filesystem path. For instance, the for request path "/assets/file.txt"
+	// with `AssetsRequestPathPrefix` set to "/assets" will look in the filesystem for
+	// the file path "file.txt".
+	AssetsRequestPathPrefix string // url path ("/assets")
+	// There are two modes of operation:
+	// 1. Serving static files via an embedded filesystem
+	// 2. Serving static files from the filesystem
+	// The first is generaly for production, the secont for development
+	AssetsEmbeddedFS        fs.FS
+	AssetsDirFS             fs.FS
+	UseFilesystemAssets     bool
 	RedirectNotFoundToIndex bool
 }
 
@@ -24,21 +33,26 @@ type Handler struct {
 	mux           *http.ServeMux
 	cfg           *Config
 	assetsHandler http.Handler
+	assetsFS      fs.FS
 }
 
 func New(cfg *Config) *Handler {
 
-	handler := http.FileServer(http.FS(cfg.AssetsFS))
-
-	if cfg.StripAssetsPrefix {
-		handler = http.StripPrefix(cfg.AssetsUrlPath, handler)
+	h := &Handler{
+		mux:      http.NewServeMux(),
+		cfg:      cfg,
+		assetsFS: cfg.AssetsEmbeddedFS,
 	}
 
-	return &Handler{
-		mux:           http.NewServeMux(),
-		cfg:           cfg,
-		assetsHandler: handler,
+	// use the directory filesystem
+	if cfg.UseFilesystemAssets {
+		h.assetsFS = cfg.AssetsDirFS
 	}
+
+	// set the assets handler
+	h.assetsHandler = http.StripPrefix(cfg.AssetsRequestPathPrefix, http.FileServer(http.FS(h.assetsFS)))
+
+	return h
 }
 
 func (h *Handler) AddRoute(path string, handler http.HandlerFunc) {
@@ -59,7 +73,7 @@ func (h *Handler) AddRoute(path string, handler http.HandlerFunc) {
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// if the url contains the assets path, use the assets handler
-	if strings.HasPrefix(r.URL.Path, h.cfg.AssetsUrlPath) {
+	if strings.HasPrefix(r.URL.Path, h.cfg.AssetsRequestPathPrefix) {
 		log.Debugf("serve using file server: %s", r.URL)
 		h.assetsHandler.ServeHTTP(w, r)
 		return

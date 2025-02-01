@@ -30,6 +30,9 @@ var port, prefixLength, minCaptionLength, maxCaptionLength int
 var maxCaptionDelay, minCaptionDelay float64
 var manifestCheckIntervalStr string
 
+const assetsDirPath = "app/server/assets"
+const assetsBuildDir = ".assets"
+
 func init() {
 
 	err := godotenv.Load()
@@ -57,33 +60,30 @@ func init() {
 }
 
 func main() {
-	var assetsFs fs.FS
 
 	ctx := context.Background()
 
-	// load assets from filesystem for development
-	if loadAssetsFromFs {
-		assetsFs = os.DirFS("app/server/assets")
-		// load assets from embedded data
-	} else {
-		var err error
-		assetsFs, err = fs.Sub(fs.FS(assets), ".assets")
-		if err != nil {
-			log.Fatal(err)
-		}
+	// strip out the name of the assets dir from the filesystem
+	assetsEmbeddedFs, err := fs.Sub(fs.FS(assets), assetsBuildDir)
+	if err != nil {
+		log.Fatal(err)
 	}
 
+	// parse manifest check interval string into time.Duration
 	manifestCheckInterval, err := time.ParseDuration(manifestCheckIntervalStr)
 	if err != nil {
 		log.Fatalf("error parsing manifest interval %s: %s", manifestCheckIntervalStr, err)
 	}
 
+	// parse about markdown
 	aboutContent := blackfriday.Run(aboutContentMarkdown, blackfriday.WithExtensions(blackfriday.CommonExtensions|blackfriday.Footnotes))
 
 	cfg := &server.Config{
 		Templates:             template.Must(template.ParseFS(templates, "tmpl/*")),
 		AboutContent:          string(aboutContent),
-		Assets:                assetsFs,
+		AssetsDirFS:           os.DirFS(assetsDirPath),
+		AssetsEmbeddedFS:      assetsEmbeddedFs,
+		UseFilesystemAssets:   loadAssetsFromFs,
 		Port:                  port,
 		MinCaptionDelay:       minCaptionDelay,
 		MaxCaptionDelay:       maxCaptionDelay,
