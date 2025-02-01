@@ -7,7 +7,6 @@ export function YesterdaysNewsCaptions({ resourceUrl, width, height }) {
   // add event listener for server-sent event
   useEffect(() => {
     const handleMessage = (event) => {
-      console.log('caption: ', event.data)
       setWords(event.data.split(' '))
     }
 
