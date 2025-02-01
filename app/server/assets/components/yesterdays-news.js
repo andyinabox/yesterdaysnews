@@ -1,5 +1,5 @@
-import { html } from 'lit'
-import { component, useState, useEffect } from 'haunted'
+import { html } from 'https://esm.sh/lit'
+import { component, useState, useEffect } from 'https://esm.sh/haunted'
 
 const ASPECT_RATIO = 0.5625
 

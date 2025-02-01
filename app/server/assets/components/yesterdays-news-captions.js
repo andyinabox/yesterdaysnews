@@ -1,5 +1,5 @@
-import { html } from 'lit'
-import { component, useState, useEffect, useMemo } from 'haunted'
+import { html } from 'https://esm.sh/lit'
+import { component, useState, useEffect, useMemo } from 'https://esm.sh/haunted'
 
 export function YesterdaysNewsCaptions({ resourceUrl, width, height }) {
   const [words, setWords] = useState([])

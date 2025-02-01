@@ -1,5 +1,5 @@
-import { html } from 'lit'
-import { component } from 'haunted'
+import { html } from 'https://esm.sh/lit'
+import { component } from 'https://esm.sh/haunted'
 
 const svgIcon = (name) => {
   return html`

@@ -1,6 +1,6 @@
-import { html } from 'lit'
-import { createRef, ref } from 'lit/directives/ref.js'
-import { component, useRef, useEffect } from 'haunted'
+import { html } from 'https://esm.sh/lit'
+import { createRef, ref } from 'https://esm.sh/lit/directives/ref.js'
+import { component, useRef, useEffect } from 'https://esm.sh/haunted'
 
 const fetchObjectURL = async (url, type) => {
   const resp = await fetch(url)
