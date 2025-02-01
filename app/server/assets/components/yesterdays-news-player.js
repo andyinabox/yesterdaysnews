@@ -1,5 +1,5 @@
-import { html } from 'https://esm.sh/lit'
-import { component, useEffect } from 'https://esm.sh/haunted'
+import { html } from 'lit'
+import { component, useEffect } from 'haunted'
 
 export function YesterdaysNewsPlayer({
   clipsResourceUrl,

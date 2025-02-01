@@ -22,7 +22,17 @@
       about-page-url="/about"
       initial-clip-url="{{.InitialClipURL}}"
     ></yesterdays-news>
-    
+
+
+    <script type="importmap">
+      {
+        "imports": {
+          "haunted": "https://esm.sh/haunted",
+          "lit": "https://esm.sh/lit",
+          "lit/directives/ref.js": "https://esm.sh/lit/directives/ref.js"
+        }
+      }
+    </script>
     <script type="module" src="/assets/script.js"></script>
   </body>
 </html>
