@@ -22,10 +22,7 @@ var templates embed.FS
 //go:embed about.md
 var aboutContentMarkdown []byte
 
-//go:embed svg-symbols.svg
-var svgSymbols string
-
-//go:embed assets/*
+//go:embed .assets/*
 var assets embed.FS
 
 var verbose, loadAssetsFromFs bool
@@ -70,7 +67,7 @@ func main() {
 		// load assets from embedded data
 	} else {
 		var err error
-		assetsFs, err = fs.Sub(fs.FS(assets), "assets")
+		assetsFs, err = fs.Sub(fs.FS(assets), ".assets")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -86,7 +83,6 @@ func main() {
 	cfg := &server.Config{
 		Templates:             template.Must(template.ParseFS(templates, "tmpl/*")),
 		AboutContent:          string(aboutContent),
-		SVGSymbols:            svgSymbols,
 		Assets:                assetsFs,
 		Port:                  port,
 		MinCaptionDelay:       minCaptionDelay,
