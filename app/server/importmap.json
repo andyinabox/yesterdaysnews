@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "haunted": "https://esm.sh/haunted",
+    "lit": "https://esm.sh/lit",
+    "lit/directives/ref.js": "https://esm.sh/lit/directives/ref.js"
+  }
+}

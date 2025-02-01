@@ -19,8 +19,12 @@ export function YesterdaysNewNav({ aboutPageUrl, fullscreen }) {
   }
 
   return html`
-    <a href=${aboutPageUrl}>${svgIcon('about')}</a>
-    <button @click=${onClick}>${svgIcon('fullscreen')}</button>
+    <a tabindex="0" title="Go to about page" href=${aboutPageUrl}
+      >${svgIcon('about')}</a
+    >
+    <button tabindex="0" title="Enter fullscreen" @click=${onClick}>
+      ${svgIcon('fullscreen')}
+    </button>
   `
 }
 

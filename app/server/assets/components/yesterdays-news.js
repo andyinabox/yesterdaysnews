@@ -3,28 +3,18 @@ import { component, useState, useEffect } from 'haunted'
 
 const ASPECT_RATIO = 0.5625
 
-function calcVideoDimensions(el, rotated = false) {
+function calcVideoDimensions(el) {
   const { width: containerWidth, height: containerHeight } =
     el.getBoundingClientRect()
 
   let width, height
 
-  if (rotated) {
-    if (containerHeight * ASPECT_RATIO > containerWidth) {
-      height = containerWidth
-      width = height / ASPECT_RATIO
-    } else {
-      width = containerHeight
-      height = width * ASPECT_RATIO
-    }
+  if (containerWidth * ASPECT_RATIO > containerHeight) {
+    height = containerHeight
+    width = height / ASPECT_RATIO
   } else {
-    if (containerWidth * ASPECT_RATIO > containerHeight) {
-      height = containerHeight
-      width = height / ASPECT_RATIO
-    } else {
-      width = containerWidth
-      height = width * ASPECT_RATIO
-    }
+    width = containerWidth
+    height = width * ASPECT_RATIO
   }
 
   return {
@@ -39,12 +29,11 @@ function YesterdaysNews({
   initialClipUrl,
   aboutPageUrl,
 }) {
-  const [rotated, setRotated] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
 
   // update video dimensions when window resizes
   const handleResize = () => {
-    const { width, height } = calcVideoDimensions(this, rotated)
+    const { width, height } = calcVideoDimensions(this)
     this.style.setProperty('--yn-video-width', width + 'px')
     this.style.setProperty('--yn-video-height', height + 'px')
     this.style.setProperty('--yn-caption-font-size', width * 0.04 + 'px')
@@ -57,12 +46,7 @@ function YesterdaysNews({
 
   // handle fullscreen event
   const handleFullScreenChange = () => {
-    if (document.fullscreenElement === this) {
-      setFullscreen(true)
-      // we only want to use the dialog in full screen mode
-    } else {
-      setFullscreen(false)
-    }
+    setFullscreen(document.fullscreenElement === this)
   }
   useEffect(() => {
     document.addEventListener('fullscreenchange', handleFullScreenChange)
@@ -70,33 +54,10 @@ function YesterdaysNews({
       document.removeEventListener('fullscreenchange', handleFullScreenChange)
   }, [])
 
-  function handleOrientationChange() {
-    // we only want to do rotation in fullscreen mode
-    if (!fullscreen) {
-      setRotated(false)
-      return
-    }
-
-    setRotated(screen.orientation.type.includes('portrait'))
-  }
-  useEffect(() => {
-    screen.orientation.addEventListener('change', handleOrientationChange)
-    return () =>
-      screen.orientation.removeEventListener('change', handleOrientationChange)
-  }, [])
-
   // handle change to fullscreen
   useEffect(() => {
     this.classList.toggle('fullscreen', fullscreen)
   }, [fullscreen])
-
-  // handle change to rotated
-  useEffect(() => {
-    this.classList.toggle('rotated', rotated)
-    this.style.setProperty('--yn-transform', rotated ? 'rotate(90deg)' : 'none')
-  }, [rotated])
-
-  useEffect(handleOrientationChange, [fullscreen, rotated])
 
   const onFullscreenClick = () => {
     this.requestFullscreen()
@@ -105,11 +66,13 @@ function YesterdaysNews({
   return html`
     <style>
         :host {
-          /* set defaults */
-          --yn-transform: none;
+          --yn-nav-btn-size: 10vmin;
+          --yn-nav-btn-margin: 2vmin;
+
+          /* these will be set with javascript */
           --yn-video-width: 0px;
           --yn-video-height: 0px
-          --yb-font-size: 0px;
+          --yn-caption-font-size: var(--yn-nav-font-size);
 
           display: flex;
           align-items: center;
@@ -120,7 +83,6 @@ function YesterdaysNews({
         }
         yesterdays-news-player {
           position: relative;
-          transform: var(--yn-transform);
           width: var(--yn-video-width);
           height: var(--yn-video-height);
         }
@@ -167,13 +129,12 @@ function YesterdaysNews({
 
         yesterdays-news-nav > a, yesterdays-news-nav > button {
         cursor: pointer;
-        font-size: calc(75% + 3vmin);
         display: block;
         border: none;
         background-color: transparent;
-        width: 2em;
-        height: 2em;
-        margin: 0.5em;
+        width: var(--yn-nav-btn-size);
+        height: var(--yn-nav-btn-size);
+        margin: var(--yn-nav-btn-margin);
       }
       yesterdays-news.fullscreen > yesterdays-news-nav {
         display: none;
