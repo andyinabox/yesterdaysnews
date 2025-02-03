@@ -1,8 +1,8 @@
 # Yesterday's News
 
-The videos you are seeing are a random reshuffling of news clips from the day before today. The text is generated from the captions of those news clips, alongside a journal of mine from late October to early November 2016. The videos are purely random, but the text follows its own internal logic. 
+The videos you are seeing are a random reshuffling of news clips from the day before today. The text is generated from the captions for those videos, alongside a journal of mine from late October to early November 2016. The videos are purely random, but the text follows its own internal logic. 
 
-Every day a new cycle, and we are meant to believe that _yesterday's news_ is no longer relevant. But every day leaves its mark, and finds its way back into the story as we continue forward. Each day follows another, and is inextricably linked to the one that came before it.
+Every day a new cycle, and we're meant to believe that _yesterday's news_ is no longer relevant. But each day leaves its mark, is inexorably linked to the one before it.
 
 —[Andy](https://andydayton.com)
 
@@ -11,13 +11,13 @@ Every day a new cycle, and we are meant to believe that _yesterday's news_ is no
  - [Fullscreen icon by Q.P. at the Noun Project](https://thenounproject.com/icon/fullscreen-6938590/)
  - [About icon by Mas Dhimas at the Noun Project](https://thenounproject.com/icon/about-6264304/)
 
-## Contents
+## Infrastructure
 
-This is really two projects in one
+I've made an effort to use cloud infratructure that is based in Europe and run somewhat environmentally sustainably. I've currently settled on three different services in order to keep costs relatively low:
 
- - A Go port of [yesterdays-news-py](https://github.com/andyinabox/yesterdays-news-py/). The goal is to build assets and them push them to an object store.
- - A web project that will be like [yesterdays-news-of](https://github.com/andyinabox/yesterdays-news-of/) in a browser.
-
+ - The Server application is hosted on [Infomaniak](https://www.infomaniak.com/)
+ - The Builder application is run on [Scaleway](https://www.scaleway.com/en/)
+ - Object Store assets stored on [Exoscale](https://www.exoscale.com/)
 
 ## Directory structure
 
