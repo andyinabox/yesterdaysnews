@@ -1,30 +1,10 @@
 import { html } from 'lit'
 import { component, useState, useEffect } from 'haunted'
 
+import { calcVideoDimensions } from '../lib/math.js'
+
 import { YesterdaysNewsStyles } from './yesterdays-news-styles.js'
 import { YesterdaysNewsIcons } from './yesterdays-news-icons.js'
-
-const ASPECT_RATIO = 0.5625
-
-function calcVideoDimensions(el) {
-  const { width: containerWidth, height: containerHeight } =
-    el.getBoundingClientRect()
-
-  let width, height
-
-  if (containerWidth * ASPECT_RATIO > containerHeight) {
-    height = containerHeight
-    width = height / ASPECT_RATIO
-  } else {
-    width = containerWidth
-    height = width * ASPECT_RATIO
-  }
-
-  return {
-    width,
-    height,
-  }
-}
 
 function YesterdaysNews({
   clipsResourceUrl,
@@ -74,7 +54,7 @@ function YesterdaysNews({
     return html`<yesterdays-news-nav
       @fullscreenclick=${onFullscreenClick}
       about-page-url=${aboutPageUrl}
-      .fullscreen=${fullscreen}
+      .showFullscreenButton=${!!this.requestFullscreen}
     ></yesterdays-news-nav>`
   }
 

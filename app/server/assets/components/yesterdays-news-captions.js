@@ -1,7 +1,7 @@
 import { html } from 'lit'
 import { component, useState, useEffect, useMemo } from 'haunted'
 
-export function YesterdaysNewsCaptions({ resourceUrl, width, height }) {
+export function YesterdaysNewsCaptions({ resourceUrl }) {
   const [words, setWords] = useState([])
 
   // add event listener for server-sent event

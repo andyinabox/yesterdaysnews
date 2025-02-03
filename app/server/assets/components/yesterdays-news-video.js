@@ -92,12 +92,14 @@ export function YesterdaysNewsVideo({
   const onEnded = () => {
     changeVideoSource(nextVideo())
   }
+
   const onError = (err) => {
     console.error(err)
     onEnded()
   }
 
   const onPlay = () => {
+    this.dispatchEvent(new Event('play'))
     setShowPlayButton(false)
   }
 

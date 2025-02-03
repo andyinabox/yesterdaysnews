@@ -34,6 +34,7 @@ export const YesterdaysNewsStyles = virtual(() => {
         position: relative;
         width: var(--yn-video-width);
         height: var(--yn-video-height);
+        background-color: #111;
       }
       yesterdays-news-video {
         display: block;

@@ -2,17 +2,21 @@ import { html } from 'lit'
 import { component } from 'haunted'
 import { svgIcon } from '../lib/svg.js'
 
-export function YesterdaysNewNav({
-  aboutPageUrl,
-  fullscreen,
-  showFullscreenButton,
-}) {
-  if (fullscreen) {
-    return null
-  }
-
+export function YesterdaysNewNav({ aboutPageUrl, showFullscreenButton }) {
   const onFullscreenClick = () => {
     this.dispatchEvent(new CustomEvent('fullscreenclick', { bubbles: true }))
+  }
+
+  const renderFullscreenButton = () => {
+    if (!showFullscreenButton) return
+    return html` <a
+      class="btn btn-fullscreen"
+      tabindex="0"
+      title="Enter fullscreen"
+      @click=${onFullscreenClick}
+    >
+      ${svgIcon('fullscreen')}
+    </a>`
   }
 
   return html`
@@ -23,14 +27,7 @@ export function YesterdaysNewNav({
       href=${aboutPageUrl}
       >${svgIcon('about')}
     </a>
-    <a
-      class="btn btn-fullscreen"
-      tabindex="0"
-      title="Enter fullscreen"
-      @click=${onFullscreenClick}
-    >
-      ${svgIcon('fullscreen')}
-    </a>
+    ${renderFullscreenButton()}
   `
 }
 
