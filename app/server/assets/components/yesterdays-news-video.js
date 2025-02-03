@@ -96,7 +96,6 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
     if (!videoEl.value) return
 
     if (!canAutoplayVideoIfMuted(videoEl.value)) {
-      console.log('cannot autoplay if muted')
       setShowPlayButton(true)
     }
   }, [videoEl.value, hasPlayedOnce])
