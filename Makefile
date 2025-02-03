@@ -68,28 +68,6 @@ docker-run-server:
 docker-push-server:
 	docker push andyinabox/yesterdaysnews-server
 
-
-#
-# file-based targets
-# 
-
-bin/server-linux-amd64: app/server/.assets
-	GOOS=linux GOARCH=amd64 go build -o $@ ./app/server/main.go
-
-bin/builder-linux-amd64:
-	GOOS=linux GOARCH=amd64 go build -o $@ ./app/builder/main.go
-
-
-app/server/.assets: app/server/.assets/styles.css app/server/.assets/script.js
-
-app/server/.assets/styles.css:
-		go run ./cmd/esbuild/main.go app/server/assets/styles.css --bundle --minify --outfile=app/server/.assets/styles.css
-
-app/server/.assets/script.js:
-		go run ./cmd/esbuild/main.go app/server/assets/script.js --bundle --minify --outfile=app/server/.assets/script.js
-
-
-
 .PHONY: docker-build-builder
 docker-build-builder: clean-bin bin/builder-linux-amd64
 	docker buildx build --platform linux/arm64 -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder .
@@ -102,3 +80,25 @@ docker-run-builder:
 .PHONY: docker-push-builder
 docker-push-builder:
 	docker push andyinabox/yesterdaysnews-builder
+
+
+#
+# file-based targets
+# 
+
+bin/server-linux-amd64: app/server/.assets
+	GOOS=linux GOARCH=amd64 go build -o $@ ./app/server/main.go
+
+bin/builder-linux-amd64:
+	GOOS=linux GOARCH=amd64 go build -o $@ ./app/builder/main.go
+
+app/server/.assets: app/server/.assets/styles.css app/server/.assets/script.js
+
+app/server/.assets/styles.css:
+		go run ./cmd/esbuild/main.go app/server/assets/styles.css --bundle --minify --outfile=app/server/.assets/styles.css
+
+app/server/.assets/script.js:
+		go run ./cmd/esbuild/main.go app/server/assets/script.js --bundle --minify --outfile=app/server/.assets/script.js
+
+
+

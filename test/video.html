@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <style>
+      #video {
+        border: 1px solid blue;
+      }
+    </style>
+    <video id="video" autoplay muted controls>
+      <source type="video/webm" src="bear.mp4" />
+    </video>
+    <br />
+    <button id="play">play</button>
+    <script>
+      const btn = document.getElementById('play')
+      const video = document.getElementById('video')
+
+      btn.onclick = function (event) {
+        console.log('button clicked')
+        video.play()
+      }
+    </script>
+  </body>
+</html>

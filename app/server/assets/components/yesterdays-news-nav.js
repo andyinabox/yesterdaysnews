@@ -1,30 +1,33 @@
 import { html } from 'lit'
 import { component } from 'haunted'
+import { svgIcon } from '../lib/svg.js'
 
-const svgIcon = (name) => {
-  return html`
-    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 500 500">
-      <use href="#yn-icon-${name}" />
-    </svg>
-  `
-}
-
-export function YesterdaysNewNav({ aboutPageUrl, fullscreen }) {
-  if (fullscreen) {
-    return null
-  }
-
-  const onClick = () => {
+export function YesterdaysNewNav({ aboutPageUrl, showFullscreenButton }) {
+  const onFullscreenClick = () => {
     this.dispatchEvent(new CustomEvent('fullscreenclick', { bubbles: true }))
   }
 
-  return html`
-    <a tabindex="0" title="Go to about page" href=${aboutPageUrl}
-      >${svgIcon('about')}</a
+  const renderFullscreenButton = () => {
+    if (!showFullscreenButton) return
+    return html` <a
+      class="btn btn-fullscreen"
+      tabindex="0"
+      title="Enter fullscreen"
+      @click=${onFullscreenClick}
     >
-    <button tabindex="0" title="Enter fullscreen" @click=${onClick}>
       ${svgIcon('fullscreen')}
-    </button>
+    </a>`
+  }
+
+  return html`
+    <a
+      class="btn btn-about"
+      tabindex="0"
+      title="Go to about page"
+      href=${aboutPageUrl}
+      >${svgIcon('about')}
+    </a>
+    ${renderFullscreenButton()}
   `
 }
 

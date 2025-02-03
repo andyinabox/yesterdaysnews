@@ -27,7 +27,7 @@ body {
   color: var(--yn-color-foreground);
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: auto;
   display: flex;
   align-items: center;
   justify-content: center;

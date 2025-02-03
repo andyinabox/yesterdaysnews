@@ -1,6 +1,7 @@
 import { html } from 'lit'
 import { createRef, ref } from 'lit/directives/ref.js'
-import { component, useRef, useEffect } from 'haunted'
+import { component, useRef, useEffect, useState } from 'haunted'
+import { svgIcon } from '../lib/svg.js'
 
 const fetchObjectURL = async (url, type) => {
   const resp = await fetch(url)
@@ -16,6 +17,8 @@ export function YesterdaysNewsVideo({
   width,
   height,
 }) {
+  const [showPlayButton, setShowPlayButton] = useState(true)
+
   // react-style data refs
   const clipsRef = useRef([])
   const preloadedRef = useRef([])
@@ -43,7 +46,7 @@ export function YesterdaysNewsVideo({
       videoEl.value.load()
       videoEl.value.play()
     } catch (err) {
-      console.log(`error changing video source to ${url}`, err)
+      console.error(`error changing video source to ${url}`, err)
     }
   }
 
@@ -89,9 +92,26 @@ export function YesterdaysNewsVideo({
   const onEnded = () => {
     changeVideoSource(nextVideo())
   }
+
   const onError = (err) => {
     console.error(err)
     onEnded()
+  }
+
+  const onPlay = () => {
+    this.dispatchEvent(new Event('play'))
+    setShowPlayButton(false)
+  }
+
+  const renderPlayButton = () => {
+    const onPlayClick = () => {
+      videoEl.value.play()
+    }
+    if (showPlayButton) {
+      return html`<button @click=${onPlayClick} class="play-button">
+        ${svgIcon('play')}
+      </button>`
+    }
   }
 
   return html`
@@ -102,9 +122,11 @@ export function YesterdaysNewsVideo({
       tabindex="-1"
       @ended=${onEnded}
       @error=${onError}
+      @play=${onPlay}
     >
       <source ${ref(sourceEl)} type="video/webm" src=${initialClipUrl} />
     </video>
+    ${renderPlayButton()}
   `
 }
 customElements.define(
