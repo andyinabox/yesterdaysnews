@@ -1,8 +1,6 @@
 import { html } from 'lit'
-import { virtual } from 'haunted'
 
-export const YesterdaysNewsIcons = virtual(() => {
-  return html`
+export default html`
   <svg style="display: none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <!-- https://thenounproject.com/icon/fullscreen-6938590/ -->
@@ -38,4 +36,3 @@ export const YesterdaysNewsIcons = virtual(() => {
     </defs>
   </svg>
 `
-})

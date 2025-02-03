@@ -3,9 +3,10 @@ import { component, useState, useEffect } from 'haunted'
 
 import { calcVideoDimensions } from '../lib/math.js'
 import { canRequestFullscreen } from '../lib/navigator.js'
+import { useConstructableStylesheets } from '../lib/hooks.js'
 
-import { YesterdaysNewsStyles } from './yesterdays-news-styles.js'
-import { YesterdaysNewsIcons } from './yesterdays-news-icons.js'
+import styles from './yesterdays-news-styles.js'
+import iconsSvg from './yesterdays-news-icons.js'
 
 function YesterdaysNews({
   clipsResourceUrl,
@@ -14,6 +15,8 @@ function YesterdaysNews({
   aboutPageUrl,
 }) {
   const [fullscreen, setFullscreen] = useState(false)
+
+  useConstructableStylesheets(this, [styles])
 
   // update video dimensions when window resizes
   const handleResize = () => {
@@ -60,7 +63,7 @@ function YesterdaysNews({
   }
 
   return html`
-    ${YesterdaysNewsStyles()} ${YesterdaysNewsIcons()}
+    ${iconsSvg}
     <yesterdays-news-player
       clips-resource-url=${clipsResourceUrl}
       initial-clip-url=${initialClipUrl}
