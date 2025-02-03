@@ -1,30 +1,31 @@
 #
-# builder
+# app runners
 # 
+
+
+# builder
 
 .PHONY: builder
 builder:
-	go run ./app/builder/main.go --keepoutput
+	go run ./app/builder/main.go
 
 .PHONY: builder-local
 builder-local:
 	go run ./app/builder/main.go --keepoutput --skipupload
 
 
-#
 # server
-# 
 
 # run server, using object store credential in .env
 .PHONY: server
-server: app/server/.assets
+server:
 	go run ./app/server/main.go -a -v -m 20s
 
 
 # run server using objectstoremock
 # (need to already be running objectstoremock)
 .PHONY: server-local
-server-local: app/server/.assets
+server-local:
 	YN_OBJECTSTORE_URL=http://localhost:9000 YN_CDN_URL=http://localhost:9000 go run ./app/server/main.go -a -v -m 20s
 
 
@@ -36,7 +37,7 @@ server-local: app/server/.assets
 objectstoremock:
 	go run ./cmd/objectstoremock/main.go
 
-.PHONY: clean-dist clean-bin
+.PHONY: clean-dist clean-bin clean-assets
 clean:
 
 .PHONY: clean-dist
@@ -56,6 +57,8 @@ clean-assets:
 # docker
 # 
 
+# server
+
 .PHONY: docker-build-server
 docker-build-server: clean-bin clean-assets bin/server-linux-amd64
 	docker build -f app/server/Dockerfile -t andyinabox/yesterdaysnews-server .
@@ -67,6 +70,8 @@ docker-run-server:
 .PHONY: docker-push-server
 docker-push-server:
 	docker push andyinabox/yesterdaysnews-server
+
+# builder
 
 .PHONY: docker-build-builder
 docker-build-builder: clean-bin bin/builder-linux-amd64
@@ -86,11 +91,15 @@ docker-push-builder:
 # file-based targets
 # 
 
+# binaries
+
 bin/server-linux-amd64: app/server/.assets
 	GOOS=linux GOARCH=amd64 go build -o $@ ./app/server/main.go
 
 bin/builder-linux-amd64:
 	GOOS=linux GOARCH=amd64 go build -o $@ ./app/builder/main.go
+
+# assets
 
 app/server/.assets: app/server/.assets/styles.css app/server/.assets/script.js
 
