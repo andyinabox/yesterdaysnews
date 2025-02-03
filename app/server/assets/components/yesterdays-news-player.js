@@ -13,7 +13,6 @@ export function YesterdaysNewsPlayer({
   }
 
   const renderCaptions = () => {
-    console.log('renderCaptions', showCaptions)
     if (!showCaptions) return
     return html`<yesterdays-news-captions
       resource-url=${captionsResourceUrl}
