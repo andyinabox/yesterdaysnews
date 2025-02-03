@@ -119,6 +119,7 @@ export function YesterdaysNewsVideo({
       ${ref(videoEl)}
       muted
       autoplay
+      playsinline
       tabindex="-1"
       @ended=${onEnded}
       @error=${onError}
