@@ -2,15 +2,7 @@ import { html } from 'lit'
 import { createRef, ref } from 'lit/directives/ref.js'
 import { component, useRef, useEffect, useState } from 'haunted'
 import { svgIcon } from '../lib/svg.js'
-import { canAutoplayVideoIfMuted } from '../lib/navigator.js'
-
-const fetchObjectURL = async (url, type) => {
-  const resp = await fetch(url)
-  // get the data as array buffer
-  const data = await resp.arrayBuffer()
-  // create ObjectURL from data
-  return URL.createObjectURL(new Blob([data], { type }))
-}
+import { canAutoplayVideoIfMuted, fetchObjectURL } from '../lib/media.js'
 
 export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
   const [showPlayButton, setShowPlayButton] = useState(false)

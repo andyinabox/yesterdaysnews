@@ -4,8 +4,6 @@ The videos you are seeing are a random reshuffling of news clips from the day be
 
 Every day a new cycle, and we're meant to believe that _yesterday's news_ is no longer relevant. But each day leaves its mark, is inexorably linked to the one before it.
 
-You can read more about this project and access the source code [here](https://gitlab.com/andyinabox/yesterdaysnews/-/blob/main/README.md).
+You can read more about this project and find the source code [here](https://gitlab.com/andyinabox/yesterdaysnews/-/blob/main/README.md).
 
 —[Andy](https://andydayton.com/)
-
-[Go back](/)

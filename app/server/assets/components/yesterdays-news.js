@@ -1,12 +1,11 @@
 import { html } from 'lit'
 import { component, useState, useEffect } from 'haunted'
 
-import { calcVideoDimensions } from '../lib/math.js'
-import { canRequestFullscreen } from '../lib/navigator.js'
+import { calcVideoDimensions, canRequestFullscreen } from '../lib/media.js'
 import { useConstructableStylesheets } from '../lib/hooks.js'
+import { svgSymbols } from '../lib/svg.js'
 
-import styles from './yesterdays-news-styles.js'
-import iconsSvg from './yesterdays-news-icons.js'
+import styles from './yesterdays-news.styles.js'
 
 function YesterdaysNews({
   clipsResourceUrl,
@@ -41,16 +40,12 @@ function YesterdaysNews({
       document.removeEventListener('fullscreenchange', handleFullScreenChange)
   }, [])
 
-  // handle change to fullscreen
-  useEffect(() => {
-    this.classList.toggle('fullscreen', fullscreen)
-  }, [fullscreen])
-
   const onFullscreenClick = () => {
     this.requestFullscreen()
   }
 
   const renderNav = () => {
+    // hide nav in fullscreen mode
     if (fullscreen) {
       return
     }
@@ -63,7 +58,7 @@ function YesterdaysNews({
   }
 
   return html`
-    ${iconsSvg}
+    ${svgSymbols()}
     <yesterdays-news-player
       clips-resource-url=${clipsResourceUrl}
       initial-clip-url=${initialClipUrl}
