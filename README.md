@@ -116,26 +116,22 @@ const (
 )
 ```
 
-### Builder remote server setup
+### Building the builder
 
-I am currently running this on a server with the following attributes:
-
- - Linux Ubuntu 24.04 LTS 64-bit
- - 16GB RAM
- - 50GB Disk
- - 4 CPUs
- - Cloud-init: [cloud-config.yml](app/builder/cloud-config.yml)
-
-I initially tried running it on a smallar instance but found it froze up.
-
-After you have provisioned the server, grab the IPv4 and run
-
-```
-./app/builder/deploy.sh <server IP>
+```bash
+# build the builder conainer
+make docker-build-builder
+# test the builder container
+make docker-run-builder
+# push the builder container to docker hub
+make docker-push-builder
 ```
 
-This will copy the remaining necessary files to the server.
+The builder container uses the Docker `ENTRYPOINT` specifyer, which means you can pass in arguments when you run the container like an executable. For instance:
 
+```bash
+docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder --output /dist -v
+```
 
 ## Utils
 
