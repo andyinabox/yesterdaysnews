@@ -78,6 +78,8 @@ Dependencies:
  - `ffmpeg`
  - `ffprobe`
 
+Additionaally the builder requires more resources to work well, so it's a good idea to give it more RAM and CPUs.
+
 ### Usage
 
 To get usage info, run `go run ./app/builder/main.go -h`.
