@@ -22,7 +22,7 @@ export const YesterdaysNewsStyles = virtual(() => {
         cursor: pointer;
       }
 
-      svg > use{
+      svg > use {
         fill: white;
         stroke: none;
         display: block;
@@ -52,6 +52,7 @@ export const YesterdaysNewsStyles = virtual(() => {
         transform: translate(-50%, -50%);
         background: transparent;
         border: none;
+        padding: 0;
         width: var(--yn-nav-btn-size);
         height: var(--yn-nav-btn-size);
       }
@@ -93,6 +94,7 @@ export const YesterdaysNewsStyles = virtual(() => {
         cursor: pointer;
         display: block;
         border: none;
+        padding: 0;
         background-color: transparent;
         width: var(--yn-nav-btn-size);
         height: var(--yn-nav-btn-size);
