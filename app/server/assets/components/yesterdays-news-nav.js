@@ -9,14 +9,14 @@ export function YesterdaysNewNav({ aboutPageUrl, showFullscreenButton }) {
 
   const renderFullscreenButton = () => {
     if (!showFullscreenButton) return
-    return html` <a
+    return html` <button
       class="btn btn-fullscreen"
       tabindex="0"
       title="Enter fullscreen"
       @click=${onFullscreenClick}
     >
       ${svgIcon('fullscreen')}
-    </a>`
+    </button>`
   }
 
   return html`

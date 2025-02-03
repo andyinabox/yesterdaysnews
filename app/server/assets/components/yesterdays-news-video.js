@@ -2,6 +2,7 @@ import { html } from 'lit'
 import { createRef, ref } from 'lit/directives/ref.js'
 import { component, useRef, useEffect, useState } from 'haunted'
 import { svgIcon } from '../lib/svg.js'
+import { canAutoplayVideoIfMuted } from '../lib/navigator.js'
 
 const fetchObjectURL = async (url, type) => {
   const resp = await fetch(url)
@@ -11,13 +12,9 @@ const fetchObjectURL = async (url, type) => {
   return URL.createObjectURL(new Blob([data], { type }))
 }
 
-export function YesterdaysNewsVideo({
-  resourceUrl,
-  initialClipUrl,
-  width,
-  height,
-}) {
-  const [showPlayButton, setShowPlayButton] = useState(true)
+export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
+  const [showPlayButton, setShowPlayButton] = useState(false)
+  const [hasPlayedOnce, setHasPlayedOnce] = useState(false)
 
   // react-style data refs
   const clipsRef = useRef([])
@@ -89,6 +86,20 @@ export function YesterdaysNewsVideo({
   // fetch clips on initial load
   useEffect(fetchClips, [resourceUrl])
 
+  // by default show video button if autoplay is disabled
+  useEffect(() => {
+    if (hasPlayedOnce) {
+      setShowPlayButton(false)
+      return
+    }
+
+    if (!videoEl.value) return
+
+    if (!canAutoplayVideoIfMuted(videoEl.value)) {
+      setShowPlayButton(true)
+    }
+  }, [videoEl.value, hasPlayedOnce])
+
   const onEnded = () => {
     changeVideoSource(nextVideo())
   }
@@ -100,7 +111,7 @@ export function YesterdaysNewsVideo({
 
   const onPlay = () => {
     this.dispatchEvent(new Event('play'))
-    setShowPlayButton(false)
+    setHasPlayedOnce(true)
   }
 
   const renderPlayButton = () => {

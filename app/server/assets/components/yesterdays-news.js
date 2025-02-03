@@ -2,6 +2,7 @@ import { html } from 'lit'
 import { component, useState, useEffect } from 'haunted'
 
 import { calcVideoDimensions } from '../lib/math.js'
+import { canRequestFullscreen } from '../lib/navigator.js'
 
 import { YesterdaysNewsStyles } from './yesterdays-news-styles.js'
 import { YesterdaysNewsIcons } from './yesterdays-news-icons.js'
@@ -54,7 +55,7 @@ function YesterdaysNews({
     return html`<yesterdays-news-nav
       @fullscreenclick=${onFullscreenClick}
       about-page-url=${aboutPageUrl}
-      .showFullscreenButton=${!!this.requestFullscreen}
+      .showFullscreenButton=${canRequestFullscreen(this)}
     ></yesterdays-news-nav>`
   }
 
