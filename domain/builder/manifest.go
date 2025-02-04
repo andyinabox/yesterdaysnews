@@ -35,7 +35,7 @@ func (b *Builder) Manifest(ctx context.Context, uploadDir string, manifest *doma
 	}
 
 	manifestFileKey := filepath.Join(uploadDir, domain.ManifestFileName)
-	log.Debugf("uploading %q as %q", manifestFilePath, manifestFileKey)
+	log.Infof("uploading %q as %q", manifestFilePath, manifestFileKey)
 	manifestFileKey, err = b.cs.UploadFile(ctx, manifestFilePath, manifestFileKey, "application/json", false)
 	if err != nil {
 		return "", fmt.Errorf("error uploading manifest file %q: %w", manifestFilePath, err)

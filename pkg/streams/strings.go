@@ -174,31 +174,6 @@ func MergeStringStreams(ctx context.Context, streams ...<-chan string) <-chan st
 	return merged
 }
 
-func DuplicateStringStream(ctx context.Context, stream <-chan string) (<-chan string, <-chan string) {
-	stream1 := make(chan string)
-	stream2 := make(chan string)
-
-	cleanup := func() {
-		close(stream1)
-		close(stream2)
-	}
-
-	go func() {
-		defer cleanup()
-		for s := range stream {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-				stream1 <- s
-				stream2 <- s
-			}
-		}
-	}()
-
-	return stream1, stream2
-}
-
 func BifurcatedStringStream(ctx context.Context, stream <-chan string, fn func(s string) bool) (<-chan string, <-chan string) {
 	trueStream := make(chan string)
 	falseStream := make(chan string)

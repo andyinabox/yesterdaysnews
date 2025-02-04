@@ -35,10 +35,10 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 			return
 		}
 
-		log.Debugf("cutting %q into %d clips", filePath, len(editPoints))
+		log.Infof("cutting %q into %d clips", filePath, len(editPoints))
 		outDir := filepath.Join(b.cfg.OutputDir, domain.ClipsDirName)
 		for clip := range b.vp.CutVideoStream(ctx, b.errs, filePath, outDir, editPoints) {
-			log.Debugf("finished cutting %q", clip)
+			log.Infof("finished cutting %q", clip)
 			clipStream <- clip
 		}
 		log.Debug("exiting cutVideo loop")
@@ -59,7 +59,7 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 				}
 
 				wg.Add(1)
-				log.Debugf("start cutting %q", filePath)
+				log.Infof("start cutting %q", filePath)
 				go cutVideo(filePath)
 			}
 		}
