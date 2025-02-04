@@ -40,7 +40,7 @@ func (p *Processor) ExtractImagesStream(ctx context.Context, errs chan<- domain.
 			errs <- errorhandler.Err(domain.ErrTypeExtractImage, fmt.Errorf("error extracting image from %q: %w", path, err))
 			return
 		}
-		stream <- path
+		stream <- output
 	}
 
 	go func() {
