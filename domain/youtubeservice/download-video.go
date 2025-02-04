@@ -44,7 +44,7 @@ func (s *Service) DownloadVideoStream(ctx context.Context, errs chan<- domain.Er
 	downloadVideo := func(id string) {
 		defer wg.Done()
 
-		log.Debug("Download video", "id", id)
+		log.Info("Download video", "id", id)
 		path, err := s.DownloadVideo(ctx, id, outDir)
 
 		// handle error
