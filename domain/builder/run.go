@@ -37,19 +37,30 @@ func (b *Builder) Run(ctx context.Context) error {
 	downloadPathStream := b.DownloadVideos(ctx, manifest.ContentDate)
 	clipPathsStream := b.CutVideos(ctx, downloadPathStream)
 
+	var clipUploadPathsStream <-chan string
+
 	// skip uploading files
 	if b.cfg.SkipUpload {
-		clipPathsStream = streams.StringTransformStream(ctx, clipPathsStream, func(s string) string {
+		clipUploadPathsStream = streams.StringTransformStream(ctx, clipPathsStream, func(s string) string {
 			return strings.TrimPrefix(s, b.cfg.OutputDir+"/")
 		})
-		manifest.Files.Clips = streams.StringSlice(ctx, clipPathsStream)
-
 		// upload files
 	} else {
-		uploadPathsStream := b.UploadVideos(ctx, manifest.ID, clipPathsStream)
-		manifest.Files.Clips = streams.StringSlice(ctx, uploadPathsStream)
+		clipUploadPathsStream = b.UploadVideos(ctx, manifest.ID, clipPathsStream)
 	}
+
+	manifest.Files.Clips = streams.StringSlice(ctx, clipUploadPathsStream)
 	log.Infof("processed %d clips", len(manifest.Files.Clips))
+
+	log.Info("generating poster image...")
+	// eventually it would be nice to not break the stream here
+	finishedClipsStream := streams.StringTransformStream(ctx, streams.StringStream(ctx, manifest.Files.Clips...), func(s string) string {
+		return filepath.Join(b.cfg.OutputDir, s)
+	})
+	extractedImagesStream := b.ExtractImages(ctx, finishedClipsStream)
+	posterImage, err := b.PosterImage(ctx, manifest.ID, extractedImagesStream)
+	manifest.Files.PosterImageFile = posterImage
+	log.Infof("successfully uploaded %q", posterImage)
 
 	log.Info("building model...")
 	modelFile, err := b.Model(ctx, manifest.ID, []domain.Corpus{

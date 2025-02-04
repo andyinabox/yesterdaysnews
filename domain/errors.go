@@ -11,6 +11,8 @@ const (
 	ErrTypeDownloadVideo = "ErrTypeDownloadVideo"
 	ErrTypeCutVideo      = "ErrTypeCutVideo"
 	ErrTypeCleanup       = "ErrTypeCleanup"
+	ErrTypeAverageImage  = "ErrTypeAverageImage"
+	ErrTypeExtractImage  = "ErrTypeExtractImage"
 
 	// object store
 	ErrTypeCopyObject   = "ErrTypeCopyObject"
@@ -44,8 +46,4 @@ type ErrorHandler interface {
 
 	// output
 	Report()
-
-	// Print()
-	// Reset()
-	// Err() error
 }

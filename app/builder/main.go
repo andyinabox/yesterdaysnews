@@ -29,6 +29,9 @@ import (
 //go:embed hospital.txt
 var hospitalText string
 
+//go:embed overlay.png
+var overlayImage []byte
+
 const defaultPlaylists = "UUupvZG-5ko_eiXAupbDfxWw,UUaXkIU1QidjPwiAYu6GcHjg,UUXIJgqnII2ZOINSWNOGFThA"
 
 var (
@@ -117,6 +120,7 @@ func main() {
 		KeepOutputFiles:             keepOutputFiles,
 		SkipUpload:                  skipUpload,
 		HospitalCorpus:              hospitalText,
+		OverlayImage:                overlayImage,
 	}
 	// auto-load env vars
 	err := configloader.Load(&config)
@@ -154,6 +158,14 @@ func main() {
 
 	case domain.BuildPhaseUploadVideos:
 		err = uploadVideos(ctx, &config, eh)
+		handleBuildPhaseErr(err)
+
+	case domain.BuildPhaseExtractImages:
+		err = extractImages(ctx, &config, eh)
+		handleBuildPhaseErr(err)
+
+	case domain.BuildPhasePosterImage:
+		err = posterImage(ctx, &config, eh)
 		handleBuildPhaseErr(err)
 
 	case domain.BuildPhaseModel:
@@ -244,23 +256,49 @@ func uploadVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHa
 	return nil
 }
 
-// func buildVideoClips(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
-// 	b := builder.New(config, eh)
+func extractImages(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
+	b := builder.New(config, eh)
 
-// 	err := b.Setup(ctx)
-// 	if err != nil {
-// 		return err
-// 	}
+	clips, err := filepath.Glob("dist/clips/*.webm")
+	if err != nil {
+		return fmt.Errorf("error getting clip paths: %w", err)
+	}
+	if len(clips) == 0 {
+		return errors.New("no clip found")
+	}
 
-// 	yesterday := util.Yesterday()
-// 	uploadDir := util.Timestamp(yesterday)
-// 	clips, err := b.VideoClips(ctx, yesterday, uploadDir)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	log.Infof("finished processing %d clips", len(clips))
-// 	return nil
-// }
+	clipsStream := streams.StringStream(ctx, clips...)
+	imagesStream := b.ExtractImages(ctx, clipsStream)
+
+	images := streams.StringSlice(ctx, imagesStream)
+	log.Infof("finished extracting %d images", len(images))
+
+	return nil
+}
+
+func posterImage(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
+	b := builder.New(config, eh)
+
+	images, err := filepath.Glob("dist/clips/*.png")
+	if err != nil {
+		return fmt.Errorf("error getting image paths: %w", err)
+	}
+	if len(images) == 0 {
+		return errors.New("no clip found")
+	}
+
+	uploadDir := util.Timestamp(time.Now())
+
+	imagesStream := streams.StringStream(ctx, images...)
+	posterImage, err := b.PosterImage(ctx, uploadDir, imagesStream)
+	if err != nil {
+		return fmt.Errorf("error generating poster image: %w", err)
+	}
+
+	log.Infof("finished outputting %q", posterImage)
+
+	return nil
+}
 
 func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
