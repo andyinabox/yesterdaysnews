@@ -289,8 +289,7 @@ func posterImage(ctx context.Context, config *builder.Config, eh domain.ErrorHan
 
 	uploadDir := util.Timestamp(time.Now())
 
-	imagesStream := streams.StringStream(ctx, images...)
-	posterImage, err := b.PosterImage(ctx, uploadDir, imagesStream)
+	posterImage, err := b.PosterImage(ctx, uploadDir, images)
 	if err != nil {
 		return fmt.Errorf("error generating poster image: %w", err)
 	}

@@ -80,7 +80,7 @@ docker-build-builder: clean-bin bin/builder-linux-amd64
 .PHONY: docker-run-builder
 docker-run-builder:
 	mkdir -p dist
-	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder --output /dist -v
+	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder --output /dist
 
 .PHONY: docker-push-builder
 docker-push-builder:

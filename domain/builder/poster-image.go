@@ -12,13 +12,13 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
-func (b *Builder) PosterImage(ctx context.Context, uploadDir string, paths <-chan string) (string, error) {
+func (b *Builder) PosterImage(ctx context.Context, uploadDir string, paths []string) (string, error) {
 
 	if b.cfg.OverlayImage == nil {
 		return "", errors.New("no overlay image set")
 	}
 
-	avgImagePath, err := b.ip.AverageImagesStream(
+	avgImagePath, err := b.ip.AverageImages(
 		ctx,
 		b.errs,
 		paths,

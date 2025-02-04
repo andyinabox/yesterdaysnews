@@ -58,7 +58,7 @@ func (b *Builder) Run(ctx context.Context) error {
 		return filepath.Join(b.cfg.OutputDir, s)
 	})
 	extractedImagesStream := b.ExtractImages(ctx, finishedClipsStream)
-	posterImage, err := b.PosterImage(ctx, manifest.ID, extractedImagesStream)
+	posterImage, err := b.PosterImage(ctx, manifest.ID, streams.StringSlice(ctx, extractedImagesStream))
 	manifest.Files.PosterImageFile = posterImage
 	log.Infof("successfully uploaded %q", posterImage)
 
