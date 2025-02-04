@@ -4,13 +4,13 @@ import (
 	"context"
 	"flag"
 	"path/filepath"
-	"strings"
-	"sync"
 	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/videoprocessor"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
 )
 
 var clipsDir string
@@ -34,42 +34,22 @@ func init() {
 func main() {
 	ctx := context.Background()
 
-	mt := mediatool.New("", "")
+	eh := errorhandler.DefaultErrorHandler(ctx, 30)
+	defer eh.Report()
 
-	var mu sync.Mutex
-	var wg sync.WaitGroup
+	vp := videoprocessor.New(&videoprocessor.Config{})
 
 	clips, err := filepath.Glob(filepath.Join(clipsDir, "*.webm"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	editPoint, err := time.ParseDuration("0s")
-	if err != nil {
-		log.Fatal(err)
-	}
+	clipsStream := streams.StringStream(ctx, clips...)
 
-	completedImages := []string{}
-	for _, clip := range clips {
-		log.Infof("process clip %q", clip)
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			output := filepath.Join(clipsDir, strings.Replace(filepath.Base(clip), filepath.Ext(clip), ".png", 1))
-			log.Debug("extract png", "input", clip, "output", output)
-			err := mt.ExtractPNG(ctx, clip, output, mediatool.Duration(editPoint))
-			if err != nil {
-				log.Errorf("error extracting PNG from %s: %s", clip, err)
-				return
-			}
-			mu.Lock()
-			completedImages = append(completedImages, output)
-			mu.Unlock()
-		}()
-	}
+	imageFileStream := vp.ExtractImagesStream(ctx, eh.Channel(), clipsStream, time.Duration(0))
 
-	log.Info("processing...")
-	wg.Wait()
-	log.Infof("finished outputting %d images", len(completedImages))
+	imageFiles := streams.StringSlice(ctx, imageFileStream)
+
+	log.Info("finished processing %d images", len(imageFiles))
 
 }

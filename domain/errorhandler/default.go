@@ -13,9 +13,10 @@ func DefaultErrorHandler(ctx context.Context, totalDownloadTargets int) domain.E
 			domain.ErrTypeTODO:          0,
 			domain.ErrTypeMoveObject:    totalDownloadTargets / 3,
 			domain.ErrTypeDownloadVideo: totalDownloadTargets / 3,
-			domain.ErrTypeCutVideo:      50,
 			domain.ErrTypeGetVideoID:    totalDownloadTargets / 3,
 			domain.ErrTypeUploadFile:    totalDownloadTargets / 3,
+			domain.ErrTypeCutVideo:      50,
+			domain.ErrTypeAverageImage:  50,
 		},
 	})
 }

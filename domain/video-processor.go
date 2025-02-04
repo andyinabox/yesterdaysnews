@@ -21,5 +21,5 @@ type VideoProcessor interface {
 	CutVideo(ctx context.Context, inFile, outFile string, edit VideoEdit) (string, error)
 	CutVideoStream(ctx context.Context, errs chan<- Error, inFile, outDir string, edits []VideoEdit) <-chan string
 	OutputImage(ctx context.Context, inFile, outFile string, t time.Duration) (string, error)
-	OutputImageStream(ctx context.Context, errs chan<- Error, files chan<- string) <-chan string
+	OutputImageStream(ctx context.Context, errs chan<- Error, paths <-chan string) <-chan string
 }

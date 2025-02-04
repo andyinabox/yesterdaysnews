@@ -29,6 +29,9 @@ import (
 //go:embed hospital.txt
 var hospitalText string
 
+//go:embed overlay.png
+var overlayImage []byte
+
 const defaultPlaylists = "UUupvZG-5ko_eiXAupbDfxWw,UUaXkIU1QidjPwiAYu6GcHjg,UUXIJgqnII2ZOINSWNOGFThA"
 
 var (
