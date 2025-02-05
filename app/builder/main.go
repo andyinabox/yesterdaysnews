@@ -159,8 +159,10 @@ func main() {
 	case domain.BuildPhaseModel:
 		err = buildModel(ctx, &config, eh)
 		handleBuildPhaseErr(err)
+
 	case domain.BuildPhaseManifest:
-		log.Fatalf("manifest build step not implemented")
+		err = buildManifest(ctx, &config, eh)
+		handleBuildPhaseErr(err)
 
 	case domain.BuildPhasePromote:
 		err = buildPromote(ctx, &config, eh)
@@ -309,6 +311,41 @@ func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 		prev = cg.Caption(prev)
 		fmt.Println(prev)
 	}
+
+	return nil
+}
+
+func buildManifest(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
+	b := builder.New(config, eh)
+
+	clips, err := filepath.Glob("dist/clips/*.webm")
+	if err != nil {
+		return err
+	}
+
+	buildDate := time.Now()
+	buildID := util.Timestamp(buildDate)
+
+	manifest := &domain.Manifest{
+		BuildDate:   buildDate,
+		ContentDate: util.Yesterday(),
+		ID:          buildID,
+		Files: domain.ManifestFiles{
+			ModelFile: domain.ModelFileName,
+			Clips:     make([]string, len(clips)),
+		},
+	}
+
+	for i, clip := range clips {
+		manifest.Files.Clips[i] = strings.Replace(clip, "dist/", "", 1)
+	}
+
+	result, err := b.Manifest(ctx, buildID, manifest)
+	if err != nil {
+		return err
+	}
+
+	log.Infof("successfully generated %q", result)
 
 	return nil
 }
