@@ -7,6 +7,7 @@ import { canAutoplayVideoIfMuted, fetchObjectURL } from '../lib/media.js'
 export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
   const [showPlayButton, setShowPlayButton] = useState(false)
   const [hasPlayedOnce, setHasPlayedOnce] = useState(false)
+  const [fetchClipsPromise, setFetchClipsPromise] = useState(null)
 
   // react-style data refs
   const clipsRef = useRef([])
@@ -44,7 +45,7 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
     // multiple outgoing requests if this is called
     // again before the first is completed
     if (clipsRef.current.length < 10) {
-      fetchClips()
+      setFetchClipsPromise(fetchClips())
     }
 
     let next
@@ -55,6 +56,8 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
     }
 
     preloadNextClip()
+
+    console.log('next video', next)
 
     return next
   }
@@ -76,7 +79,9 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
   }
 
   // fetch clips on initial load
-  useEffect(fetchClips, [resourceUrl])
+  useEffect(() => {
+    setFetchClipsPromise(fetchClips)
+  }, [resourceUrl])
 
   // by default show video button if autoplay is disabled
   useEffect(() => {
@@ -93,11 +98,13 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
   }, [videoEl.value, hasPlayedOnce])
 
   const onEnded = () => {
-    changeVideoSource(nextVideo())
+    fetchClipsPromise.then(() => {
+      changeVideoSource(nextVideo())
+    })
   }
 
   const onError = (err) => {
-    console.error(err)
+    console.error('onError', err)
     onEnded()
   }
 
@@ -117,6 +124,16 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
     }
   }
 
+  const onStalled = () => {
+    console.error('video stalled')
+    onEnded()
+  }
+
+  const onSuspend = () => {
+    console.error('video suspended')
+    onEnded()
+  }
+
   return html`
     <video
       ${ref(videoEl)}
@@ -127,6 +144,8 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
       @ended=${onEnded}
       @error=${onError}
       @play=${onPlay}
+      @stalled=${onStalled}
+      @suspend=${onSuspend}
     >
       <source ${ref(sourceEl)} type="video/webm" src=${initialClipUrl} />
     </video>
