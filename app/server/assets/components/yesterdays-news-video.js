@@ -9,7 +9,6 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
   const [showPlayButton, setShowPlayButton] = useState(false)
   const [hasPlayedOnce, setHasPlayedOnce] = useState(false)
   const [videoLoader, setVideoLoader] = useState(null)
-  const [needsReload, setNeedsReload] = useState(false)
 
   // lit-style dom refs
   const videoEl = createRef()
