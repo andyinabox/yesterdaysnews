@@ -58,11 +58,6 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
     loadNextVideo()
   }
 
-  const onVideoError = (err) => {
-    // console.error('video error', err)
-    // loadNextVideo()
-  }
-
   const onPlay = () => {
     this.dispatchEvent(new Event('play'))
     setHasPlayedOnce(true)
@@ -92,7 +87,6 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
       playsinline
       tabindex="-1"
       @ended=${onEnded}
-      @error=${onVideoError}
       @play=${onPlay}
     >
       <source
