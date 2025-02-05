@@ -2,85 +2,41 @@ import { html } from 'lit'
 import { createRef, ref } from 'lit/directives/ref.js'
 import { component, useRef, useEffect, useState } from 'haunted'
 import { svgIcon } from '../lib/svg.js'
-import { canAutoplayVideoIfMuted, fetchObjectURL } from '../lib/media.js'
+import { canAutoplayVideoIfMuted } from '../lib/media.js'
+import { VideoLoader } from '../lib/video-loader.js'
 
 export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
   const [showPlayButton, setShowPlayButton] = useState(false)
   const [hasPlayedOnce, setHasPlayedOnce] = useState(false)
-  const [fetchClipsPromise, setFetchClipsPromise] = useState(null)
-
-  // react-style data refs
-  const clipsRef = useRef([])
-  const preloadedRef = useRef([])
+  const [videoLoader, setVideoLoader] = useState(null)
+  const [needsReload, setNeedsReload] = useState(false)
 
   // lit-style dom refs
   const videoEl = createRef()
   const sourceEl = createRef()
 
-  const preloadNextClip = async () => {
+  const loadNextVideo = async () => {
     try {
-      const objectURL = await fetchObjectURL(
-        clipsRef.current.pop(),
-        'video/webm'
-      )
-      preloadedRef.current.push(objectURL)
-    } catch (err) {
-      console.error('error preloading next clip', err)
-    }
-  }
+      const next = await videoLoader.next()
 
-  const changeVideoSource = (url) => {
-    try {
-      videoEl.value.pause()
-      sourceEl.value.setAttribute('src', url)
-      videoEl.value.load()
-      videoEl.value.play()
-    } catch (err) {
-      console.error(`error changing video source to ${url}`, err)
-    }
-  }
-
-  const nextVideo = () => {
-    // note: it's possible we could end up with
-    // multiple outgoing requests if this is called
-    // again before the first is completed
-    if (clipsRef.current.length < 10) {
-      setFetchClipsPromise(fetchClips())
-    }
-
-    let next
-    if (preloadedRef.current.length) {
-      next = preloadedRef.current.pop()
-    } else {
-      next = clipsRef.current.pop()
-    }
-
-    preloadNextClip()
-
-    console.log('next video', next)
-
-    return next
-  }
-
-  const fetchClips = async () => {
-    try {
-      const resp = await fetch(resourceUrl)
-      if (!resp.ok) {
-        throw new Error(`Response status: ${resp.status}`)
+      if (!videoEl.value) {
+        throw new Error('video element is not available')
       }
-      const data = await resp.json()
 
-      clipsRef.current = data.clips
-      preloadedRef.current = []
-      preloadNextClip()
+      videoEl.value.pause()
+      sourceEl.value.setAttribute('src', next)
+      videoEl.value.load()
+      await videoEl.value.play()
     } catch (err) {
-      console.error('error loading clip urls', err)
+      if (err.name !== 'AbortError') {
+        console.error(err)
+      }
     }
   }
 
   // fetch clips on initial load
   useEffect(() => {
-    setFetchClipsPromise(fetchClips)
+    setVideoLoader(new VideoLoader(resourceUrl))
   }, [resourceUrl])
 
   // by default show video button if autoplay is disabled
@@ -97,15 +53,14 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
     }
   }, [videoEl.value, hasPlayedOnce])
 
+  // event handlers
   const onEnded = () => {
-    fetchClipsPromise.then(() => {
-      changeVideoSource(nextVideo())
-    })
+    loadNextVideo()
   }
 
-  const onError = (err) => {
-    console.error('onError', err)
-    onEnded()
+  const onVideoError = (err) => {
+    // console.error('video error', err)
+    // loadNextVideo()
   }
 
   const onPlay = () => {
@@ -113,6 +68,11 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
     setHasPlayedOnce(true)
   }
 
+  const onSourceError = () => {
+    loadNextVideo()
+  }
+
+  // render functions
   const renderPlayButton = () => {
     const onPlayClick = () => {
       videoEl.value.play()
@@ -124,16 +84,6 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
     }
   }
 
-  const onStalled = () => {
-    console.error('video stalled')
-    onEnded()
-  }
-
-  const onSuspend = () => {
-    console.error('video suspended')
-    onEnded()
-  }
-
   return html`
     <video
       ${ref(videoEl)}
@@ -142,12 +92,15 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
       playsinline
       tabindex="-1"
       @ended=${onEnded}
-      @error=${onError}
+      @error=${onVideoError}
       @play=${onPlay}
-      @stalled=${onStalled}
-      @suspend=${onSuspend}
     >
-      <source ${ref(sourceEl)} type="video/webm" src=${initialClipUrl} />
+      <source
+        ${ref(sourceEl)}
+        type="video/webm"
+        src=${initialClipUrl}
+        @error=${onSourceError}
+      />
     </video>
     ${renderPlayButton()}
   `
