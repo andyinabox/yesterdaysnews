@@ -1,24 +1,22 @@
 package main
 
 import (
-	"context"
 	"flag"
+	"os"
 	"path/filepath"
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/imageprocessor"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/imgavg"
 )
 
-var inputGlob, outputFile string
+var inputGlob, outputFile, workDir string
 var verbose bool
 
 func init() {
 	flag.StringVar(&inputGlob, "i", "dist/clips/*.png", "input file glob")
 	flag.StringVar(&outputFile, "o", "dist/average.png", "output file")
+	flag.StringVar(&workDir, "w", "dist/avg", "working dir for intermediate files")
 	flag.BoolVar(&verbose, "v", false, "verbose output")
 	flag.Parse()
 
@@ -37,27 +35,50 @@ const imageHeight = 720
 
 func main() {
 
-	ctx := context.Background()
-
-	eh := errorhandler.DefaultErrorHandler(ctx, 30)
-	defer eh.Report()
-
-	ip := imageprocessor.New()
-
-	imagePaths, err := filepath.Glob(inputGlob)
+	err := os.MkdirAll(workDir, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	imagePathsStream := streams.StringStream(ctx, imagePaths...)
-
-	log.Infof("averaging %d images", len(imagePaths))
-
-	outputFile, err = ip.AverageImagesStream(ctx, eh.Channel(), imagePathsStream, domain.VideoWidth, domain.VideoHeight, outputFile)
+	paths, err := filepath.Glob(inputGlob)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Infof("finished outputting %q", outputFile)
+	client := imgavg.New(workDir, imageWidth, imageHeight, func(err error) {
+		log.Error(err)
+	})
 
+	result, err := client.Run(paths, outputFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Info("successfully outputed image %q", result)
 }
+
+// func main() {
+
+// 	ctx := context.Background()
+
+// 	eh := errorhandler.DefaultErrorHandler(ctx, 30)
+// 	defer eh.Report()
+
+// 	ip := imageprocessor.New()
+
+// 	imagePaths, err := filepath.Glob(inputGlob)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	imagePathsStream := streams.StringStream(ctx, imagePaths...)
+
+// 	log.Infof("averaging %d images", len(imagePaths))
+
+// 	outputFile, err = ip.AverageImagesStream(ctx, eh.Channel(), imagePathsStream, domain.VideoWidth, domain.VideoHeight, outputFile)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	log.Infof("finished outputting %q", outputFile)
+
+// }
