@@ -1,9 +1,8 @@
 import { fetchObjectURL } from '../lib/media.js'
 
-const FETCH_WHEN_LOWER_THAN = 5
-
 export class VideoLoader {
   #resourceUrl = ''
+  #fetchWhenLowerThan = 5
 
   #clips = []
   #preloaded = []
@@ -11,15 +10,16 @@ export class VideoLoader {
   #fetching = Promise.resolve()
   #preloading = Promise.resolve()
 
-  constructor(resourceUrl) {
+  constructor(resourceUrl, fetchWhenLowerThan = 5) {
     this.#resourceUrl = resourceUrl
+    this.#fetchWhenLowerThan = fetchWhenLowerThan
     this.fetch()
   }
 
   async next() {
     await this.fetching
 
-    if (this.#clips.length < FETCH_WHEN_LOWER_THAN) {
+    if (this.#clips.length < this.#fetchWhenLowerThan) {
       this.fetch()
     }
 

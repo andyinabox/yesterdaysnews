@@ -35,7 +35,7 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
 
   // fetch clips on initial load
   useEffect(() => {
-    setVideoLoader(new VideoLoader(resourceUrl))
+    setVideoLoader(new VideoLoader(resourceUrl, 5))
   }, [resourceUrl])
 
   // by default show video button if autoplay is disabled
