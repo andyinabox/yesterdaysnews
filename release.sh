@@ -20,10 +20,12 @@ GITTAG=$APP-$TAG
 
 git status
 
+echo ""
 echo "App:     $APP"
 echo "Tag:     $TAG"
 echo "Git tag: $GITTAG"
 
+echo ""
 echo "Please review output above. Continue with tag/release workflow? (y/N)"
 read CONFIRM
 
