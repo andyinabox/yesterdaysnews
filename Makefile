@@ -13,6 +13,11 @@ builder:
 builder-local:
 	go run ./app/builder/main.go --keepoutput --skipupload
 
+.PHONY: builder-docker
+builder-docker: clean-bin bin/builder-linux-amd64
+	docker buildx build --platform linux/amd64 -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder:dev .
+	mkdir -p dist
+	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder:dev --output /dist -v --keepoutput --skipupload
 
 # server
 
@@ -28,6 +33,11 @@ server:
 server-local:
 	YN_OBJECTSTORE_URL=http://localhost:9000 YN_CDN_URL=http://localhost:9000 go run ./app/server/main.go -a -v -m 20s
 
+
+.PHONY: server-docker
+server-docker: clean-bin clean-assets bin/server-linux-amd64
+	docker buildx build --platform linux/amd64 -f app/server/Dockerfile -t andyinabox/yesterdaysnews-server:dev .
+	docker run --rm --env-file .env -p 8080:8080 andyinabox/yesterdaysnews-server:dev
 
 #
 # utils
@@ -51,41 +61,6 @@ clean-bin:
 .PHONY: clean-assets
 clean-assets:
 	-rm -rf app/server/.assets
-
-
-#
-# docker
-# 
-
-# server
-
-.PHONY: docker-build-server
-docker-build-server: clean-bin clean-assets bin/server-linux-amd64
-	docker build -f app/server/Dockerfile -t andyinabox/yesterdaysnews-server .
-
-.PHONY: docker-run-server
-docker-run-server:
-	docker run --rm --env-file .env -p 8080:8080 andyinabox/yesterdaysnews-server
-
-.PHONY: docker-push-server
-docker-push-server:
-	docker push andyinabox/yesterdaysnews-server
-
-# builder
-
-.PHONY: docker-build-builder
-docker-build-builder: clean-bin bin/builder-linux-amd64
-	docker buildx build --platform linux/arm64 -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder .
-
-.PHONY: docker-run-builder
-docker-run-builder:
-	mkdir -p dist
-	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder --output /dist
-
-.PHONY: docker-push-builder
-docker-push-builder:
-	docker push andyinabox/yesterdaysnews-builder
-
 
 #
 # file-based targets
