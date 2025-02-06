@@ -13,6 +13,7 @@ const VideoSubFormat = "vtt"
 type Config struct {
 	GoogleAPIKey        string
 	BinPathYTDLP        string
+	MaxPlaylistRequests int
 	ThrottleDownloadsBy time.Duration
 }
 

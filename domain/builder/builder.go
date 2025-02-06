@@ -26,6 +26,7 @@ type Config struct {
 	OutputDir                   string
 	MaxVideoSize                uint
 	DownloadCountPerPlaylist    int
+	MaxPlaylistRequests         int
 	MinClipLengthSeconds        int
 	MaxClipLengthSeconds        int
 	CaptionPrefixLength         int
@@ -54,6 +55,7 @@ func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 	yt := youtubeservice.New(&youtubeservice.Config{
 		GoogleAPIKey:        cfg.GoogleAPIKey,
 		BinPathYTDLP:        cfg.BinPathYTDLP,
+		MaxPlaylistRequests: cfg.MaxPlaylistRequests,
 		ThrottleDownloadsBy: cfg.ThrottleDownloadsBy,
 	})
 

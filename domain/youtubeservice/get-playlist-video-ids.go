@@ -95,7 +95,6 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 		close(stream)
 	}
 
-	maxRequests := 20
 	totalRequests := 0
 
 	go func() {
@@ -113,8 +112,8 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 			default:
 				log.Infof("fetch video ids for %q", playlistId)
 
-				if totalRequests >= maxRequests {
-					log.Warnf("reached max requests for playlist %q, aborting", playlistId)
+				if totalRequests >= s.cfg.MaxPlaylistRequests {
+					log.Infof("reached max requests of %d for playlist %q", s.cfg.MaxPlaylistRequests, playlistId)
 					return
 				}
 
