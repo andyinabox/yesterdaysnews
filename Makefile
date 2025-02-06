@@ -77,6 +77,8 @@ bin/builder-linux-amd64:
 # assets
 
 app/server/.assets: app/server/.assets/styles.css app/server/.assets/script.js
+	cp app/server/assets/*.png app/server/.assets/
+	cp -r app/server/assets/icon app/server/.assets/icon
 
 app/server/.assets/styles.css:
 		go run ./cmd/esbuild/main.go app/server/assets/styles.css --bundle --minify --outfile=app/server/.assets/styles.css

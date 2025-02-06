@@ -16,9 +16,12 @@ import (
 type Config struct {
 	ObjectStoreUrl string `env:"YN_OBJECTSTORE_URL" required:"true"`
 	CDNUrl         string `env:"YN_CDN_URL" required:"true"`
-	Templates      *template.Template
-	AboutContent   string
-	ImportMap      string
+
+	// embedded content
+	Templates       *template.Template
+	AboutContent    string
+	ImportMap       string
+	SiteDescription string
 
 	// see pkg/assetshandler for these options
 	AssetsDirFS         fs.FS

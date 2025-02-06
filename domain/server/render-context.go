@@ -6,8 +6,10 @@ import (
 )
 
 type RenderContext struct {
-	AssetsPath string
-	ImportMap  template.HTML
+	PageTitle       string
+	AssetsPath      string
+	SiteDescription string
+	ImportMap       template.HTML
 }
 
 const importMapTpl = `
@@ -25,7 +27,9 @@ func (s *Server) renderContext() RenderContext {
 	}
 
 	return RenderContext{
-		AssetsPath: s.assetsPath,
-		ImportMap:  importMap,
+		PageTitle:       "yesterday's news",
+		AssetsPath:      s.assetsPath,
+		SiteDescription: s.cfg.SiteDescription,
+		ImportMap:       importMap,
 	}
 }

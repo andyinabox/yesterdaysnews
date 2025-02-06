@@ -1,36 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-
-    <!-- the basics -->
-    <meta charset="UTF-8" />
-    <title>{{ .PageTitle }}</title>
-    <meta name="description" content="yesterday's news" />
-
-    <!-- browser compat -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
-	  <!-- metadata -->
-		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://www.11ty.dev/">
-		<meta property="og:site_name" content="Eleventy">
-		<meta property="og:locale" content="en_US">
-		<meta property="og:title" content="Eleventy is a simpler static site generator">
-		<meta property="og:description" content="Eleventy is a simpler static site generator.">
-		<meta property="og:image" content="https://v1.screenshot.11ty.dev/https%3A%2F%2Fwww.11ty.dev%2F%3Fcache%3D1/opengraph/">
-		<meta property="og:image:width" content="1280">
-		<meta property="og:image:height" content="640">
-		<meta property="og:image:alt" content="A screenshot of the web page at https://www.11ty.dev/">
-
-
-	  <!-- media -->
-		<link rel="icon" type="image/png" sizes="96x96" href="/img/favicon.png">
-    <link rel="stylesheet" href="{{ .AssetsPath }}/styles.css" />
-
+    {{template "head-meta.html.tmpl" .}}
     {{ .MetaComment }}
-
   </head>
   <body>
 
