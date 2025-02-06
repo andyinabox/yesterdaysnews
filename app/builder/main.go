@@ -64,7 +64,7 @@ func init() {
 
 	flag.IntVar(&maxVideoSize, "maxvideosize", 52428800, "max video download size in bytes")
 	flag.IntVar(&downloadCountPerPlaylist, "count", 10, "download count per playlist")
-	flag.IntVar(&maxPlaylistRequests, "maxplaylistreq", 10, "the maximum times to request a new playlist page before giving up")
+	flag.IntVar(&maxPlaylistRequests, "maxplaylistreq", 3, "the maximum times to request a new playlist page before giving up")
 	flag.IntVar(&minClipLengthSeconds, "mincliplength", 5, "minimum clip length in seconds")
 	flag.IntVar(&maxClipLengthSeconds, "maxcliplength", 15, "maximum clip length in seconds")
 	flag.IntVar(&captionPrefixLength, "prefixlength", 2, "caption chain prefix length")

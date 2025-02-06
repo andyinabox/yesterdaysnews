@@ -2,9 +2,7 @@ package youtubeservice
 
 import (
 	"context"
-	"errors"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
 )
 
@@ -14,17 +12,17 @@ func (s *Service) GetChannelPlaylistID(ctx context.Context, userName string) (id
 		ForHandle: userName,
 		Part:      []string{"contentDetails"},
 	})
+	if err != nil {
+		return "", err
+	}
 
 	if len(resp.Items) == 0 {
-		err = errors.New("no channels in response")
-		log.Error(err.Error())
-		return
+		return "", err
 	}
 
 	id = resp.Items[0].ContentDetails.RelatedPlaylists.Uploads
 	if id == "" {
-		err = errors.New("recieved empty id")
-		log.Error(err.Error())
+		return "", err
 	}
 
 	return
