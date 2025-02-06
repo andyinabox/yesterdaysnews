@@ -35,6 +35,8 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 	}
 	nextPageToken = resp.NextPageToken
 
+	throttler := time.Tick(s.cfg.ThrottleDownloadsBy)
+
 	wg.Add(len(resp.Items))
 	for _, item := range resp.Items {
 		go func() {
@@ -48,9 +50,9 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 				return
 			}
 
-			if s.cfg.ThrottleDownloadsBy != 0 {
+			if throttler != nil {
 				log.Infof("throttling YouTube ID check for %s", s.cfg.ThrottleDownloadsBy)
-				time.Sleep(s.cfg.ThrottleDownloadsBy)
+				<-throttler
 			}
 
 			// this will error if the video format is not available
