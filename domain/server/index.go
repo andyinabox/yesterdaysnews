@@ -17,9 +17,10 @@ const metaCommentTmpl = `
 
 type IndexRenderContext struct {
 	RenderContext
-	PageTitle      string
-	InitialClipURL string
-	MetaComment    template.HTML
+	PageTitle               string
+	InitialClipURL          string
+	MetaComment             template.HTML
+	FetchClipsWhenLowerThan int
 }
 
 func (s *Server) Index() http.HandlerFunc {
@@ -46,10 +47,11 @@ func (s *Server) Index() http.HandlerFunc {
 		))
 
 		data := IndexRenderContext{
-			RenderContext:  s.renderContext(),
-			PageTitle:      title,
-			InitialClipURL: clipUrl,
-			MetaComment:    metaComment,
+			RenderContext:           s.renderContext(),
+			PageTitle:               title,
+			InitialClipURL:          clipUrl,
+			MetaComment:             metaComment,
+			FetchClipsWhenLowerThan: s.cfg.FetchClipsWhenLowerThan,
 		}
 
 		s.cfg.Templates.ExecuteTemplate(w, "index.html.tmpl", data)

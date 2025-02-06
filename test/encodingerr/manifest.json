@@ -1,0 +1,14 @@
+{
+    "buildDate": "2025-02-05T15:10:56.347357+01:00",
+    "contentDate": "2025-02-04T15:10:56.347358+01:00",
+    "id": "1738764656",
+    "files": {
+        "model": "yesterdays-news.model.json",
+        "clips": [
+            "clips/badvideo.webm",
+            "clips/goodvideo.webm",
+            "clips/badvideo.webm",
+            "clips/goodvideo.webm"
+        ]
+    }
+}

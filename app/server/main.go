@@ -29,7 +29,7 @@ var assets embed.FS
 var importMap string
 
 var verbose, loadAssetsFromFs bool
-var port, prefixLength, minCaptionLength, maxCaptionLength int
+var port, prefixLength, minCaptionLength, maxCaptionLength, fetchClipsWhenLowerThan int
 var maxCaptionDelay, minCaptionDelay float64
 var manifestCheckIntervalStr string
 
@@ -48,6 +48,7 @@ func init() {
 	flag.IntVar(&prefixLength, "p", 2, "markov chain prefix length")
 	flag.IntVar(&minCaptionLength, "minl", 7, "min caption length in words")
 	flag.IntVar(&maxCaptionLength, "maxl", 15, "max caption length in words")
+	flag.IntVar(&fetchClipsWhenLowerThan, "fetchclips", 5, "on frontend, when clips count is lower than this fetch more")
 	flag.Float64Var(&minCaptionDelay, "mind", 3, "min caption delay in seconds")
 	flag.Float64Var(&maxCaptionDelay, "maxd", 7.0, "max caption delay in seconds")
 	flag.IntVar(&port, "port", 8080, "server port")
@@ -82,18 +83,19 @@ func main() {
 	aboutContent := blackfriday.Run(aboutContentMarkdown, blackfriday.WithExtensions(blackfriday.CommonExtensions|blackfriday.Footnotes))
 
 	cfg := &server.Config{
-		Templates:             template.Must(template.ParseFS(templates, "tmpl/*")),
-		AboutContent:          string(aboutContent),
-		ImportMap:             importMap,
-		AssetsDirFS:           os.DirFS(assetsDirPath),
-		AssetsEmbeddedFS:      assetsEmbeddedFs,
-		UseFilesystemAssets:   loadAssetsFromFs,
-		Port:                  port,
-		MinCaptionDelay:       minCaptionDelay,
-		MaxCaptionDelay:       maxCaptionDelay,
-		MinCaptionLength:      minCaptionLength,
-		MaxCaptionLength:      maxCaptionLength,
-		ManifestCheckInterval: manifestCheckInterval,
+		Templates:               template.Must(template.ParseFS(templates, "tmpl/*")),
+		AboutContent:            string(aboutContent),
+		ImportMap:               importMap,
+		AssetsDirFS:             os.DirFS(assetsDirPath),
+		AssetsEmbeddedFS:        assetsEmbeddedFs,
+		UseFilesystemAssets:     loadAssetsFromFs,
+		Port:                    port,
+		MinCaptionDelay:         minCaptionDelay,
+		MaxCaptionDelay:         maxCaptionDelay,
+		MinCaptionLength:        minCaptionLength,
+		MaxCaptionLength:        maxCaptionLength,
+		ManifestCheckInterval:   manifestCheckInterval,
+		FetchClipsWhenLowerThan: fetchClipsWhenLowerThan,
 	}
 
 	err = configloader.Load(cfg)

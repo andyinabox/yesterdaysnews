@@ -12,6 +12,7 @@ function YesterdaysNews({
   captionsResourceUrl,
   initialClipUrl,
   aboutPageUrl,
+  fetchClipsWhenLowerThan,
 }) {
   const [fullscreen, setFullscreen] = useState(false)
 
@@ -63,6 +64,7 @@ function YesterdaysNews({
       clips-resource-url=${clipsResourceUrl}
       initial-clip-url=${initialClipUrl}
       captions-resource-url=${captionsResourceUrl}
+      .fetchClipsWhenLowerThan=${parseInt(fetchClipsWhenLowerThan)}
     ></yesterdays-news-player>
     ${renderNav()}
   `
@@ -76,6 +78,7 @@ customElements.define(
       'initial-clip-url',
       'captions-resource-url',
       'about-page-url',
+      'fetch-clips-when-lower-than',
     ],
   })
 )
