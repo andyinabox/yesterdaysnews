@@ -11,35 +11,71 @@ import (
 	"github.com/charmbracelet/log"
 )
 
-const batchSize = 255
+const MaxBatchSize = 255
 
-type Client struct {
-	width      int
-	height     int
-	sum        pixelSum
-	dir        string
-	errHandler func(error)
+type pixelSum [][3]uint16
+
+func (p pixelSum) Clear() pixelSum {
+	for i := 0; i < len(p); i++ {
+		p[i][0] = 0
+		p[i][1] = 0
+		p[i][2] = 0
+	}
+	return p
 }
 
-func New(dir string, width, height int, errHandler func(error)) *Client {
+type Client struct {
+	errHandler func(error)
+
+	height int
+	width  int
+	dir    string
+	sum    pixelSum
+}
+
+func New(errHandler func(error)) *Client {
 	return &Client{
-		width:      width,
-		height:     height,
-		sum:        make(pixelSum, width*height),
-		dir:        dir,
 		errHandler: errHandler,
 	}
 }
 
-func (c *Client) Run(paths []string, outFile string) (string, error) {
-	return c.run(paths, outFile, 0)
+func (c *Client) Run(paths []string, outFile string, width, height int) (string, error) {
+
+	// setup temp dir
+	var err error
+	c.dir, err = os.MkdirTemp("", "imgavg")
+	if err != nil {
+		return "", fmt.Errorf("error creating tmp dir: %w", err)
+	}
+
+	log.Debugf("created temp dir %q", c.dir)
+
+	// setup bounds
+	c.width = width
+	c.height = height
+	c.sum = make(pixelSum, width*height)
+
+	// run recursively
+	var result string
+	result, err = c.run(paths, outFile, 0)
+	if err != nil {
+		return "", err
+	}
+
+	// cleanup
+	err = os.RemoveAll(c.dir)
+	if err != nil {
+		c.errHandler(fmt.Errorf("error removing temp files: %w", err))
+	}
+
+	return result, nil
 }
 
 func (c *Client) run(paths []string, outFile string, count int) (string, error) {
 	var err error
 
 	// single batch
-	if len(paths) <= batchSize {
+	if len(paths) <= MaxBatchSize {
 		result, err := c.avg(paths, count)
 		if err != nil {
 			return "", fmt.Errorf("error running single batch %d: %w", count, err)
@@ -53,10 +89,11 @@ func (c *Client) run(paths []string, outFile string, count int) (string, error) 
 
 	// break into batches that will generate individual files,
 	// then pass those files into this method recursivley
+	batchSize := getBatchSize(len(paths))
 	batchCount := (len(paths) / batchSize) + 1
 	batchPaths := make([]string, batchCount)
 
-	log.Debugf("breaking into %d batches", batchCount)
+	log.Debugf("breaking into %d batches of %d", batchCount, batchSize)
 	var start, end int
 	for i := 0; i < batchCount; i++ {
 		start = batchSize * i
@@ -65,15 +102,17 @@ func (c *Client) run(paths []string, outFile string, count int) (string, error) 
 			end = len(paths)
 		}
 
+		log.Debug("batch slice", "start", start, "end", end)
+
 		count++
-		batchPaths[i], err = c.avg(batchPaths[start:end], count)
+		batchPaths[i], err = c.avg(paths[start:end], count)
 		if err != nil {
 			return "", fmt.Errorf("error in level %d: %w", count, err)
 		}
 	}
 
 	count++
-	log.Debugf("finished creating intermediary images, now running batch %d", count)
+	log.Debugf("finished creating intermediary images, now running batch %d with %d images", count, len(batchPaths))
 	return c.run(batchPaths, outFile, count)
 }
 
@@ -154,11 +193,4 @@ func (c *Client) avg(paths []string, count int) (string, error) {
 	}
 
 	return outFile, nil
-}
-
-func intMin(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

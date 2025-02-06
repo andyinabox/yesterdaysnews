@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"math"
 	"os"
 	"path/filepath"
 
@@ -11,12 +12,14 @@ import (
 )
 
 var inputGlob, outputFile, workDir string
+var maxImages int
 var verbose bool
 
 func init() {
 	flag.StringVar(&inputGlob, "i", "dist/clips/*.png", "input file glob")
-	flag.StringVar(&outputFile, "o", "dist/average.png", "output file")
+	flag.StringVar(&outputFile, "o", "dist/average-test.png", "output file")
 	flag.StringVar(&workDir, "w", "dist/avg", "working dir for intermediate files")
+	flag.IntVar(&maxImages, "max", math.MaxInt, "max images to process")
 	flag.BoolVar(&verbose, "v", false, "verbose output")
 	flag.Parse()
 
@@ -45,15 +48,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	client := imgavg.New(workDir, imageWidth, imageHeight, func(err error) {
+	client := imgavg.New(func(err error) {
 		log.Error(err)
 	})
 
-	result, err := client.Run(paths, outputFile)
+	if maxImages > len(paths) {
+		maxImages = len(paths)
+	}
+
+	result, err := client.Run(paths[:maxImages], outputFile, imageWidth, imageHeight)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Info("successfully outputed image %q", result)
+	log.Infof("successfully outputed image %q", result)
 }
 
 // func main() {
