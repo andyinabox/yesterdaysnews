@@ -10,6 +10,7 @@ type Manifest struct {
 }
 
 type ManifestFiles struct {
-	ModelFile string   `json:"model"`
-	Clips     []string `json:"clips"`
+	PosterImageFile string   `json:"posterImage"`
+	ModelFile       string   `json:"model"`
+	Clips           []string `json:"clips"`
 }

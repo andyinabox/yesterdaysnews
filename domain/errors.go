@@ -11,6 +11,8 @@ const (
 	ErrTypeDownloadVideo = "ErrTypeDownloadVideo"
 	ErrTypeCutVideo      = "ErrTypeCutVideo"
 	ErrTypeCleanup       = "ErrTypeCleanup"
+	ErrTypeExtractImage  = "ErrTypeExtractImage"
+	ErrTypeAverageImage  = "ErrTypeAverageImage"
 
 	// object store
 	ErrTypeCopyObject   = "ErrTypeCopyObject"

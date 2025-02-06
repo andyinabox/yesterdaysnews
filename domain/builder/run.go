@@ -51,6 +51,16 @@ func (b *Builder) Run(ctx context.Context) error {
 	}
 	log.Infof("processed %d clips", len(manifest.Files.Clips))
 
+	log.Info("generating poster image...")
+	// eventually it would be nice to not break the stream here
+	finishedClipsStream := streams.StringTransformStream(ctx, streams.StringStream(ctx, manifest.Files.Clips...), func(s string) string {
+		return filepath.Join(b.cfg.OutputDir, s)
+	})
+	extractedImagesStream := b.ExtractImages(ctx, finishedClipsStream)
+	posterImage, err := b.PosterImage(ctx, manifest.ID, streams.StringSlice(ctx, extractedImagesStream))
+	manifest.Files.PosterImageFile = posterImage
+	log.Infof("successfully uploaded %q", posterImage)
+
 	log.Info("building model...")
 	modelFile, err := b.Model(ctx, manifest.ID, []domain.Corpus{
 		{
