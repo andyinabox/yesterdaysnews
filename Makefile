@@ -61,7 +61,7 @@ clean-assets:
 
 .PHONY: docker-run-server
 docker-run-server: clean-bin clean-assets bin/server-linux-amd64
-	docker build -f app/server/Dockerfile -t andyinabox/yesterdaysnews-server:dev .
+	docker buildx build --platform linux/amd64 -f app/server/Dockerfile -t andyinabox/yesterdaysnews-server:dev .
 	docker run --rm --env-file .env -p 8080:8080 andyinabox/yesterdaysnews-server:dev
 
 
@@ -81,7 +81,7 @@ docker-run-server: clean-bin clean-assets bin/server-linux-amd64
 
 .PHONY: docker-run-builder
 docker-run-builder: clean-bin bin/builder-linux-amd64
-	docker buildx build --platform linux/arm64 -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder:dev .
+	docker buildx build --platform linux/amd64 -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder:dev .
 	mkdir -p dist
 	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder:dev --output /dist -v
 

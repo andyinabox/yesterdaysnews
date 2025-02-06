@@ -16,12 +16,29 @@ fi
 
 APP=$1
 TAG=$2
+GITTAG=$APP-$TAG
+
+git status
+
+echo "App:     $APP"
+echo "Tag:     $TAG"
+echo "Git tag: $GITTAG"
+
+echo "Please review output above. Continue with tag/release workflow? (y/N)"
+read CONFIRM
+
+if [[ "$CONFIRM" != "y" ]]; then
+    exit 0;
+fi
+
+git tag $GITTAG
+git checkout $GITTAG
 
 # build a fresh binary
 make clean-bin bin/$APP-linux-amd64
 
 # build the container
-docker buildx build --platform linux/arm64\
+docker buildx build --platform linux/amd64\
  -f app/$APP/Dockerfile\
  -t andyinabox/yesterdaysnews-$APP:$TAG .
 
@@ -31,3 +48,6 @@ docker push andyinabox/yesterdaysnews-$APP:$TAG
 # tag as latest and push
 docker tag andyinabox/yesterdaysnews-$APP:$TAG andyinabox/yesterdaysnews-$APP:latest
 docker push andyinabox/yesterdaysnews-$APP:latest
+
+git push --tags
+git checkout main
