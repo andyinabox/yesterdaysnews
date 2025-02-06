@@ -3,9 +3,14 @@ import { createRef, ref } from 'lit/directives/ref.js'
 import { component, useRef, useEffect, useState } from 'haunted'
 import { svgIcon } from '../lib/svg.js'
 import { canAutoplayVideoIfMuted } from '../lib/media.js'
+import { usePlaybackPolling } from '../hooks/use-playback-polling.js'
 import { VideoLoader } from '../lib/video-loader.js'
 
-export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
+export function YesterdaysNewsVideo({
+  resourceUrl,
+  initialClipUrl,
+  fetchClipsWhenLowerThan,
+}) {
   const [showPlayButton, setShowPlayButton] = useState(false)
   const [hasPlayedOnce, setHasPlayedOnce] = useState(false)
   const [videoLoader, setVideoLoader] = useState(null)
@@ -33,10 +38,14 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
     }
   }
 
+  // this should only be necessary in safari, but doesn't seem to
+  // cause any issues in other browsers I've tested
+  usePlaybackPolling(videoEl, loadNextVideo)
+
   // fetch clips on initial load
   useEffect(() => {
-    setVideoLoader(new VideoLoader(resourceUrl, 5))
-  }, [resourceUrl])
+    setVideoLoader(new VideoLoader(resourceUrl, fetchClipsWhenLowerThan))
+  }, [resourceUrl, fetchClipsWhenLowerThan])
 
   // by default show video button if autoplay is disabled
   useEffect(() => {
@@ -59,6 +68,9 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
 
   const onPlay = () => {
     this.dispatchEvent(new Event('play'))
+  }
+
+  const onPlaying = () => {
     setHasPlayedOnce(true)
   }
 
@@ -87,6 +99,7 @@ export function YesterdaysNewsVideo({ resourceUrl, initialClipUrl }) {
       tabindex="-1"
       @ended=${onEnded}
       @play=${onPlay}
+      @playing=${onPlaying}
     >
       <source
         ${ref(sourceEl)}

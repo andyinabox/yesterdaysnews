@@ -31,6 +31,9 @@ type Config struct {
 	MinCaptionLength      int
 	MaxCaptionLength      int
 	ManifestCheckInterval time.Duration
+
+	// frontend vars
+	FetchClipsWhenLowerThan int
 }
 
 type Server struct {
