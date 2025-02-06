@@ -38,6 +38,7 @@ var (
 	playlistIDs              string
 	objectStoreContainerName string
 	outputDir                string
+	throttleDownloadsBy      string
 
 	maxVideoSize                                         int
 	downloadCountPerPlaylist                             int
@@ -58,6 +59,7 @@ func init() {
 	flag.StringVar(&playlistIDs, "playlistids", defaultPlaylists, "comma-separated list of playlists to download")
 	flag.StringVar(&objectStoreContainerName, "containername", "yesterdaysnews", "object storage container name")
 	flag.StringVar(&outputDir, "output", "dist", "dir to output build artifacts to")
+	flag.StringVar(&throttleDownloadsBy, "throttledl", "0s", "throttle downloads by this amount")
 
 	flag.IntVar(&maxVideoSize, "maxvideosize", 52428800, "max video download size in bytes")
 	flag.IntVar(&downloadCountPerPlaylist, "count", 10, "download count per playlist")
@@ -85,6 +87,7 @@ func init() {
 }
 
 func main() {
+	var err error
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -101,6 +104,11 @@ func main() {
 		os.Exit(1)
 	}()
 
+	throttleInterval, err := time.ParseDuration(throttleDownloadsBy)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// load config
 	config := builder.Config{
 		PlaylistIDs:                 strings.Split(playlistIDs, ","),
@@ -116,10 +124,12 @@ func main() {
 		TotalBuildsToKeep:           totalBuildsToKeep,
 		KeepOutputFiles:             keepOutputFiles,
 		SkipUpload:                  skipUpload,
-		HospitalCorpus:              hospitalText,
+		ThrottleDownloadsBy:         throttleInterval,
+
+		HospitalCorpus: hospitalText,
 	}
 	// auto-load env vars
-	err := configloader.Load(&config)
+	err = configloader.Load(&config)
 	if err != nil {
 		log.Fatal(err)
 	}
