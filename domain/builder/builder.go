@@ -5,6 +5,7 @@ import (
 
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/containerservice"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/imageprocessor"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/videoprocessor"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/youtubeservice"
 )
@@ -39,11 +40,13 @@ type Config struct {
 
 	// other
 	HospitalCorpus string
+	OverlayImage   []byte
 }
 
 type Builder struct {
 	yt   domain.YouTubeService
 	vp   domain.VideoProcessor
+	ip   domain.ImageProcessor
 	cs   domain.ContainerService
 	eh   domain.ErrorHandler
 	errs chan<- domain.Error
@@ -64,6 +67,8 @@ func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 		FFProbeBinPath: cfg.BinPathFFPROBE,
 	})
 
+	ip := imageprocessor.New()
+
 	cs := containerservice.New(&containerservice.Config{
 		S3Endpoint:    cfg.S3Endpoint,
 		S3AccessKey:   cfg.S3AccessKey,
@@ -74,6 +79,7 @@ func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 	return &Builder{
 		yt:   yt,
 		vp:   vp,
+		ip:   ip,
 		cs:   cs,
 		eh:   eh,
 		errs: eh.Channel(),
