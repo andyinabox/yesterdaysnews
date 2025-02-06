@@ -32,6 +32,7 @@ if [[ "$CONFIRM" != "y" ]]; then
 fi
 
 git tag $GITTAG
+git push --tags
 git checkout $GITTAG
 
 # build a fresh binary
@@ -49,5 +50,4 @@ docker push andyinabox/yesterdaysnews-$APP:$TAG
 docker tag andyinabox/yesterdaysnews-$APP:$TAG andyinabox/yesterdaysnews-$APP:latest
 docker push andyinabox/yesterdaysnews-$APP:latest
 
-git push --tags
 git checkout main
