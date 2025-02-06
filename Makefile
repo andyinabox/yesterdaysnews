@@ -7,7 +7,7 @@
 
 .PHONY: builder
 builder:
-	go run ./app/builder/main.go
+	go run ./app/builder/main.go --keepoutput
 
 .PHONY: builder-local
 builder-local:

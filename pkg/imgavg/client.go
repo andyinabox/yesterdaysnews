@@ -102,6 +102,12 @@ func (c *Client) run(paths []string, outFile string, count int) (string, error) 
 			end = len(paths)
 		}
 
+		// skip a batch of size 0
+		if start == end {
+			log.Warnf("found batch of size zero, skipping")
+			continue
+		}
+
 		log.Debug("batch slice", "start", start, "end", end)
 
 		count++
@@ -162,6 +168,10 @@ func (c *Client) avg(paths []string, count int) (string, error) {
 		}
 
 		completed++
+	}
+
+	if completed == 0 {
+		return "", fmt.Errorf("no pixels collected")
 	}
 
 	img := image.NewNRGBA(image.Rect(0, 0, c.width, c.height))
