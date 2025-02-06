@@ -48,6 +48,11 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 				return
 			}
 
+			if s.cfg.ThrottleDownloadsBy != 0 {
+				log.Infof("throttling YouTube ID check for %s", s.cfg.ThrottleDownloadsBy)
+				time.Sleep(s.cfg.ThrottleDownloadsBy)
+			}
+
 			// this will error if the video format is not available
 			videoInfo, err := s.ytdl.GetVideoInfo(ctx, id, VideoFormatString)
 			if err != nil {
@@ -77,10 +82,6 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 			ids = append(ids, id)
 			mu.Unlock()
 		}()
-		if s.cfg.ThrottleDownloadsBy != 0 {
-			log.Infof("throttling YouTube ID check for %s", s.cfg.ThrottleDownloadsBy)
-			time.Sleep(s.cfg.ThrottleDownloadsBy)
-		}
 	}
 
 	wg.Wait()
