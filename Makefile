@@ -59,33 +59,18 @@ clean-assets:
 
 # server
 
-.PHONY: docker-build-server
-docker-build-server: clean-bin clean-assets bin/server-linux-amd64
-	docker build -f app/server/Dockerfile -t andyinabox/yesterdaysnews-server .
-
 .PHONY: docker-run-server
-docker-run-server:
-	docker run --rm --env-file .env -p 8080:8080 andyinabox/yesterdaysnews-server
-
-.PHONY: docker-push-server
-docker-push-server:
-	docker push andyinabox/yesterdaysnews-server
+docker-run-server: clean-bin clean-assets bin/server-linux-amd64
+	docker buildx build --platform linux/amd64 -f app/server/Dockerfile -t andyinabox/yesterdaysnews-server:dev .
+	docker run --rm --env-file .env -p 8080:8080 andyinabox/yesterdaysnews-server:dev
 
 # builder
 
-.PHONY: docker-build-builder
-docker-build-builder: clean-bin bin/builder-linux-amd64
-	docker buildx build --platform linux/arm64 -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder .
-
 .PHONY: docker-run-builder
-docker-run-builder:
+docker-run-builder: clean-bin bin/builder-linux-amd64
+	docker buildx build --platform linux/amd64 -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder:dev .
 	mkdir -p dist
-	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder --output /dist -v
-
-.PHONY: docker-push-builder
-docker-push-builder:
-	docker push andyinabox/yesterdaysnews-builder
-
+	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder:dev --output /dist -v
 
 #
 # file-based targets
