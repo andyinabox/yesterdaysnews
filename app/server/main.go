@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io/fs"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -21,6 +22,9 @@ var templates embed.FS
 
 //go:embed about.md
 var aboutContentMarkdown []byte
+
+//go:embed description.txt
+var siteDescription string
 
 //go:embed .assets/*
 var assets embed.FS
@@ -86,6 +90,7 @@ func main() {
 		Templates:               template.Must(template.ParseFS(templates, "tmpl/*")),
 		AboutContent:            string(aboutContent),
 		ImportMap:               importMap,
+		SiteDescription:         strings.TrimSpace(siteDescription),
 		AssetsDirFS:             os.DirFS(assetsDirPath),
 		AssetsEmbeddedFS:        assetsEmbeddedFs,
 		UseFilesystemAssets:     loadAssetsFromFs,

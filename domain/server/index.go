@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"math/rand"
 	"net/http"
+
+	"github.com/charmbracelet/log"
 )
 
 const metaCommentTmpl = `
@@ -17,7 +19,6 @@ const metaCommentTmpl = `
 
 type IndexRenderContext struct {
 	RenderContext
-	PageTitle               string
 	InitialClipURL          string
 	MetaComment             template.HTML
 	FetchClipsWhenLowerThan int
@@ -33,12 +34,6 @@ func (s *Server) Index() http.HandlerFunc {
 			s.manifest.Files.Clips[rand.Intn(len(s.manifest.Files.Clips))],
 		)
 
-		title := "yesterday's news"
-
-		if s.manifest != nil {
-			title = s.manifest.ContentDate.Format("Monday, January 2, 2006")
-		}
-
 		metaComment := template.HTML(fmt.Sprintf(
 			metaCommentTmpl,
 			s.manifest.BuildDate,
@@ -48,12 +43,18 @@ func (s *Server) Index() http.HandlerFunc {
 
 		data := IndexRenderContext{
 			RenderContext:           s.renderContext(),
-			PageTitle:               title,
 			InitialClipURL:          clipUrl,
 			MetaComment:             metaComment,
 			FetchClipsWhenLowerThan: s.cfg.FetchClipsWhenLowerThan,
 		}
 
-		s.cfg.Templates.ExecuteTemplate(w, "index.html.tmpl", data)
+		if s.manifest != nil {
+			data.PageTitle = s.manifest.ContentDate.Format("Monday, January 2, 2006")
+		}
+
+		err := s.cfg.Templates.ExecuteTemplate(w, "index.html.tmpl", data)
+		if err != nil {
+			log.Error(err)
+		}
 	}
 }

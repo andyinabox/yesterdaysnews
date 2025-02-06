@@ -3,26 +3,28 @@ package server
 import (
 	"html/template"
 	"net/http"
+
+	"github.com/charmbracelet/log"
 )
 
 type AboutRenderContext struct {
 	RenderContext
-	PageTitle    string
 	AboutContent template.HTML
 }
 
 func (s *Server) About() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		title := "yesterday's news"
 
 		data := AboutRenderContext{
 			RenderContext: s.renderContext(),
-			PageTitle:     title,
 			AboutContent:  template.HTML(s.cfg.AboutContent),
 		}
 
-		s.cfg.Templates.ExecuteTemplate(w, "about.html.tmpl", data)
+		err := s.cfg.Templates.ExecuteTemplate(w, "about.html.tmpl", data)
+		if err != nil {
+			log.Error(err)
+		}
 	}
 
 }
