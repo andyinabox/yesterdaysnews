@@ -21,7 +21,7 @@ func (c *Client) DownloadVideo(ctx context.Context, url string, req Request) (*Y
 	video := YouTubeVideo{}
 	err = json.Unmarshal(result, &video)
 	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling video download result: %w: %s", err, string(result))
+		return nil, fmt.Errorf("error unmarshaling video download result: %w: %s", err, string(result[:100000]))
 	}
 
 	return &video, err
