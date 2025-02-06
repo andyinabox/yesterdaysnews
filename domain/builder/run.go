@@ -37,19 +37,18 @@ func (b *Builder) Run(ctx context.Context) error {
 	downloadPathStream := b.DownloadVideos(ctx, manifest.ContentDate)
 	clipPathsStream := b.CutVideos(ctx, downloadPathStream)
 
-	var clipUploadPathsStream <-chan string
-
 	// skip uploading files
 	if b.cfg.SkipUpload {
-		clipUploadPathsStream = streams.StringTransformStream(ctx, clipPathsStream, func(s string) string {
+		clipPathsStream = streams.StringTransformStream(ctx, clipPathsStream, func(s string) string {
 			return strings.TrimPrefix(s, b.cfg.OutputDir+"/")
 		})
+		manifest.Files.Clips = streams.StringSlice(ctx, clipPathsStream)
+
 		// upload files
 	} else {
-		clipUploadPathsStream = b.UploadVideos(ctx, manifest.ID, clipPathsStream)
+		uploadPathsStream := b.UploadVideos(ctx, manifest.ID, clipPathsStream)
+		manifest.Files.Clips = streams.StringSlice(ctx, uploadPathsStream)
 	}
-
-	manifest.Files.Clips = streams.StringSlice(ctx, clipUploadPathsStream)
 	log.Infof("processed %d clips", len(manifest.Files.Clips))
 
 	log.Info("generating poster image...")

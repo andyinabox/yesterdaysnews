@@ -41,9 +41,11 @@ var (
 	playlistIDs              string
 	objectStoreContainerName string
 	outputDir                string
+	throttleDownloadsBy      string
 
 	maxVideoSize                                         int
 	downloadCountPerPlaylist                             int
+	maxPlaylistRequests                                  int
 	minClipLengthSeconds, maxClipLengthSeconds           int
 	captionPrefixLength                                  int
 	captionNewsCorpusWeight, captionHospitalCorpusWeight int
@@ -61,9 +63,11 @@ func init() {
 	flag.StringVar(&playlistIDs, "playlistids", defaultPlaylists, "comma-separated list of playlists to download")
 	flag.StringVar(&objectStoreContainerName, "containername", "yesterdaysnews", "object storage container name")
 	flag.StringVar(&outputDir, "output", "dist", "dir to output build artifacts to")
+	flag.StringVar(&throttleDownloadsBy, "throttledl", "0s", "throttle downloads by this amount")
 
 	flag.IntVar(&maxVideoSize, "maxvideosize", 52428800, "max video download size in bytes")
 	flag.IntVar(&downloadCountPerPlaylist, "count", 10, "download count per playlist")
+	flag.IntVar(&maxPlaylistRequests, "maxplaylistreq", 3, "the maximum times to request a new playlist page before giving up")
 	flag.IntVar(&minClipLengthSeconds, "mincliplength", 5, "minimum clip length in seconds")
 	flag.IntVar(&maxClipLengthSeconds, "maxcliplength", 15, "maximum clip length in seconds")
 	flag.IntVar(&captionPrefixLength, "prefixlength", 2, "caption chain prefix length")
@@ -88,6 +92,7 @@ func init() {
 }
 
 func main() {
+	var err error
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -104,6 +109,11 @@ func main() {
 		os.Exit(1)
 	}()
 
+	throttleInterval, err := time.ParseDuration(throttleDownloadsBy)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// load config
 	config := builder.Config{
 		PlaylistIDs:                 strings.Split(playlistIDs, ","),
@@ -111,6 +121,7 @@ func main() {
 		OutputDir:                   outputDir,
 		MaxVideoSize:                uint(maxVideoSize),
 		DownloadCountPerPlaylist:    downloadCountPerPlaylist,
+		MaxPlaylistRequests:         maxPlaylistRequests,
 		MinClipLengthSeconds:        minClipLengthSeconds,
 		MaxClipLengthSeconds:        maxClipLengthSeconds,
 		CaptionPrefixLength:         captionPrefixLength,
@@ -119,11 +130,13 @@ func main() {
 		TotalBuildsToKeep:           totalBuildsToKeep,
 		KeepOutputFiles:             keepOutputFiles,
 		SkipUpload:                  skipUpload,
-		HospitalCorpus:              hospitalText,
-		OverlayImage:                overlayImage,
+		ThrottleDownloadsBy:         throttleInterval,
+
+		HospitalCorpus: hospitalText,
+		OverlayImage:   overlayImage,
 	}
 	// auto-load env vars
-	err := configloader.Load(&config)
+	err = configloader.Load(&config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -171,8 +184,10 @@ func main() {
 	case domain.BuildPhaseModel:
 		err = buildModel(ctx, &config, eh)
 		handleBuildPhaseErr(err)
+
 	case domain.BuildPhaseManifest:
-		log.Fatalf("manifest build step not implemented")
+		err = buildManifest(ctx, &config, eh)
+		handleBuildPhaseErr(err)
 
 	case domain.BuildPhasePromote:
 		err = buildPromote(ctx, &config, eh)
@@ -346,6 +361,41 @@ func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 		prev = cg.Caption(prev)
 		fmt.Println(prev)
 	}
+
+	return nil
+}
+
+func buildManifest(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
+	b := builder.New(config, eh)
+
+	clips, err := filepath.Glob("dist/clips/*.webm")
+	if err != nil {
+		return err
+	}
+
+	buildDate := time.Now()
+	buildID := util.Timestamp(buildDate)
+
+	manifest := &domain.Manifest{
+		BuildDate:   buildDate,
+		ContentDate: util.Yesterday(),
+		ID:          buildID,
+		Files: domain.ManifestFiles{
+			ModelFile: domain.ModelFileName,
+			Clips:     make([]string, len(clips)),
+		},
+	}
+
+	for i, clip := range clips {
+		manifest.Files.Clips[i] = strings.Replace(clip, "dist/", "", 1)
+	}
+
+	result, err := b.Manifest(ctx, buildID, manifest)
+	if err != nil {
+		return err
+	}
+
+	log.Infof("successfully generated %q", result)
 
 	return nil
 }

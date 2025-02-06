@@ -5,6 +5,7 @@ export function YesterdaysNewsPlayer({
   clipsResourceUrl,
   captionsResourceUrl,
   initialClipUrl,
+  fetchClipsWhenLowerThan,
 }) {
   const [showCaptions, setShowCaptions] = useState(false)
 
@@ -24,6 +25,7 @@ export function YesterdaysNewsPlayer({
       @play=${onVideoPlay}
       resource-url=${clipsResourceUrl}
       initial-clip-url=${initialClipUrl}
+      .fetchClipsWhenLowerThan=${fetchClipsWhenLowerThan}
     ></yesterdays-news-video>
     ${renderCaptions()}
   `

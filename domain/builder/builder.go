@@ -1,6 +1,8 @@
 package builder
 
 import (
+	"time"
+
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/containerservice"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/imageprocessor"
@@ -25,6 +27,7 @@ type Config struct {
 	OutputDir                   string
 	MaxVideoSize                uint
 	DownloadCountPerPlaylist    int
+	MaxPlaylistRequests         int
 	MinClipLengthSeconds        int
 	MaxClipLengthSeconds        int
 	CaptionPrefixLength         int
@@ -33,6 +36,7 @@ type Config struct {
 	TotalBuildsToKeep           int
 	KeepOutputFiles             bool
 	SkipUpload                  bool
+	ThrottleDownloadsBy         time.Duration
 
 	// other
 	HospitalCorpus string
@@ -52,8 +56,10 @@ type Builder struct {
 func New(cfg *Config, eh domain.ErrorHandler) *Builder {
 
 	yt := youtubeservice.New(&youtubeservice.Config{
-		GoogleAPIKey: cfg.GoogleAPIKey,
-		BinPathYTDLP: cfg.BinPathYTDLP,
+		GoogleAPIKey:        cfg.GoogleAPIKey,
+		BinPathYTDLP:        cfg.BinPathYTDLP,
+		MaxPlaylistRequests: cfg.MaxPlaylistRequests,
+		ThrottleDownloadsBy: cfg.ThrottleDownloadsBy,
 	})
 
 	vp := videoprocessor.New(&videoprocessor.Config{

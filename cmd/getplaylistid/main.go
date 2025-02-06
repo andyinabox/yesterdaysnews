@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
@@ -35,12 +36,14 @@ func init() {
 
 func main() {
 	dl := youtubeservice.New(&youtubeservice.Config{
-		GoogleAPIKey: os.Getenv("GOOGLE_API_KEY"),
+		GoogleAPIKey:        os.Getenv("YN_GOOGLE_API_KEY"),
+		MaxPlaylistRequests: 10,
+		ThrottleDownloadsBy: time.Duration(0),
 	})
 
 	id, err := dl.GetChannelPlaylistID(context.Background(), channelName)
 	if err != nil {
-		log.Fatal(id)
+		log.Fatal(err)
 	}
 
 	fmt.Println(id)

@@ -48,6 +48,11 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 				return
 			}
 
+			if s.cfg.ThrottleDownloadsBy != 0 {
+				log.Infof("throttling YouTube ID check for %s", s.cfg.ThrottleDownloadsBy)
+				time.Sleep(s.cfg.ThrottleDownloadsBy)
+			}
+
 			// this will error if the video format is not available
 			videoInfo, err := s.ytdl.GetVideoInfo(ctx, id, VideoFormatString)
 			if err != nil {
@@ -91,7 +96,6 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 		close(stream)
 	}
 
-	maxRequests := 20
 	totalRequests := 0
 
 	go func() {
@@ -107,10 +111,10 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 			case <-ctx.Done():
 				return
 			default:
-				log.Debugf("fetch video ids for %q", playlistId)
+				log.Infof("fetch video ids for %q", playlistId)
 
-				if totalRequests >= maxRequests {
-					log.Warnf("reached max requests for playlist %q, aborting", playlistId)
+				if totalRequests >= s.cfg.MaxPlaylistRequests {
+					log.Warnf("reached max requests of %d for playlist %q", s.cfg.MaxPlaylistRequests, playlistId)
 					return
 				}
 
@@ -122,7 +126,7 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 				}
 
 				for _, id := range ids {
-					log.Debugf("found valid video id: %q", id)
+					log.Infof("found valid video id: %q", id)
 					stream <- id
 					total++
 					if total >= count {

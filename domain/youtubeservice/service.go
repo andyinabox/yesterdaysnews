@@ -1,6 +1,8 @@
 package youtubeservice
 
 import (
+	"time"
+
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
 )
@@ -9,8 +11,10 @@ const VideoFormatString = "bv[ext=webm][width<=1280][aspect_ratio>1]"
 const VideoSubFormat = "vtt"
 
 type Config struct {
-	GoogleAPIKey string
-	BinPathYTDLP string
+	GoogleAPIKey        string
+	BinPathYTDLP        string
+	MaxPlaylistRequests int
+	ThrottleDownloadsBy time.Duration
 }
 
 type Service struct {
