@@ -2,7 +2,7 @@ import { html } from 'lit'
 import { component, useState, useEffect } from 'haunted'
 
 import { calcVideoDimensions, canRequestFullscreen } from '../lib/media.js'
-import { useConstructableStylesheets } from '../lib/hooks.js'
+import { useConstructableStylesheets } from '../hooks/use-constructable-stylesheets.js'
 import { svgSymbols } from '../lib/svg.js'
 
 import styles from './yesterdays-news.styles.js'

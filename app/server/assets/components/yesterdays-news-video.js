@@ -3,6 +3,7 @@ import { createRef, ref } from 'lit/directives/ref.js'
 import { component, useRef, useEffect, useState } from 'haunted'
 import { svgIcon } from '../lib/svg.js'
 import { canAutoplayVideoIfMuted } from '../lib/media.js'
+import { usePlaybackPolling } from '../hooks/use-playback-polling.js'
 import { VideoLoader } from '../lib/video-loader.js'
 
 export function YesterdaysNewsVideo({
@@ -13,10 +14,6 @@ export function YesterdaysNewsVideo({
   const [showPlayButton, setShowPlayButton] = useState(false)
   const [hasPlayedOnce, setHasPlayedOnce] = useState(false)
   const [videoLoader, setVideoLoader] = useState(null)
-  const [needsReload, setNeedsReload] = useState(false)
-
-  // react-style ref
-  const isPlaying = useRef(false)
 
   // lit-style dom refs
   const videoEl = createRef()
@@ -41,6 +38,10 @@ export function YesterdaysNewsVideo({
     }
   }
 
+  // this should only be necessary in safari, but doesn't seem to
+  // cause any issues in other browsers I've tested
+  usePlaybackPolling(videoEl, loadNextVideo)
+
   // fetch clips on initial load
   useEffect(() => {
     setVideoLoader(new VideoLoader(resourceUrl, fetchClipsWhenLowerThan))
@@ -60,52 +61,20 @@ export function YesterdaysNewsVideo({
     }
   }, [videoEl.value, hasPlayedOnce])
 
-  useEffect(() => {
-    let count = 0
-    const int = setInterval(() => {
-      console.log('isPlaying', isPlaying.current)
-
-      if (isPlaying.current) {
-        count = 0
-      } else {
-        count++
-      }
-
-      if (count > 2) {
-        console.log('polling caught loading error, load next video')
-        setNeedsReload(true)
-      }
-    }, 200)
-    return () => clearInterval(int)
-  }, [])
-
-  useEffect(() => {
-    console.log('needs reload')
-    if (needsReload) {
-      loadNextVideo()
-    }
-    setNeedsReload(false)
-  }, [needsReload])
-
   // event handlers
   const onEnded = () => {
-    isPlaying.current = false
     loadNextVideo()
   }
 
   const onPlay = () => {
-    console.log('play')
     this.dispatchEvent(new Event('play'))
   }
 
   const onPlaying = () => {
-    console.log('playing')
-    isPlaying.current = true
     setHasPlayedOnce(true)
   }
 
   const onSourceError = () => {
-    isPlaying.current = false
     loadNextVideo()
   }
 
