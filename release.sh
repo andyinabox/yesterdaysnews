@@ -18,7 +18,15 @@ APP=$1
 TAG=$2
 GITTAG=$APP-$TAG
 
-git status
+echo ""
+echo "repo status:"
+echo ""
+git status --short --branch
+
+echo ""
+echo "existing tags:"
+echo ""
+git tag | grep $APP
 
 echo ""
 echo "App:     $APP"
