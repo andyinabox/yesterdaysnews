@@ -21,6 +21,7 @@ export function YesterdaysNewsPlayer({
   }
 
   return html`
+    <yesterdays-news-static></yesterdays-news-static>
     <yesterdays-news-video
       @play=${onVideoPlay}
       resource-url=${clipsResourceUrl}

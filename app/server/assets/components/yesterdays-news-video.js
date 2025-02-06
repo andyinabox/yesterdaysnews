@@ -1,6 +1,6 @@
 import { html } from 'lit'
 import { createRef, ref } from 'lit/directives/ref.js'
-import { component, useRef, useEffect, useState } from 'haunted'
+import { component, useEffect, useState } from 'haunted'
 import { svgIcon } from '../lib/svg.js'
 import { canAutoplayVideoIfMuted } from '../lib/media.js'
 import { usePlaybackPolling } from '../hooks/use-playback-polling.js'

@@ -1,5 +1,6 @@
 import './components/yesterdays-news-captions.js'
 import './components/yesterdays-news-video.js'
+import './components/yesterdays-news-static.js'
 import './components/yesterdays-news-player.js'
 import './components/yesterdays-news-nav.js'
 import './components/yesterdays-news.js'

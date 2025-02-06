@@ -33,9 +33,21 @@ yesterdays-news-player {
   height: var(--yn-video-height);
   background-color: #111;
 }
+
+yesterdays-news-static {
+  display: block;
+}
+yesterdays-news-static > canvas {
+  width: var(--yn-video-width);
+  height: var(--yn-video-height);
+}
+
 yesterdays-news-video {
   display: block;
+  position: absolute;
   z-index: 0;
+  top: 0px;
+  left: 0px;
 }
 yesterdays-news-video > video {
   width: var(--yn-video-width);
