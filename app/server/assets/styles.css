@@ -52,4 +52,19 @@ article {
 yesterdays-news {
   width: 100vw;
   height: 100vh;
+  /* background: var(--yn-background-image);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: 50% 50%; */
+}
+
+canvas#static {
+  border; none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100vw;
+  height: 55vw;
+  background-color: #ccc;
+  transform: translate(-50%, -50%);
 }
