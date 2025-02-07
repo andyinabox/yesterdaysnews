@@ -1,20 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    {{template "head-meta.html.tmpl" .}}
     {{ .MetaComment }}
+    {{template "head-meta.html.tmpl" .}}
+    {{ .ImportMap }}
+    <script async type="module" src="{{ .AssetsPath }}/script.js"></script>
   </head>
   <body>
-
     <yesterdays-news
       clips-resource-url="/clips"
       captions-resource-url="/captions"
       about-page-url="/about"
       initial-clip-url="{{.InitialClipURL}}"
       fetch-clips-when-lower-than="{{ .FetchClipsWhenLowerThan }}"
-    ></yesterdays-news>
+    >
+    <canvas id="static"></canvas>
+    <script>
+      const ctx = document.getElementById('static').getContext('2d')
+      const tick = () => {
+        imageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height)
+        data = imageData.data
 
-    {{ .ImportMap }}
-    <script type="module" src="{{ .AssetsPath }}/script.js"></script>
+        for (let i = 0; i < data.length; i += 4) {
+          const value = Math.random() * 127
+          data[i] = value // red
+          data[i + 1] = value // green
+          data[i + 2] = value // blue
+          data[i + 3] = 255 // alpha
+        }
+
+        ctx.putImageData(imageData, 0, 0)
+        requestAnimationFrame(tick)
+      }
+      requestAnimationFrame(tick)
+    </script>
+    </yesterdays-news>
   </body>
 </html>

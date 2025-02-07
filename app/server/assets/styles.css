@@ -53,3 +53,12 @@ yesterdays-news {
   width: 100vw;
   height: 100vh;
 }
+
+canvas#static {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100vw;
+  height: 55vw;
+  transform: translate(-50%, -50%);
+}
