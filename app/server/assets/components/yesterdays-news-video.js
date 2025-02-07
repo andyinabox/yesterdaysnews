@@ -68,9 +68,6 @@ export function YesterdaysNewsVideo({
 
   const onPlay = () => {
     this.dispatchEvent(new Event('play'))
-  }
-
-  const onPlaying = () => {
     setHasPlayedOnce(true)
   }
 
@@ -99,7 +96,6 @@ export function YesterdaysNewsVideo({
       tabindex="-1"
       @ended=${onEnded}
       @play=${onPlay}
-      @playing=${onPlaying}
     >
       <source
         ${ref(sourceEl)}
