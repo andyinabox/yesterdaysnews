@@ -97,6 +97,7 @@ export function YesterdaysNewsVideo({
     return () => clearInterval(int)
   }, [])
 
+  // respond to needsReload and load next video
   useEffect(() => {
     if (needsReload) loadNextVideo()
     setNeedsReload(false)
