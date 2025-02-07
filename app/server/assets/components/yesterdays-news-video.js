@@ -128,7 +128,7 @@ export function YesterdaysNewsVideo({
     setNeedsReload(true)
   }
 
-  // video has started autplay, or the .play method is triggered
+  // video playback has been requested by autoplay or `.play()` method
   // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play_event
   const onPlay = () => {}
 
