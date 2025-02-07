@@ -1,4 +1,4 @@
-import { component, useState, useEffect, useRef } from 'haunted'
+import { useState, useEffect, useRef } from 'haunted'
 
 const PLAYBACK_FAIL_LIMIT = 1
 

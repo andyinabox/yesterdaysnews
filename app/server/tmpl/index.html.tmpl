@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    {{template "head-meta.html.tmpl" .}}
     {{ .MetaComment }}
+    {{template "head-meta.html.tmpl" .}}
+    {{ .ImportMap }}
+    <script type="module" src="{{ .AssetsPath }}/script.js"></script>
   </head>
   <body>
-
     <yesterdays-news
       clips-resource-url="/clips"
       captions-resource-url="/captions"
@@ -13,8 +14,5 @@
       initial-clip-url="{{.InitialClipURL}}"
       fetch-clips-when-lower-than="{{ .FetchClipsWhenLowerThan }}"
     ></yesterdays-news>
-
-    {{ .ImportMap }}
-    <script type="module" src="{{ .AssetsPath }}/script.js"></script>
   </body>
 </html>

@@ -8,9 +8,20 @@ export function YesterdaysNewsPlayer({
   fetchClipsWhenLowerThan,
 }) {
   const [showCaptions, setShowCaptions] = useState(false)
+  const [showStatic, setShowStatic] = useState(true)
 
-  const onVideoPlay = () => {
+  const onVideoPlaying = () => {
     setShowCaptions(true)
+    setShowStatic(false)
+  }
+
+  const onVideoStopped = () => {
+    setShowStatic(true)
+  }
+
+  const renderStatic = () => {
+    if (!showStatic) return
+    return html`<yesterdays-news-static></yesterdays-news-static>`
   }
 
   const renderCaptions = () => {
@@ -21,9 +32,10 @@ export function YesterdaysNewsPlayer({
   }
 
   return html`
-    <yesterdays-news-static></yesterdays-news-static>
+    ${renderStatic()}
     <yesterdays-news-video
-      @play=${onVideoPlay}
+      @playing=${onVideoPlaying}
+      @stopped=${onVideoStopped}
       resource-url=${clipsResourceUrl}
       initial-clip-url=${initialClipUrl}
       .fetchClipsWhenLowerThan=${fetchClipsWhenLowerThan}
