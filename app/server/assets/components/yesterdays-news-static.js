@@ -2,6 +2,10 @@ import { html } from 'lit'
 import { createRef, ref } from 'lit/directives/ref.js'
 import { component, useEffect, useState } from 'haunted'
 
+// not sure if this work the way I think in JS, but in
+// theory it prevents re-allocating memory every frame?
+let imageData, data
+
 export function YesterdaysNewsStatic() {
   const canvasEl = createRef()
 
@@ -12,8 +16,8 @@ export function YesterdaysNewsStatic() {
 
     const tick = () => {
       const ctx = canvasEl.value.getContext('2d')
-      const imageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height)
-      const data = imageData.data
+      imageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height)
+      data = imageData.data
 
       for (let i = 0; i < data.length; i += 4) {
         const value = Math.random() * 127
