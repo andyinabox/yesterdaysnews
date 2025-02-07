@@ -47,8 +47,8 @@ server-docker: clean-bin clean-assets bin/server-linux-amd64
 objectstoremock:
 	go run ./cmd/objectstoremock/main.go
 
-.PHONY: clean-dist clean-bin clean-assets
-clean:
+.PHONY: clean
+clean: clean-dist clean-bin clean-assets
 
 .PHONY: clean-dist
 clean-dist:
@@ -68,7 +68,7 @@ clean-assets:
 
 # binaries
 
-bin/server-linux-amd64: app/server/.assets
+bin/server-linux-amd64: clean-assetsapp/server/.assets
 	GOOS=linux GOARCH=amd64 go build -o $@ ./app/server/main.go
 
 bin/builder-linux-amd64:
