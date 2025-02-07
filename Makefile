@@ -68,7 +68,7 @@ clean-assets:
 
 # binaries
 
-bin/server-linux-amd64: clean-assetsapp/server/.assets
+bin/server-linux-amd64: clean-assets app/server/.assets
 	GOOS=linux GOARCH=amd64 go build -o $@ ./app/server/main.go
 
 bin/builder-linux-amd64:
