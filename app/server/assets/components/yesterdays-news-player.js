@@ -1,11 +1,13 @@
 import { html } from 'lit'
 import { component, useState } from 'haunted'
+import { loadingIcon } from '../lib/svg.js'
 
 export function YesterdaysNewsPlayer({
   clipsResourceUrl,
   captionsResourceUrl,
   initialClipUrl,
   fetchClipsWhenLowerThan,
+  assetsPath,
 }) {
   const [showCaptions, setShowCaptions] = useState(false)
   const [showStatic, setShowStatic] = useState(true)
@@ -33,6 +35,13 @@ export function YesterdaysNewsPlayer({
     ></yesterdays-news-captions>`
   }
 
+  const renderLoading = () => {
+    if (!showStatic) return
+    return html`<span class="centered-icon loading-icon"
+      >${loadingIcon(assetsPath)}</span
+    >`
+  }
+
   return html`
     ${renderStatic()}
     <yesterdays-news-video
@@ -42,7 +51,7 @@ export function YesterdaysNewsPlayer({
       initial-clip-url=${initialClipUrl}
       .fetchClipsWhenLowerThan=${fetchClipsWhenLowerThan}
     ></yesterdays-news-video>
-    ${renderCaptions()}
+    ${renderCaptions()} ${renderLoading()}
   `
 }
 
@@ -53,6 +62,7 @@ customElements.define(
       'clips-resource-url',
       'initial-clip-url',
       'captions-resource-url',
+      'assets-path',
     ],
     useShadowDOM: false,
   })

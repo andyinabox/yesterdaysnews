@@ -11,10 +11,14 @@
       clips-resource-url="/clips"
       captions-resource-url="/captions"
       about-page-url="/about"
+      assets-path="{{ .AssetsPath }}"
       initial-clip-url="{{.InitialClipURL}}"
       fetch-clips-when-lower-than="{{ .FetchClipsWhenLowerThan }}"
     >
     <canvas id="static"></canvas>
+    <div class="centered-icon loading-icon">
+      <img src="{{ .AssetsPath }}/loading.svg" />
+    </div>
     <script>
       const ctx = document.getElementById('static').getContext('2d')
       const tick = () => {

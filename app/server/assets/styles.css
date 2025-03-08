@@ -16,6 +16,19 @@
   --yn-content-max-width: 1280px;
 }
 
+.loading-icon {
+  z-index: 5;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: none;
+  padding: 0;
+  width: 20vmin;
+  height: 20vmin;
+}
+
 body {
   background-color: var(--yn-color-background);
   color: var(--yn-color-foreground);
