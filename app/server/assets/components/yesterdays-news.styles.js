@@ -3,7 +3,7 @@ import { css } from 'lit'
 export default css`
 :host {
   --yn-nav-btn-size: 10vmin;
-  --yn-loading-icon-size: 15vmin;
+  --yn-loading-icon-size: 20vmin;
   --yn-nav-btn-margin: 2vmin;
   /* these will be set with javascript */
   --yn-video-width: 0px;
@@ -31,35 +31,46 @@ svg > use {
   0% {
     opacity: 0%
   }
-  33% {
+  25% {
     opacity: 100%;
+  }
+  50% {
+    opacity: 0%;
   }
 }
 
 @keyframes changeOpacity2 {
   0% {
+    opacity: 0%;
+  }
+  25% {
     opacity: 0%
   }
-  66% {
+  50% {
     opacity: 100%;
+  }
+  75% {
+    opacity: 0%;
   }
 }
 
 @keyframes changeOpacity3 {
   0% {
-    opacity: 0%
+    opacity: 0%;
+  }
+  50% {
+    opacity: 0%;
+  }
+  75% {
+    opacity: 100%
   }
   100% {
-    opacity: 100%;
+    opacity: 0%;
   }
 }
 
 
 .loading-icon {
-  // --wave-1-opacity: 30%;
-  // --wave-2-opacity: 60%;
-  // --wave-3-opacity: 90%;
-
   fill: #fff;
   width: var(--yn-loading-icon-size);
   height: var(--yn-loading-icon-size);
@@ -70,19 +81,17 @@ svg > use {
 .loading-icon .wave3 {
   animation-duration: 2s;
   animation-iteration-count: infinite;
+  animation-timing-function: step-end;
 }
 
 .loading-icon .wave1 {
   animation-name: changeOpacity3;
-  // animation-delay: 0s;
 }
 .loading-icon .wave2 {
   animation-name: changeOpacity2;
-  // animation-delay: 1s;
 }
 .loading-icon .wave3 {
   animation-name: changeOpacity1;
-  // animation-delay: 2s;
 }
 
 
