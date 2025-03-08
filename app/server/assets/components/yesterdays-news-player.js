@@ -21,7 +21,9 @@ export function YesterdaysNewsPlayer({
 
   const renderStatic = () => {
     if (!showStatic) return
-    return html`<yesterdays-news-static></yesterdays-news-static>`
+    return html`<yesterdays-news-static
+      .maxBrightness=${48}
+    ></yesterdays-news-static>`
   }
 
   const renderCaptions = () => {

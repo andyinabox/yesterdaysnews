@@ -1,7 +1,7 @@
 import { html } from 'lit'
 import { createRef, ref } from 'lit/directives/ref.js'
 import { component, useEffect, useState, useRef } from 'haunted'
-import { svgIcon } from '../lib/svg.js'
+import { svgIcon, loadingIcon } from '../lib/svg.js'
 import { canAutoplayVideoIfMuted } from '../lib/media.js'
 import { VideoLoader } from '../lib/video-loader.js'
 
@@ -158,10 +158,19 @@ export function YesterdaysNewsVideo({
       videoEl.value.play()
     }
     if (showPlayButton) {
-      return html`<button @click=${onPlayClick} class="play-button">
+      return html`<button
+        @click=${onPlayClick}
+        class="centered-icon play-button"
+      >
         ${svgIcon('play')}
       </button>`
     }
+  }
+
+  const renderLoading = () => {
+    return html`<span class="centered-icon loading-icon"
+      >${loadingIcon()}</span
+    >`
   }
 
   return html`
@@ -182,7 +191,7 @@ export function YesterdaysNewsVideo({
         @error=${onSourceError}
       />
     </video>
-    ${renderPlayButton()}
+    ${renderPlayButton()} ${renderLoading()}
   `
 }
 customElements.define(

@@ -3,8 +3,8 @@ import { css } from 'lit'
 export default css`
 :host {
   --yn-nav-btn-size: 10vmin;
+  --yn-loading-icon-size: 15vmin;
   --yn-nav-btn-margin: 2vmin;
-
   /* these will be set with javascript */
   --yn-video-width: 0px;
   --yn-video-height: 0px
@@ -26,6 +26,66 @@ svg > use {
   width: 100%;
   height: 100%;
 }
+
+@keyframes changeOpacity1 {
+  0% {
+    opacity: 0%
+  }
+  33% {
+    opacity: 100%;
+  }
+}
+
+@keyframes changeOpacity2 {
+  0% {
+    opacity: 0%
+  }
+  66% {
+    opacity: 100%;
+  }
+}
+
+@keyframes changeOpacity3 {
+  0% {
+    opacity: 0%
+  }
+  100% {
+    opacity: 100%;
+  }
+}
+
+
+.loading-icon {
+  // --wave-1-opacity: 30%;
+  // --wave-2-opacity: 60%;
+  // --wave-3-opacity: 90%;
+
+  fill: #fff;
+  width: var(--yn-loading-icon-size);
+  height: var(--yn-loading-icon-size);
+}
+
+.loading-icon .wave1,
+.loading-icon .wave2,
+.loading-icon .wave3 {
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+
+.loading-icon .wave1 {
+  animation-name: changeOpacity3;
+  // animation-delay: 0s;
+}
+.loading-icon .wave2 {
+  animation-name: changeOpacity2;
+  // animation-delay: 1s;
+}
+.loading-icon .wave3 {
+  animation-name: changeOpacity1;
+  // animation-delay: 2s;
+}
+
+
 
 yesterdays-news-player {
   position: relative;
@@ -53,7 +113,8 @@ yesterdays-news-video > video {
   width: var(--yn-video-width);
   height: var(--yn-video-height);
 }
-yesterdays-news-video .play-button {
+
+yesterdays-news-video .centered-icon {
   z-index: 5;
   position: absolute;
   left: 50%;
@@ -62,9 +123,18 @@ yesterdays-news-video .play-button {
   background: transparent;
   border: none;
   padding: 0;
+  // width: var(--yn-nav-btn-size);
+  // height: var(--yn-nav-btn-size);
+}
+
+
+yesterdays-news-video .play-button {
   width: var(--yn-nav-btn-size);
   height: var(--yn-nav-btn-size);
 }
+
+
+
 yesterdays-news-captions {
   position: absolute;
   top: 0px;

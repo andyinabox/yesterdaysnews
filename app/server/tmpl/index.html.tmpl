@@ -4,7 +4,7 @@
     {{ .MetaComment }}
     {{template "head-meta.html.tmpl" .}}
     {{ .ImportMap }}
-    <script async type="module" src="{{ .AssetsPath }}/script.js"></script>
+    <script async type="module" src="{{ .AssetsPath }}/script.js"></script> 
   </head>
   <body>
     <yesterdays-news
@@ -22,7 +22,7 @@
         data = imageData.data
 
         for (let i = 0; i < data.length; i += 4) {
-          const value = Math.random() * 127
+          const value = Math.random() * 48
           data[i] = value // red
           data[i + 1] = value // green
           data[i + 2] = value // blue
