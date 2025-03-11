@@ -1,7 +1,7 @@
 import { html } from 'lit'
 import { createRef, ref } from 'lit/directives/ref.js'
 import { component, useEffect, useState, useRef } from 'haunted'
-import { svgIcon } from '../lib/svg.js'
+import { svgIcon, loadingIcon } from '../lib/svg.js'
 import { canAutoplayVideoIfMuted } from '../lib/media.js'
 import { VideoLoader } from '../lib/video-loader.js'
 
@@ -12,6 +12,7 @@ export function YesterdaysNewsVideo({
   resourceUrl,
   initialClipUrl,
   fetchClipsWhenLowerThan,
+  assetsPath,
 }) {
   // used to hide play button after first play
   const [hasPlayedOnce, setHasPlayedOnce] = useState(false)
@@ -21,6 +22,8 @@ export function YesterdaysNewsVideo({
   const [needsReload, setNeedsReload] = useState(false)
   // determines whether we need to show the play button
   const [showPlayButton, setShowPlayButton] = useState(false)
+  // determines whether play button has been clicked once
+  const [playButtonClicked, setPlayButtonClicked] = useState(false)
 
   // react-style refs
   const isPlaying = useRef(false)
@@ -66,7 +69,7 @@ export function YesterdaysNewsVideo({
   // by default show video button if autoplay is disabled
   useEffect(() => {
     // once it's played we shouldn't need the button
-    if (hasPlayedOnce) {
+    if (hasPlayedOnce || playButtonClicked) {
       setShowPlayButton(false)
       return
     }
@@ -77,7 +80,7 @@ export function YesterdaysNewsVideo({
     if (!canAutoplayVideoIfMuted(videoEl.value)) {
       setShowPlayButton(true)
     }
-  }, [videoEl.value, hasPlayedOnce])
+  }, [videoEl.value, hasPlayedOnce, playButtonClicked])
 
   // poll video to see if video is actually playing
   useEffect(() => {
@@ -153,15 +156,29 @@ export function YesterdaysNewsVideo({
   //
   // rendering
   //
+
+  // this could potentially be a separate component, nut sure if it's worth it though
   const renderPlayButton = () => {
     const onPlayClick = () => {
       videoEl.value.play()
+      setPlayButtonClicked(true)
     }
-    if (showPlayButton) {
-      return html`<button @click=${onPlayClick} class="play-button">
-        ${svgIcon('play')}
-      </button>`
-    }
+    return html`<button @click=${onPlayClick} class="centered-icon play-button">
+      ${svgIcon('play')}
+    </button>`
+  }
+
+  // this could potentially be a separate component, nut sure if it's worth it though
+  const renderLoading = () => {
+    return html`<span class="centered-icon loading-icon"
+      >${loadingIcon(assetsPath)}</span
+    >`
+  }
+
+  // show play button OR loading depending on the situation
+  const renderLoadingOrPlayButton = () => {
+    if (showPlayButton) return renderPlayButton()
+    if (!hasPlayedOnce || !isPlaying) return renderLoading()
   }
 
   return html`
@@ -182,13 +199,13 @@ export function YesterdaysNewsVideo({
         @error=${onSourceError}
       />
     </video>
-    ${renderPlayButton()}
+    ${renderLoadingOrPlayButton()}
   `
 }
 customElements.define(
   'yesterdays-news-video',
   component(YesterdaysNewsVideo, {
-    observedAttributes: ['resource-url', 'initial-clip-url'],
+    observedAttributes: ['resource-url', 'initial-clip-url', 'assets-path'],
     useShadowDOM: false,
   })
 )

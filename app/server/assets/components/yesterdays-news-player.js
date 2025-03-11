@@ -6,6 +6,7 @@ export function YesterdaysNewsPlayer({
   captionsResourceUrl,
   initialClipUrl,
   fetchClipsWhenLowerThan,
+  assetsPath,
 }) {
   const [showCaptions, setShowCaptions] = useState(false)
   const [showStatic, setShowStatic] = useState(true)
@@ -21,7 +22,9 @@ export function YesterdaysNewsPlayer({
 
   const renderStatic = () => {
     if (!showStatic) return
-    return html`<yesterdays-news-static></yesterdays-news-static>`
+    return html`<yesterdays-news-static
+      .maxBrightness=${48}
+    ></yesterdays-news-static>`
   }
 
   const renderCaptions = () => {
@@ -38,6 +41,7 @@ export function YesterdaysNewsPlayer({
       @stopped=${onVideoStopped}
       resource-url=${clipsResourceUrl}
       initial-clip-url=${initialClipUrl}
+      assets-path=${assetsPath}
       .fetchClipsWhenLowerThan=${fetchClipsWhenLowerThan}
     ></yesterdays-news-video>
     ${renderCaptions()}
@@ -51,6 +55,7 @@ customElements.define(
       'clips-resource-url',
       'initial-clip-url',
       'captions-resource-url',
+      'assets-path',
     ],
     useShadowDOM: false,
   })

@@ -78,6 +78,7 @@ bin/builder-linux-amd64:
 
 app/server/.assets: app/server/.assets/styles.css app/server/.assets/script.js
 	cp app/server/assets/*.png app/server/.assets/
+	cp app/server/assets/*.svg app/server/.assets/
 	cp -r app/server/assets/icon app/server/.assets/icon
 
 app/server/.assets/styles.css:

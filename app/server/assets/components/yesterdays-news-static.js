@@ -6,7 +6,7 @@ import { component, useEffect, useState } from 'haunted'
 // theory it prevents re-allocating memory every frame?
 let imageData, data
 
-export function YesterdaysNewsStatic() {
+export function YesterdaysNewsStatic({ maxBrightness = 255 }) {
   const canvasEl = createRef()
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export function YesterdaysNewsStatic() {
       data = imageData.data
 
       for (let i = 0; i < data.length; i += 4) {
-        const value = Math.random() * 127
+        const value = Math.random() * maxBrightness
         data[i] = value // red
         data[i + 1] = value // green
         data[i + 2] = value // blue

@@ -3,8 +3,8 @@ import { css } from 'lit'
 export default css`
 :host {
   --yn-nav-btn-size: 10vmin;
+  --yn-loading-icon-size: 20vmin;
   --yn-nav-btn-margin: 2vmin;
-
   /* these will be set with javascript */
   --yn-video-width: 0px;
   --yn-video-height: 0px
@@ -26,6 +26,23 @@ svg > use {
   width: 100%;
   height: 100%;
 }
+
+.centered-icon {
+  z-index: 5;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.loading-icon {
+  width: var(--yn-loading-icon-size);
+  height: var(--yn-loading-icon-size);
+}
+
 
 yesterdays-news-player {
   position: relative;
@@ -53,18 +70,13 @@ yesterdays-news-video > video {
   width: var(--yn-video-width);
   height: var(--yn-video-height);
 }
+
+
 yesterdays-news-video .play-button {
-  z-index: 5;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background: transparent;
-  border: none;
-  padding: 0;
   width: var(--yn-nav-btn-size);
   height: var(--yn-nav-btn-size);
 }
+
 yesterdays-news-captions {
   position: absolute;
   top: 0px;

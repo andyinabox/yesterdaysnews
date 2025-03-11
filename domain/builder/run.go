@@ -2,6 +2,7 @@ package builder
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -49,6 +50,11 @@ func (b *Builder) Run(ctx context.Context) error {
 		uploadPathsStream := b.UploadVideos(ctx, manifest.ID, clipPathsStream)
 		manifest.Files.Clips = streams.StringSlice(ctx, uploadPathsStream)
 	}
+
+	if len(manifest.Files.Clips) == 0 {
+		return errors.New("no clips were processed")
+	}
+
 	log.Infof("processed %d clips", len(manifest.Files.Clips))
 
 	// right now this step takes up too much memory to run in the serverless job

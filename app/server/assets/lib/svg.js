@@ -48,3 +48,10 @@ export const svgIcon = (name) => {
     </svg>
   `
 }
+
+export const loadingIcon = (assetsPath) => {
+  return html`<img
+    class="centered-icon loading-icon"
+    src="${assetsPath}/loading.svg"
+  />`
+}
