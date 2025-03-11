@@ -36,7 +36,6 @@ export const svgSymbols = () => {
         <symbol id="${SVG_SYMBOL_PREFIX}play">
           <path d="M 426.98988,238.35531 253.94956,339.35664 79.959692,440.35798 V 240 39.642032 L 253,138.99868 Z">
         </symbol>
-
       </defs>
     </svg>
 `
