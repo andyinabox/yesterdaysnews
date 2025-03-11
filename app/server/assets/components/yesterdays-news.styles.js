@@ -71,26 +71,11 @@ yesterdays-news-video > video {
   height: var(--yn-video-height);
 }
 
-// yesterdays-news-video .centered-icon {
-//   z-index: 5;
-//   position: absolute;
-//   left: 50%;
-//   top: 50%;
-//   transform: translate(-50%, -50%);
-//   background: transparent;
-//   border: none;
-//   padding: 0;
-//   // width: var(--yn-nav-btn-size);
-//   // height: var(--yn-nav-btn-size);
-// }
-
 
 yesterdays-news-video .play-button {
   width: var(--yn-nav-btn-size);
   height: var(--yn-nav-btn-size);
 }
-
-
 
 yesterdays-news-captions {
   position: absolute;
