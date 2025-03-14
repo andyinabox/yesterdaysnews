@@ -1,8 +1,10 @@
 # Yesterday's News
 
-The videos you are seeing are a random reshuffling of news clips from the day before today. The text is generated from the captions for those videos, alongside a journal of mine from late October to early November 2016. The videos are purely random, but the text follows its own internal logic. 
+The videos you are seeing are news clips from the day before today.
 
-Every day a new cycle, and we're meant to believe that _yesterday's news_ is no longer relevant. But each day leaves its mark, is inexorably linked to the one before it.
+The text is generated from the subtitles for those videos, alongside a journal of mine from late October to early November 2016.
+
+The video ordering is purely random, but the text follows its own internal logic.
 
 —[Andy](https://andydayton.com)
 
@@ -10,14 +12,6 @@ Every day a new cycle, and we're meant to believe that _yesterday's news_ is no 
 
  - [Fullscreen icon by Q.P. at the Noun Project](https://thenounproject.com/icon/fullscreen-6938590/)
  - [About icon by Mas Dhimas at the Noun Project](https://thenounproject.com/icon/about-6264304/)
-
-## Infrastructure
-
-I've made an effort to use cloud infratructure that is based in Europe and run somewhat environmentally sustainably. I've currently settled on three different services in order to keep costs relatively low:
-
- - The Server application is hosted on [Infomaniak](https://www.infomaniak.com/)
- - The Builder application is run on [Scaleway](https://www.scaleway.com/en/)
- - Object Store assets stored on [Exoscale](https://www.exoscale.com/)
 
 ## Directory structure
 
@@ -29,7 +23,9 @@ I've made an effort to use cloud infratructure that is based in Europe and run s
  - `pkg` - more general-use code that could be used in other projects
  - `test` - test fixtures
 
-## Server
+## Primary Applications
+
+### Server (`app/server`)
 
 Server serves the actual video player, and generates captions using the model JSON file. The metadata and model are fetched from a remote Object Store by the server, and video clips from the Object Store are loaded via a CDN. 
 
@@ -38,36 +34,8 @@ Dependencies:
  - Go 1.22.10
  - `docker`
 
-### Usage
 
-To get usage info, run `go run ./app/server/main.go -h`.
-
-To run the server locally with good defaults for local development:
-
-```bash
-make server
-```
-
-This will:
- - Enable loading assets from the filesystem so you can do frontend development
- - Set to check for updated build assets (on the Object Store) to every 20 seconds
- - Enable verbose logging
-
-
-### Building the server
-
-The server is deployed using docker:
-
-```bash
-# build the server conainer
-make docker-build-server
-# test the server container
-make docker-run-server
-# push the server container to docker hub
-make docker-push-server
-```
-
-## Builder
+### Builder (`app/builder`)
 
 Builder will download videos from YouTube, cut them up, build a markov model, and upload everything to an S3-compatible Object Store.
 
@@ -80,60 +48,52 @@ Dependencies:
 
 Additionaally the builder requires more resources to work well, so it's a good idea to give it more RAM and CPUs.
 
-### Usage
+## Running locally
 
-To get usage info, run `go run ./app/builder/main.go -h`.
-
-Run the default build and save artifacts:
+First you will want to run the Builder locally:
 
 ```bash
-make builder
+make builder-local
 ```
 
-Test the build without uploading artifacts (helpful if you want to populate "dist" for use with `objectstoremock`):
+This will download all the assets and process them, but skip the step of uploading them to the Object Store.
+
+Next you'll want to start a local Object Store mock to serve the assets:
 
 ```bash
-go run ./app/builder/main.go --keepoutput --skipupload
+make objectstoremock
 ```
 
-Test individual build steps:
+This will similate the S3-compatible Object Store used provide assets in production, but using the locally processed assets.
+
+Finally, **in a new terminal window** (you need to keep the `objectstoremock` running), run the following:
 
 ```bash
-go run ./app/builder/main.go -b <build step>
+make server-local
 ```
 
-You can find the proper name for each build step in [domain/builder.go](domain/builder.go).
+This will run the server on `localhost`, retrieving assets from the `objectstoremock`.
 
-```go
-const (
-	BuildPhaseAll            BuildPhase = "all"
-	BuildPhaseSetup          BuildPhase = "setup"
-	BuildPhaseDownloadVideos BuildPhase = "download-videos"
-	BuildPhaseCutVideos      BuildPhase = "cut-videos"
-	BuildPhaseUploadVideos   BuildPhase = "upload-videos"
-	BuildPhaseModel          BuildPhase = "model"
-	BuildPhaseManifest       BuildPhase = "manifest"
-	BuildPhasePromote        BuildPhase = "promote"
-	BuildPhaseCleanup        BuildPhase = "cleanup"
-)
-```
+## Releasing
 
-### Building the builder
+There is a script `release.sh` that automates tagging, building the docker container, and publishing to the container registry. It is run separately for each application:
 
 ```bash
-# build the builder conainer
-make docker-build-builder
-# test the builder container
-make docker-run-builder
-# push the builder container to docker hub
-make docker-push-builder
+# create a v0.0.0 release for the server application
+./release.sh server v0.0.0
+
+# create a v0.0.0 release for the builder application
+./release.sh builder v0.0.0
 ```
 
-The builder container uses the Docker `ENTRYPOINT` specifyer, which means you can pass in arguments when you run the container like an executable. For instance:
+## Infrastructure
 
-```bash
-docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder --output /dist -v
-```
+I've made an effort to use cloud infratructure that is based in Europe and run somewhat environmentally sustainably. I've currently settled on three different services in order to keep costs relatively low:
+
+ - The Server application is hosted on [Infomaniak](https://www.infomaniak.com/)
+ - The Builder application is run on [Scaleway](https://www.scaleway.com/en/)
+ - Object Store assets stored on [Exoscale](https://www.exoscale.com/)
+
 
 ## Utils
 
