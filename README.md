@@ -13,14 +13,6 @@ The video ordering is purely random, but the text follows its own internal logic
  - [Fullscreen icon by Q.P. at the Noun Project](https://thenounproject.com/icon/fullscreen-6938590/)
  - [About icon by Mas Dhimas at the Noun Project](https://thenounproject.com/icon/about-6264304/)
 
-## Infrastructure
-
-I've made an effort to use cloud infratructure that is based in Europe and run somewhat environmentally sustainably. I've currently settled on three different services in order to keep costs relatively low:
-
- - The Server application is hosted on [Infomaniak](https://www.infomaniak.com/)
- - The Builder application is run on [Scaleway](https://www.scaleway.com/en/)
- - Object Store assets stored on [Exoscale](https://www.exoscale.com/)
-
 ## Directory structure
 
  - `app` - entrypoints and data for the two main applications 
@@ -93,6 +85,14 @@ There is a script `release.sh` that automates tagging, building the docker conta
 # create a v0.0.0 release for the builder application
 ./release.sh builder v0.0.0
 ```
+
+## Infrastructure
+
+I've made an effort to use cloud infratructure that is based in Europe and run somewhat environmentally sustainably. I've currently settled on three different services in order to keep costs relatively low:
+
+ - The Server application is hosted on [Infomaniak](https://www.infomaniak.com/)
+ - The Builder application is run on [Scaleway](https://www.scaleway.com/en/)
+ - Object Store assets stored on [Exoscale](https://www.exoscale.com/)
 
 
 ## Utils
