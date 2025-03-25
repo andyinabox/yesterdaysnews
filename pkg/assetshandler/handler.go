@@ -58,7 +58,7 @@ func New(cfg *Config) *Handler {
 func (h *Handler) AddRoute(path string, handler http.HandlerFunc) {
 	h.mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != path {
-			log.Infof("attempt to access path %q", r.URL.Path)
+			log.Debugf("attempt to access path %q", r.URL.Path)
 			if h.cfg.RedirectNotFoundToIndex {
 				http.Redirect(w, r, "/", http.StatusSeeOther)
 			} else {
