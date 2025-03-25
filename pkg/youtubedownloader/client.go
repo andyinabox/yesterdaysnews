@@ -46,19 +46,28 @@ func (c *Client) Execute(ctx context.Context, url string, req Request) ([]byte, 
 
 	result, err := c.shell.Execute(ctx, fmt.Sprintf("%s%s -- '%s'", c.binPath, req.String(), url))
 
+	// if there are warnings or errors they will be prepended to the json string, so we need to separate them
+	// NOTE: this is probably because I'm combining stdout and stderr :(
+	msg, data, found := strings.Cut(string(result), "{")
+	// if we have content before the first '{', assume it's an error or warning message
+	// and set the result to the part after that
+	if found && msg != "" {
+		result = []byte("{" + data)
+		log.Warn("youtubedownloader: " + msg)
+	}
+
 	if err != nil {
 
 		// handle requested format not available errors
-		if strings.Contains(strings.ToLower(string(result)), "requested format is not available") {
+		if strings.Contains(strings.ToLower(msg), "requested format is not available") {
 			err = ErrRequestedFormatNotAvailable
 		}
 
-		// err = fmt.Errorf("error executing youtubedownloader: %s: %w", string(result), err)
 		err = fmt.Errorf("error executing youtubedownloader: %w", err)
 
 	}
 
-	log.Debug(string(result))
+	// log.Debug(string(result))
 
 	return result, err
 

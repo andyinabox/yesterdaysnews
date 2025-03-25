@@ -80,7 +80,7 @@ func (c *Client) parseBody(r *http.Response) (data []byte, err error) {
 		return
 	}
 
-	log.Debugf("response body from %s:\n%s", r.Request.URL, string(data))
+	// log.Debugf("response body from %s:\n%s", r.Request.URL, string(data))
 
 	return
 }
