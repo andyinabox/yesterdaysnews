@@ -3,10 +3,10 @@ package containerservice
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strings"
 	"sync"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
@@ -43,7 +43,7 @@ func (s *Service) ListObjectsWithPrefixStream(ctx context.Context, errs chan<- d
 	getObjectsWithPrefix := func(prefix string) {
 		defer wg.Done()
 
-		log.Debugf("get objects with prefix %q", prefix)
+		slog.Debug("get objects with prefix", "prefix", prefix)
 
 		objects, err := s.ListObjectsWithPrefix(ctx, prefix)
 		if err != nil {
@@ -51,10 +51,10 @@ func (s *Service) ListObjectsWithPrefixStream(ctx context.Context, errs chan<- d
 			return
 		}
 
-		log.Debugf("found %d objects with prefix %q", len(objects), prefix)
+		slog.Debug("found objects with prefix", "count", len(objects), "prefix", prefix)
 
 		for _, object := range objects {
-			log.Debug(object)
+			slog.Debug("object with prefix", "object", object, "prefix", prefix)
 			stream <- object
 		}
 	}

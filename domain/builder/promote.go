@@ -3,16 +3,16 @@ package builder
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strings"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
 func (b *Builder) Promote(ctx context.Context, uploadDir string) error {
 
 	if b.cfg.SkipUpload {
-		log.Info("SkipUpload is true, skipping Promote step")
+		slog.Info("SkipUpload is true, skipping Promote step")
 		return nil
 	}
 

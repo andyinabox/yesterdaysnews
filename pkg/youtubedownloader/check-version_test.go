@@ -4,13 +4,9 @@ import (
 	"context"
 	"path/filepath"
 	"testing"
-
-	"github.com/charmbracelet/log"
 )
 
 func TestCheckVersion(t *testing.T) {
-
-	log.SetLevel(log.DebugLevel)
 
 	{
 		binPath, err := filepath.Abs("../../test/bin/yt-dlp-equalversion")

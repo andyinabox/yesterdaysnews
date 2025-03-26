@@ -3,10 +3,10 @@ package containerservice
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"sync"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 )
@@ -28,21 +28,21 @@ func (s *Service) UploadFileStream(ctx context.Context, errs chan<- domain.Error
 
 	cleanup := func() {
 		wg.Wait()
-		log.Debug("closing upload file stream")
+		slog.Debug("closing upload file stream")
 		close(stream)
 	}
 
 	uploadFile := func(filePath, fileKey string) {
 		defer wg.Done()
 
-		log.Infof("uploading file %q as %q", filePath, fileKey)
+		slog.Info("uploading file", "path", filePath, "key", fileKey)
 		fileKey, err := s.UploadFile(ctx, filePath, fileKey, contentType, multipart)
 		if err != nil {
-			log.Errorf("error uploading file %q as %q: %s", filePath, fileKey, err)
+			slog.Error("error uploading file", "path", filePath, "key", fileKey, "error", err)
 			errs <- errorhandler.Err(domain.ErrTypeUploadFile, err)
 			return
 		}
-		log.Infof("finished uploading %q", fileKey)
+		slog.Info("finished uploading", "key", fileKey)
 		stream <- fileKey
 	}
 

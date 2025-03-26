@@ -7,6 +7,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -14,11 +15,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/builder"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/captiongenerator"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
@@ -35,8 +34,9 @@ var overlayImage []byte
 const defaultPlaylists = "UUupvZG-5ko_eiXAupbDfxWw,UUaXkIU1QidjPwiAYu6GcHjg,UUXIJgqnII2ZOINSWNOGFThA"
 
 var (
-	verbose    bool
-	buildPhase string
+	verbose       bool
+	jsonLogOutput bool
+	buildPhase    string
 
 	playlistIDs              string
 	objectStoreContainerName string
@@ -57,6 +57,7 @@ var (
 func init() {
 	// meta flags
 	flag.BoolVar(&verbose, "v", false, "verbose output")
+	flag.BoolVar(&jsonLogOutput, "j", false, "json log output")
 	flag.StringVar(&buildPhase, "b", "all", "build phase to execute")
 
 	// config flags
@@ -81,15 +82,33 @@ func init() {
 
 	flag.Parse()
 
-	if verbose {
-		log.SetLevel(log.DebugLevel)
-		log.SetReportCaller(true)
-	}
+	initLogger()
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Warnf("error loading .env: %s", err)
+		slog.Warn("error loading .env", "error", err)
 	}
+}
+
+func initLogger() {
+	var logger *slog.Logger
+
+	// nil by default, which means use default options
+	var options *slog.HandlerOptions
+	if verbose {
+		options = &slog.HandlerOptions{
+			AddSource: true,
+			Level:     slog.LevelDebug,
+		}
+	}
+
+	if jsonLogOutput {
+		logger = slog.New(slog.NewJSONHandler(os.Stdout, options))
+	} else {
+		logger = slog.New(slog.NewTextHandler(os.Stdout, options))
+	}
+
+	slog.SetDefault(logger)
 }
 
 func main() {
@@ -112,7 +131,7 @@ func main() {
 
 	throttleInterval, err := time.ParseDuration(throttleDownloadsBy)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// load config
@@ -139,7 +158,7 @@ func main() {
 	// auto-load env vars
 	err = configloader.Load(&config)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// for testing setting this to 1
@@ -147,11 +166,11 @@ func main() {
 
 	handleBuildPhaseErr := func(err error) {
 		if err != nil {
-			log.Fatalf("error building %q: %s", buildPhase, err)
+			panic(fmt.Errorf("error building %q: %s", buildPhase, err))
 		}
 	}
 
-	log.Infof("running %q", buildPhase)
+	slog.Info("running", "buildPhase", buildPhase)
 
 	switch domain.BuildPhase(buildPhase) {
 	case domain.BuildPhaseAll:
@@ -199,10 +218,10 @@ func main() {
 		handleBuildPhaseErr(err)
 
 	default:
-		log.Fatalf("invalid build phase: %s", buildPhase)
+		panic(fmt.Errorf("invalid build phase: %s", buildPhase))
 	}
 
-	log.Info("Done")
+	slog.Info("Done")
 }
 
 func buildAll(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
@@ -227,7 +246,7 @@ func downloadVideos(ctx context.Context, config *builder.Config, eh domain.Error
 	videosStream := b.DownloadVideos(ctx, yesterday)
 
 	videos := streams.StringSlice(ctx, videosStream)
-	log.Infof("finished downloading %d videos", len(videos))
+	slog.Info("finished downloading videos", "count", len(videos))
 	return nil
 }
 
@@ -246,7 +265,7 @@ func cutVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHandl
 	clipsStream := b.CutVideos(ctx, videoPathsStream)
 
 	clips := streams.StringSlice(ctx, clipsStream)
-	log.Infof("finished processing %d clips", len(clips))
+	slog.Info("finished processing clips", "count", len(clips))
 
 	return nil
 }
@@ -267,7 +286,7 @@ func uploadVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHa
 	uploadsStream := b.UploadVideos(ctx, uploadDir, clipsStream)
 
 	uploads := streams.StringSlice(ctx, uploadsStream)
-	log.Infof("finished uploading %d clips", len(uploads))
+	slog.Info("finished uploading clips", "count", len(uploads))
 
 	return nil
 }
@@ -287,7 +306,7 @@ func extractImages(ctx context.Context, config *builder.Config, eh domain.ErrorH
 	imagesStream := b.ExtractImages(ctx, clipsStream)
 
 	images := streams.StringSlice(ctx, imagesStream)
-	log.Infof("finished extracting %d images", len(images))
+	slog.Info("finished extracting images", "count", len(images))
 
 	return nil
 }
@@ -310,7 +329,7 @@ func posterImage(ctx context.Context, config *builder.Config, eh domain.ErrorHan
 		return fmt.Errorf("error generating poster image: %w", err)
 	}
 
-	log.Infof("finished outputting %q", posterImage)
+	slog.Info("finished outputting image", "image", posterImage)
 
 	return nil
 }
@@ -338,30 +357,30 @@ func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 		},
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	data, err = os.ReadFile(filepath.Join(config.OutputDir, fileName))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	chain := captionschain.New(config.CaptionPrefixLength)
 	err = chain.Load(data)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	cg := captiongenerator.New(chain, &captiongenerator.Config{
-		MinCaptionLength: 5,
-		MaxCaptionLength: 15,
-	})
+	// cg := captiongenerator.New(chain, &captiongenerator.Config{
+	// 	MinCaptionLength: 5,
+	// 	MaxCaptionLength: 15,
+	// })
 
-	prev := ""
-	for i := 0; i < 20; i++ {
-		prev = cg.Caption(prev)
-		fmt.Println(prev)
-	}
+	// prev := ""
+	// for range 20 {
+	// 	prev = cg.Caption(prev)
+	// 	fmt.Println(prev)
+	// }
 
 	return nil
 }
@@ -396,7 +415,7 @@ func buildManifest(ctx context.Context, config *builder.Config, eh domain.ErrorH
 		return err
 	}
 
-	log.Infof("successfully generated %q", result)
+	slog.Info("successfully generated manifest", "file", result)
 
 	return nil
 }
@@ -416,7 +435,7 @@ func buildPromote(ctx context.Context, config *builder.Config, eh domain.ErrorHa
 		return err
 	}
 
-	log.Infof("finished promoting %q clips", uploadDir)
+	slog.Info("finished promoting clips", "dir", uploadDir)
 	return nil
 }
 
@@ -427,7 +446,7 @@ func buildCleanup(ctx context.Context, config *builder.Config, eh domain.ErrorHa
 	if err != nil {
 		return err
 	}
-	log.Infof("deleted %d objects", len(deleted))
+	slog.Info("deleted objects", "count", len(deleted))
 	return nil
 }
 

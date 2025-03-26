@@ -4,11 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"sync"
 	"time"
-
-	"github.com/charmbracelet/log"
 
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
@@ -18,10 +17,11 @@ var defaultErrorFunc, defaultFatalFunc func(string, error)
 
 func init() {
 	defaultErrorFunc = func(typ string, err error) {
-		log.Errorf("%s error: %s\n", typ, err)
+		slog.Error(fmt.Sprintf("%s error", typ), "type", typ, "error", err)
 	}
 	defaultFatalFunc = func(typ string, err error) {
-		log.Fatalf("%s error: %s\n", typ, err)
+		slog.Error(fmt.Sprintf("%s error", typ), "type", typ, "error", err)
+		panic(err)
 	}
 }
 
@@ -147,13 +147,14 @@ func (h *errorHandler) String() (str string) {
 func (h *errorHandler) Report() {
 	if h.CountAll() > 0 {
 
-		log.Error(h.String())
+		// TODO: log error report in a more structured way
+		slog.Error(h.String())
 
 		if h.cfg.SaveErrorFile {
 			// don't output file if no filename is provided
 			data, err := h.MarshalJSON()
 			if err != nil {
-				log.Errorf("error marshaling error data: %s\n", err)
+				slog.Error("error marshaling error data", "error", err)
 				return
 			}
 
@@ -161,7 +162,7 @@ func (h *errorHandler) Report() {
 		}
 
 	} else {
-		log.Info("no errors to report")
+		slog.Info("no errors to report")
 	}
 }
 

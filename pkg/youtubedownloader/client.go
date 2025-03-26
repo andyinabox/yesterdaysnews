@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/shell"
 )
 
@@ -28,7 +28,7 @@ func New(binPath string) *Client {
 		binPath = sh.MustGetBinaryPath("yt-dlp")
 	}
 
-	log.Debug("create new youtubedownloader", "binPath", binPath)
+	slog.Debug("create new youtubedownloader", "binPath", binPath)
 
 	return &Client{
 		binPath: binPath,
@@ -42,7 +42,7 @@ func (c *Client) Execute(ctx context.Context, url string, req Request) ([]byte, 
 		return nil, ErrNoURLProvided
 	}
 
-	log.Debug("execute youtubedownloader", "url", url, "request", req)
+	slog.Debug("execute youtubedownloader", "url", url, "request", req)
 
 	result, err := c.shell.Execute(ctx, fmt.Sprintf("%s%s -- '%s'", c.binPath, req.String(), url))
 
@@ -53,7 +53,7 @@ func (c *Client) Execute(ctx context.Context, url string, req Request) ([]byte, 
 	// and set the result to the part after that
 	if found && msg != "" {
 		result = []byte("{" + data)
-		log.Warn("youtubedownloader: " + msg)
+		slog.Warn("youtubedownloader: " + msg)
 	}
 
 	if err != nil {

@@ -51,7 +51,7 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 			}
 
 			if throttler != nil {
-				log.Infof("throttling YouTube ID check for %s", s.cfg.ThrottleDownloadsBy)
+				log.Debugf("throttling YouTube ID check for %s", s.cfg.ThrottleDownloadsBy)
 				<-throttler
 			}
 

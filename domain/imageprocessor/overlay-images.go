@@ -8,10 +8,10 @@ import (
 	"image/color"
 	"image/png"
 	"io"
+	"log/slog"
 	"os"
 	"reflect"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
@@ -52,7 +52,7 @@ func (p *Processor) OverlayImages(ctx context.Context, baseReader, overlayReader
 		}
 	}
 
-	log.Info("saving final image")
+	slog.Info("saving final image")
 	output, err := os.Create(outputFilePath)
 	if err != nil {
 		return "", fmt.Errorf("error opening output file: %w", err)

@@ -3,12 +3,12 @@ package captionschain
 import (
 	"bufio"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 	"unicode"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
@@ -23,7 +23,7 @@ func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {
 
 		// handle straightforward string corpus
 		if source.Type == domain.CorpusTypeString {
-			log.Debug("processing text from string")
+			slog.Debug("processing text from string")
 			if source.Content == "" {
 				return fmt.Errorf("corpus type %q has no content", domain.CorpusTypeString)
 			}
@@ -35,7 +35,7 @@ func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {
 		}
 
 		// handle file-based corpus
-		log.Debugf("processing text from source %q", source.FileGlob)
+		slog.Debug("processing text from corpus source", "glob", source.FileGlob)
 		files, err := filepath.Glob(source.FileGlob)
 		if err != nil {
 			return fmt.Errorf("error resolving file glob: %s: %w", source.FileGlob, err)
@@ -45,7 +45,7 @@ func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {
 
 		// iterate through files
 		for _, f := range files {
-			log.Debugf("processing file %q", f)
+			slog.Debug("processing corpus file", "file", f)
 			var err error
 			var parsedContent string
 
@@ -92,7 +92,7 @@ func (c *Chain) parseTextFile(filePath string) (string, error) {
 }
 
 func (c *Chain) parseVTTFile(filePath string) (string, error) {
-	log.Debug("parse vtt file", "path", filePath)
+	slog.Debug("parse vtt file", "path", filePath)
 	file, err := os.Open(filePath)
 	if err != nil {
 		return "", err
@@ -140,7 +140,7 @@ scanloop:
 
 	output := strings.Join(lines, " ")
 
-	// log.Debug(output)
+	// slog.Debug(output)
 
 	return output, nil
 }

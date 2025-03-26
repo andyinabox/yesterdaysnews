@@ -3,9 +3,9 @@ package containerservice
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"sync"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 )
@@ -31,7 +31,7 @@ func (s *Service) DeleteObjectStream(ctx context.Context, errs chan<- domain.Err
 	deleteObject := func(key string) {
 		defer wg.Done()
 
-		log.Debugf("delete %q from stream", key)
+		slog.Debug("delete object from stream", "key", key)
 		fileKey, err := s.DeleteObject(ctx, key)
 		if err != nil {
 			errs <- errorhandler.Err(domain.ErrTypeDeleteObject, err)

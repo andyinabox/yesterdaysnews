@@ -2,9 +2,8 @@ package server
 
 import (
 	"html/template"
+	"log/slog"
 	"net/http"
-
-	"github.com/charmbracelet/log"
 )
 
 type AboutRenderContext struct {
@@ -23,7 +22,7 @@ func (s *Server) About() http.HandlerFunc {
 
 		err := s.cfg.Templates.ExecuteTemplate(w, "about.html.tmpl", data)
 		if err != nil {
-			log.Error(err)
+			slog.Error("error rendering about page", "error", err)
 		}
 	}
 
