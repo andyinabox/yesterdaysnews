@@ -2,12 +2,13 @@ package main
 
 import (
 	"flag"
+	"log/slog"
 	"math"
 	"os"
 	"path/filepath"
 
-	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/imgavg"
 )
 
@@ -23,13 +24,13 @@ func init() {
 	flag.BoolVar(&verbose, "v", false, "verbose output")
 	flag.Parse()
 
-	if verbose {
-		log.SetLevel(log.DebugLevel)
-	}
+	logger.SetDefault(&logger.Config{
+		Verbose: verbose,
+	})
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Warnf("error getting .env: %s", err)
+		slog.Warn("error getting .env", "error", err)
 	}
 }
 
@@ -40,16 +41,16 @@ func main() {
 
 	err := os.MkdirAll(workDir, os.ModePerm)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	paths, err := filepath.Glob(inputGlob)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	client := imgavg.New(func(err error) {
-		log.Error(err)
+		panic(err)
 	})
 
 	if maxImages > len(paths) {
@@ -58,9 +59,9 @@ func main() {
 
 	result, err := client.Run(paths[:maxImages], outputFile, imageWidth, imageHeight)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-	log.Infof("successfully outputed image %q", result)
+	slog.Info("successfully outputed image", "image", result)
 }
 
 // func main() {

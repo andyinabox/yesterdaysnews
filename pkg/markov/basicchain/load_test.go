@@ -3,13 +3,8 @@ package basicchain
 import (
 	"os"
 	"testing"
-
-	"github.com/charmbracelet/log"
 )
 
-func init() {
-	log.SetLevel(log.DebugLevel)
-}
 func TestLoadV0(t *testing.T) {
 	file := "../../../test/model-v0.json"
 

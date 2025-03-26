@@ -4,11 +4,12 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log/slog"
 	"os"
 	"time"
 
-	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/youtubeservice"
 )
 
@@ -20,17 +21,18 @@ func init() {
 	flag.BoolVar(&verbose, "v", false, "verbose output")
 	flag.Parse()
 
-	if verbose {
-		log.SetLevel(log.DebugLevel)
-	}
+	logger.SetDefault(&logger.Config{
+		Verbose: verbose,
+	})
 
 	if channelName == "" {
-		log.Fatal("channel name is required")
+		slog.Error("channel name is required")
+		os.Exit(1)
 	}
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Warnf("error getting .env: %s", err)
+		slog.Warn("error getting .env", "error", err)
 	}
 }
 
@@ -43,7 +45,7 @@ func main() {
 
 	id, err := dl.GetChannelPlaylistID(context.Background(), channelName)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	fmt.Println(id)

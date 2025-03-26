@@ -2,13 +2,9 @@ package imgavg
 
 import (
 	"testing"
-
-	"github.com/charmbracelet/log"
 )
 
 func TestGetBatchSize(t *testing.T) {
-
-	log.SetLevel(log.DebugLevel)
 
 	{
 		len := 510

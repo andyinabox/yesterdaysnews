@@ -2,10 +2,9 @@ package builder
 
 import (
 	"context"
+	"log/slog"
 	"sync"
 	"time"
-
-	"github.com/charmbracelet/log"
 )
 
 func (b *Builder) DownloadVideos(ctx context.Context, date time.Time) <-chan string {
@@ -27,10 +26,10 @@ func (b *Builder) videoIDStream(ctx context.Context, date time.Time, playlistIDs
 	for _, playlistID := range playlistIDs {
 		go func() {
 			defer wg.Done()
-			log.Infof("getting video id stream for %q", playlistID)
+			slog.Info("getting video id stream", "playlistID", playlistID)
 			playlistIDs := b.yt.GetPlaylistVideoIDStream(ctx, b.errs, playlistID, date, b.cfg.MaxVideoSize, b.cfg.DownloadCountPerPlaylist)
 			for id := range playlistIDs {
-				log.Infof("got new video ID: %s", id)
+				slog.Info("got new video ID", "id", id)
 				stream <- id
 			}
 		}()
@@ -39,7 +38,7 @@ func (b *Builder) videoIDStream(ctx context.Context, date time.Time, playlistIDs
 	// close stream once all playlistIDs are gathered
 	go func() {
 		wg.Wait()
-		log.Debug("closing video id stream")
+		slog.Debug("closing video id stream")
 		close(stream)
 	}()
 

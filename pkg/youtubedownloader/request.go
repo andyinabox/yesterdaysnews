@@ -1,10 +1,10 @@
 package youtubedownloader
 
 import (
+	"log/slog"
 	"reflect"
 	"strings"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
 )
 
@@ -42,7 +42,7 @@ func (r *Request) Args() *shellargs.Args {
 		// break up tag contents
 		tagParts := strings.Split(tag, ",")
 		if len(tagParts) == 0 {
-			log.Errorf("missing tag values: %q", tag)
+			slog.Error("missing tag values", "tag", tag)
 		}
 
 		argName := tagParts[0]
@@ -64,7 +64,7 @@ func (r *Request) Args() *shellargs.Args {
 			}
 			continue
 		default:
-			log.Errorf("invalid type: %s", fieldKind)
+			slog.Error("invalid type", "type", fieldKind)
 		}
 	}
 

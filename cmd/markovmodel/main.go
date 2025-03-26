@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/charmbracelet/log"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov/basicchain"
 )
 
@@ -19,12 +19,12 @@ func init() {
 	flag.StringVar(&inputFile, "i", "", "input file")
 	flag.Parse()
 
-	if verbose {
-		log.SetLevel(log.DebugLevel)
-	}
+	logger.SetDefault(&logger.Config{
+		Verbose: true,
+	})
 
 	if inputFile == "" {
-		log.Fatal("input file is required")
+		panic("input file is required")
 	}
 }
 
@@ -32,7 +32,7 @@ func main() {
 
 	file, err := os.Open(inputFile)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	defer file.Close()
 
@@ -41,7 +41,7 @@ func main() {
 
 	model, err := chain.Save()
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	fmt.Print(string(model))

@@ -2,10 +2,9 @@ package assetshandler
 
 import (
 	"io/fs"
+	"log/slog"
 	"net/http"
 	"strings"
-
-	"github.com/charmbracelet/log"
 )
 
 type Route interface {
@@ -58,7 +57,7 @@ func New(cfg *Config) *Handler {
 func (h *Handler) AddRoute(path string, handler http.HandlerFunc) {
 	h.mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != path {
-			log.Debugf("attempt to access path %q", r.URL.Path)
+			slog.Debug("attempt to access non-existant path", "url", r.URL.Path)
 			if h.cfg.RedirectNotFoundToIndex {
 				http.Redirect(w, r, "/", http.StatusSeeOther)
 			} else {
@@ -74,11 +73,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// if the url contains the assets path, use the assets handler
 	if strings.HasPrefix(r.URL.Path, h.cfg.AssetsRequestPathPrefix) {
-		log.Debugf("serve using file server: %s", r.URL)
+		slog.Debug("serve using file server", "url", r.URL)
 		h.assetsHandler.ServeHTTP(w, r)
 		return
 	}
 
-	log.Debugf("serve using ServeMux: %s", r.URL)
+	slog.Debug("serve using ServeMux", "url", r.URL)
 	h.mux.ServeHTTP(w, r)
 }

@@ -20,6 +20,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain/builder"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
@@ -82,33 +83,15 @@ func init() {
 
 	flag.Parse()
 
-	initLogger()
+	logger.SetDefault(&logger.Config{
+		Verbose:    verbose,
+		JSONOutput: jsonLogOutput,
+	})
 
 	err := godotenv.Load()
 	if err != nil {
 		slog.Warn("error loading .env", "error", err)
 	}
-}
-
-func initLogger() {
-	var logger *slog.Logger
-
-	// nil by default, which means use default options
-	var options *slog.HandlerOptions
-	if verbose {
-		options = &slog.HandlerOptions{
-			AddSource: true,
-			Level:     slog.LevelDebug,
-		}
-	}
-
-	if jsonLogOutput {
-		logger = slog.New(slog.NewJSONHandler(os.Stdout, options))
-	} else {
-		logger = slog.New(slog.NewTextHandler(os.Stdout, options))
-	}
-
-	slog.SetDefault(logger)
 }
 
 func main() {

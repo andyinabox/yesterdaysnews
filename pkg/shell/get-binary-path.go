@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/charmbracelet/log"
 )
 
 func (s *Shell) GetBinaryPath(ctx context.Context, cmd string) (path string, err error) {
@@ -29,7 +27,7 @@ func (s *Shell) MustGetBinaryPath(cmd string) (path string) {
 	var err error
 	path, err = s.GetBinaryPath(context.Background(), cmd)
 	if err != nil {
-		log.Fatal("uable to find find binary path", "cmd", cmd, "error", err)
+		panic(fmt.Sprintf("uable to find find binary path", "cmd", cmd, "error", err))
 	}
 	return
 }

@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"log/slog"
 	"os/exec"
-
-	"github.com/charmbracelet/log"
 )
 
 func (s *Shell) execute(ctx context.Context, command string, input string, output chan<- string) (result []byte, err error) {
 
-	log.Debug("shell execute", "command", command)
+	slog.Debug("shell execute", "cmd", command)
 
 	cmd := exec.CommandContext(ctx, "sh", "-c", command)
 

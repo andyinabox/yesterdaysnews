@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"sync"
 	"time"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
@@ -46,12 +46,12 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 
 			// check date
 			if !util.IsSameDay(date, item.Snippet.PublishedAt) {
-				log.Debugf("skipping video %q: wrong date: %s / %s", id, date, item.Snippet.PublishedAt)
+				slog.Debug("skipping video: wrong date", "id", id, "date", item.Snippet.PublishedAt, "targetDate", date)
 				return
 			}
 
 			if throttler != nil {
-				log.Debugf("throttling YouTube ID check for %s", s.cfg.ThrottleDownloadsBy)
+				slog.Debug("throttling YouTube ID check", "time", s.cfg.ThrottleDownloadsBy)
 				<-throttler
 			}
 
@@ -59,7 +59,7 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 			videoInfo, err := s.ytdl.GetVideoInfo(ctx, id, VideoFormatString)
 			if err != nil {
 				if errors.Is(err, youtubedownloader.ErrRequestedFormatNotAvailable) {
-					log.Debugf("skipping video %q because requested format is not available", id)
+					slog.Debug("skipping video because requested format is not available", "id", id)
 					return
 				}
 
@@ -69,13 +69,13 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 
 			// check filesize
 			if videoInfo.FilesizeApprox > maxSize {
-				log.Debugf("skipping video %s: size %d is too large", id, videoInfo.FilesizeApprox)
+				slog.Debug("skipping video: size is too large", "id", id, "size", videoInfo.FilesizeApprox)
 				return
 			}
 
 			// check for captions
 			if c, ok := videoInfo.AutomaticCaptions["en"]; !ok || len(c) == 0 {
-				log.Debugf("skipping video %s: no subtitles", id)
+				slog.Debug("skipping video: no subtitles", "id", id)
 				return
 			}
 
@@ -113,10 +113,10 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 			case <-ctx.Done():
 				return
 			default:
-				log.Infof("fetch video ids for %q", playlistId)
+				slog.Info("fetch video ids", "playlistId", playlistId)
 
 				if totalRequests >= s.cfg.MaxPlaylistRequests {
-					log.Warnf("reached max requests of %d for playlist %q", s.cfg.MaxPlaylistRequests, playlistId)
+					slog.Warn("reached max requests for playlist", "maxRequests", s.cfg.MaxPlaylistRequests, "playlistId", playlistId)
 					return
 				}
 
@@ -128,7 +128,7 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 				}
 
 				for _, id := range ids {
-					log.Infof("found valid video id: %q", id)
+					slog.Info("found valid video id", "id", id)
 					stream <- id
 					total++
 					if total >= count {

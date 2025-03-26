@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"time"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/captiongenerator"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
@@ -50,21 +50,21 @@ func (s *Server) Start(ctx context.Context) error {
 			default:
 				time.Sleep(s.cfg.ManifestCheckInterval)
 
-				log.Info("checking build id")
+				slog.Info("checking build id")
 
 				newBuildID, err := s.getCurrentBuildID(ctx)
 				if err != nil {
-					log.Errorf("error loading current buildID: %s", err)
+					slog.Error("error loading current buildID", "error", err)
 					continue
 				}
 
-				log.Debug("comparing buildID", "current", s.buildID, "new", newBuildID)
+				slog.Debug("comparing buildID", "current", s.buildID, "new", newBuildID)
 				if newBuildID != s.buildID {
-					log.Info("buildID is updated, reloading...")
+					slog.Info("buildID is updated, reloading...")
 
 					manifest, err := s.getManifest(ctx, newBuildID)
 					if err != nil {
-						log.Errorf("error loading manifest: %s", err)
+						slog.Error("error loading manifest", "error", err)
 						continue
 					}
 
@@ -75,7 +75,7 @@ func (s *Server) Start(ctx context.Context) error {
 
 					cg, err := s.makeCaptionGenerator(ctx, newBuildID)
 					if err != nil {
-						log.Errorf("error making new text processor: %s", err)
+						slog.Error("error making new text processor", "error", err)
 						continue
 					}
 
@@ -89,7 +89,7 @@ func (s *Server) Start(ctx context.Context) error {
 		}
 	}()
 
-	log.Infof("starting server at http://localhost:%d", s.cfg.Port)
+	slog.Info("starting server", "host", "localhost", "port", s.cfg.Port)
 	return s.srv.ListenAndServe()
 }
 
@@ -123,9 +123,9 @@ func (s *Server) getManifest(ctx context.Context, buildID string) (*domain.Manif
 		return nil, err
 	}
 
-	// log.Debug(string(data))
+	// slog.Debug("get manifest data", "data", string(data))
 
-	log.Debug("unmarshal manifest data")
+	slog.Debug("unmarshal manifest data")
 	manifest := domain.Manifest{}
 	err = json.Unmarshal(data, &manifest)
 	if err != nil {
@@ -142,7 +142,7 @@ func (s *Server) getCurrentBuildID(ctx context.Context) (string, error) {
 		return "", fmt.Errorf("error getting current build id: %w", err)
 	}
 
-	log.Debug(string(data))
+	slog.Debug("get current buildID", "buildID", string(data))
 
 	return string(data), nil
 }
