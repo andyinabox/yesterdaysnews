@@ -40,6 +40,7 @@ type errorHandler struct {
 	stream     chan domain.Error
 	err        error
 	cfg        *Config
+	ctx        context.Context
 }
 
 func New(ctx context.Context, cfg *Config) domain.ErrorHandler {
@@ -54,6 +55,7 @@ func New(ctx context.Context, cfg *Config) domain.ErrorHandler {
 		errs:       make(map[string][]domain.Error),
 		stream:     stream,
 		cfg:        cfg,
+		ctx:        ctx,
 	}
 
 	if cfg.ErrorFunc != nil {
@@ -143,12 +145,31 @@ func (h *errorHandler) String() (str string) {
 	return
 }
 
+func (h *errorHandler) Log() {
+	slogErrs := []slog.Attr{}
+
+	for typ, errs := range h.errs {
+		groupErrs := []any{}
+		for i, err := range errs {
+			groupErrs = append(groupErrs, slog.String(fmt.Sprintf("error%d", i), err.Error()))
+		}
+		slogErrs = append(slogErrs, slog.Group(typ, groupErrs...))
+	}
+
+	slog.LogAttrs(
+		h.ctx,
+		slog.LevelError,
+		"ErrorHandler Errors",
+		slogErrs...,
+	)
+
+}
+
 // Report will log the error report and output an errors file if there are errors (use like `defer h.DeferredReport()`)
 func (h *errorHandler) Report() {
 	if h.CountAll() > 0 {
 
-		// TODO: log error report in a more structured way
-		slog.Error(h.String())
+		h.Log()
 
 		if h.cfg.SaveErrorFile {
 			// don't output file if no filename is provided

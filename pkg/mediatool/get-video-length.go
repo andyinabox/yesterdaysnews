@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log/slog"
 	"strings"
 	"time"
 
@@ -30,7 +29,7 @@ func (t *Tool) GetVideoLength(ctx context.Context, inputPath string) (Duration, 
 
 	result, err := t.executeFfprobe(ctx, options)
 
-	slog.Debug("ffprobe get video info", "result", string(result))
+	// slog.Debug("ffprobe get video info", "result", string(result))
 
 	if err != nil {
 		return 0, fmt.Errorf("error getting video info: %w", err)

@@ -37,12 +37,12 @@ func (t *Tool) CombineVideos(ctx context.Context, files []string, outFile string
 		AddKeyed("-c", "copy").
 		Add(outFile)
 
-	result, err := t.executeFfmpeg(ctx, options)
+	_, err = t.executeFfmpeg(ctx, options)
 	if err != nil {
 		return
 	}
 
-	slog.Debug("ffmpeg combine videos", "result", string(result))
+	// slog.Debug("ffmpeg combine videos", "result", string(result))
 
 	return outFile, nil
 }

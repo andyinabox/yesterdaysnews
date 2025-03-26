@@ -46,8 +46,4 @@ type ErrorHandler interface {
 
 	// output
 	Report()
-
-	// Print()
-	// Reset()
-	// Err() error
 }

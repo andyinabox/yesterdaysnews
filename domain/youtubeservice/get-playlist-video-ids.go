@@ -37,6 +37,8 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 
 	throttler := time.Tick(s.cfg.ThrottleDownloadsBy)
 
+	slog.Info("recieved playlist items from YouTube API", "count", len(resp.Items), "page", pageToken)
+
 	wg.Add(len(resp.Items))
 	for _, item := range resp.Items {
 		go func() {

@@ -38,7 +38,7 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 		slog.Info("cutting video into clips", "file", filePath, "count", len(editPoints))
 		outDir := filepath.Join(b.cfg.OutputDir, domain.ClipsDirName)
 		for clip := range b.vp.CutVideoStream(ctx, b.errs, filePath, outDir, editPoints) {
-			slog.Info("finished cutting clipe", "file", clip)
+			slog.Info("finished cutting clip", "file", clip)
 			clipStream <- clip
 		}
 		slog.Debug("exiting cutVideo loop")
