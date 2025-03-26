@@ -3,8 +3,8 @@ package mediatool
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/shell"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
 )
@@ -27,7 +27,7 @@ func New(ffmpegPath string, ffprobePath string) *Tool {
 		ffprobePath = sh.MustGetBinaryPath("ffprobe")
 	}
 
-	log.Debug("create new video editor", "ffmpegPath", ffmpegPath, "ffprobePath", ffprobePath)
+	slog.Debug("create new video editor", "ffmpegPath", ffmpegPath, "ffprobePath", ffprobePath)
 	return &Tool{
 		ffmpegPath:  ffmpegPath,
 		ffprobePath: ffprobePath,
@@ -39,7 +39,7 @@ func (t *Tool) execute(ctx context.Context, exePath string, options *shellargs.A
 
 	command := fmt.Sprintf("%s%s", exePath, options)
 
-	log.Debug(command)
+	slog.Debug("execute mediatool command", "cmd", command)
 
 	data, err := t.shell.Execute(ctx, command)
 

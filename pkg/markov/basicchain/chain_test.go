@@ -5,13 +5,9 @@ import (
 	"os"
 	"strings"
 	"testing"
-
-	"github.com/charmbracelet/log"
 )
 
 func TestBasicChainJSONMarshaling(t *testing.T) {
-	log.SetLevel(log.DebugLevel)
-	log.SetReportCaller(true)
 
 	f, err := os.Open("../../../test/corpus.txt")
 	if err != nil {

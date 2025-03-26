@@ -2,10 +2,10 @@ package builder
 
 import (
 	"context"
+	"log/slog"
 	"path/filepath"
 	"sync"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
@@ -21,7 +21,7 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 
 	cleanup := func() {
 		wg.Wait()
-		log.Debug("closing video clip stream")
+		slog.Debug("closing video clip stream")
 		close(clipStream)
 	}
 
@@ -35,13 +35,13 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 			return
 		}
 
-		log.Infof("cutting %q into %d clips", filePath, len(editPoints))
+		slog.Info("cutting video into clips", "file", filePath, "count", len(editPoints))
 		outDir := filepath.Join(b.cfg.OutputDir, domain.ClipsDirName)
 		for clip := range b.vp.CutVideoStream(ctx, b.errs, filePath, outDir, editPoints) {
-			log.Infof("finished cutting %q", clip)
+			slog.Info("finished cutting clip", "file", clip)
 			clipStream <- clip
 		}
-		log.Debug("exiting cutVideo loop")
+		slog.Debug("exiting cutVideo loop")
 	}
 
 	go func() {
@@ -59,7 +59,7 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 				}
 
 				wg.Add(1)
-				log.Infof("start cutting %q", filePath)
+				slog.Info("start cutting clips", "file", filePath)
 				go cutVideo(filePath)
 			}
 		}

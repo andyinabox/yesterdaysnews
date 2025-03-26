@@ -2,8 +2,8 @@ package mediatool
 
 import (
 	"context"
+	"log/slog"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
 )
 
@@ -20,7 +20,7 @@ func (t *Tool) AddCaptions(ctx context.Context, videoFile, subsFile, outFile str
 		return "", err
 	}
 
-	log.Debug(string(result))
+	slog.Debug("ffmpeg add captions", "result", string(result))
 
 	return outFile, nil
 

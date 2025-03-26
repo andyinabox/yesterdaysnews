@@ -5,10 +5,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
@@ -46,7 +46,7 @@ func (b *Builder) PosterImage(ctx context.Context, uploadDir string, paths []str
 	}
 	if !b.cfg.SkipUpload {
 		posterImageFileKey := filepath.Join(uploadDir, domain.PosterImageFileName)
-		log.Infof("uploading %q as %q", posterImagePath, posterImageFileKey)
+		slog.Info("uploading image file", "from", posterImagePath, "to", posterImageFileKey)
 		posterImageFileKey, err = b.cs.UploadFile(ctx, posterImagePath, posterImageFileKey, "image/png", false)
 		if err != nil {
 			return "", fmt.Errorf("error uploading %q: %w", posterImageFileKey, err)

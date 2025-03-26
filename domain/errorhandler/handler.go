@@ -4,11 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"sync"
 	"time"
-
-	"github.com/charmbracelet/log"
 
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
@@ -18,10 +17,11 @@ var defaultErrorFunc, defaultFatalFunc func(string, error)
 
 func init() {
 	defaultErrorFunc = func(typ string, err error) {
-		log.Errorf("%s error: %s\n", typ, err)
+		slog.Error(fmt.Sprintf("%s error", typ), "type", typ, "error", err)
 	}
 	defaultFatalFunc = func(typ string, err error) {
-		log.Fatalf("%s error: %s\n", typ, err)
+		slog.Error(fmt.Sprintf("%s error", typ), "type", typ, "error", err)
+		panic(err)
 	}
 }
 
@@ -40,6 +40,7 @@ type errorHandler struct {
 	stream     chan domain.Error
 	err        error
 	cfg        *Config
+	ctx        context.Context
 }
 
 func New(ctx context.Context, cfg *Config) domain.ErrorHandler {
@@ -54,6 +55,7 @@ func New(ctx context.Context, cfg *Config) domain.ErrorHandler {
 		errs:       make(map[string][]domain.Error),
 		stream:     stream,
 		cfg:        cfg,
+		ctx:        ctx,
 	}
 
 	if cfg.ErrorFunc != nil {
@@ -143,17 +145,37 @@ func (h *errorHandler) String() (str string) {
 	return
 }
 
+func (h *errorHandler) Log() {
+	slogErrs := []slog.Attr{}
+
+	for typ, errs := range h.errs {
+		groupErrs := []any{}
+		for i, err := range errs {
+			groupErrs = append(groupErrs, slog.String(fmt.Sprintf("error%d", i), err.Error()))
+		}
+		slogErrs = append(slogErrs, slog.Group(typ, groupErrs...))
+	}
+
+	slog.LogAttrs(
+		h.ctx,
+		slog.LevelError,
+		"ErrorHandler Errors",
+		slogErrs...,
+	)
+
+}
+
 // Report will log the error report and output an errors file if there are errors (use like `defer h.DeferredReport()`)
 func (h *errorHandler) Report() {
 	if h.CountAll() > 0 {
 
-		log.Error(h.String())
+		h.Log()
 
 		if h.cfg.SaveErrorFile {
 			// don't output file if no filename is provided
 			data, err := h.MarshalJSON()
 			if err != nil {
-				log.Errorf("error marshaling error data: %s\n", err)
+				slog.Error("error marshaling error data", "error", err)
 				return
 			}
 
@@ -161,7 +183,7 @@ func (h *errorHandler) Report() {
 		}
 
 	} else {
-		log.Info("no errors to report")
+		slog.Info("no errors to report")
 	}
 }
 

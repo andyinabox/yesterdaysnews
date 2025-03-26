@@ -8,8 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/assetshandler"
 )
 
@@ -23,10 +23,9 @@ func init() {
 	flag.BoolVar(&verbose, "v", false, "verbose logging")
 	flag.Parse()
 
-	if verbose {
-		log.SetLevel(log.DebugLevel)
-		log.SetReportCaller(true)
-	}
+	logger.SetDefault(&logger.Config{
+		Verbose: true,
+	})
 }
 
 func cors(fs http.Handler) http.HandlerFunc {
@@ -41,22 +40,22 @@ func main() {
 	// Check if the directory exists
 	_, err := os.Stat(dir)
 	if os.IsNotExist(err) {
-		log.Fatalf("directory %q not found.\n", dir)
+		panic(fmt.Sprintf("directory %q not found.\n", dir))
 	}
 
 	data, err := os.ReadFile(filepath.Join(dir, domain.ManifestFileName))
 	if err != nil {
-		log.Fatalf("problem reading manifest file: %s", err)
+		panic(fmt.Sprintf("problem reading manifest file: %s", err))
 	}
 
 	manifest := domain.Manifest{}
 	err = json.Unmarshal(data, &manifest)
 	if err != nil {
-		log.Fatalf("problem unmarshaling manifest file: %s", err)
+		panic(fmt.Sprintf("problem unmarshaling manifest file: %s", err))
 	}
 
 	if manifest.ID == "" {
-		log.Fatal("no build ID found")
+		panic("no build ID found")
 	}
 
 	buildID := manifest.ID
@@ -79,5 +78,8 @@ func main() {
 	}
 
 	fmt.Printf("fileserver started at http://localhost:%d with buildID %q \n", port, buildID)
-	log.Fatal(srv.ListenAndServe())
+	err = srv.ListenAndServe()
+	if err != nil {
+		panic(err)
+	}
 }

@@ -3,11 +3,11 @@ package builder
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
 )
@@ -23,19 +23,19 @@ func (b *Builder) Model(ctx context.Context, uploadDir string, corpi []domain.Co
 	}
 
 	modelFilePath := filepath.Join(b.cfg.OutputDir, domain.ModelFileName)
-	log.Infof("saving model file to %q", modelFilePath)
+	slog.Info("saving model file", "path", modelFilePath)
 	err = os.WriteFile(modelFilePath, data, os.ModePerm)
 	if err != nil {
 		return "", fmt.Errorf("error saving model file %s: %w", domain.ModelFileName, err)
 	}
 
 	if b.cfg.SkipUpload {
-		log.Info("SkipUpload is true, skipping model upload")
+		slog.Info("SkipUpload is true, skipping model upload")
 		return strings.TrimPrefix(modelFilePath, b.cfg.OutputDir+"/"), nil
 	}
 
 	modelFileKey := filepath.Join(uploadDir, domain.ModelFileName)
-	log.Infof("uploading %q as %q", modelFilePath, modelFileKey)
+	slog.Info("uploading model file", "from", modelFilePath, "to", modelFileKey)
 	modelFileKey, err = b.cs.UploadFile(ctx, modelFilePath, modelFileKey, "application/json", false)
 	if err != nil {
 		return "", fmt.Errorf("error uploading %q: %w", modelFileKey, err)

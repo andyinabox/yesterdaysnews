@@ -3,10 +3,9 @@ package server
 import (
 	"fmt"
 	"html/template"
+	"log/slog"
 	"math/rand"
 	"net/http"
-
-	"github.com/charmbracelet/log"
 )
 
 const metaCommentTmpl = `
@@ -54,7 +53,7 @@ func (s *Server) Index() http.HandlerFunc {
 
 		err := s.cfg.Templates.ExecuteTemplate(w, "index.html.tmpl", data)
 		if err != nil {
-			log.Error(err)
+			slog.Error("error rendering index page", "error", err)
 		}
 	}
 }

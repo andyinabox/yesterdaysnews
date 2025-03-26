@@ -2,18 +2,17 @@ package server
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/charmbracelet/log"
 )
 
 func (s *Server) Captions() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		log.Debug("captions sse connected")
+		slog.Debug("captions sse connected")
 
 		// Set CORS headers to allow all origins. You may want to restrict this to specific origins in a production environment.
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -35,7 +34,7 @@ func (s *Server) Captions() http.HandlerFunc {
 				return
 			default:
 				caption = s.cg.Caption(caption)
-				// log.Debug(caption)
+				// slog.Debug(caption)
 				fmt.Fprintf(w, "data: %s\n\n", caption)
 				w.(http.Flusher).Flush()
 
@@ -58,7 +57,7 @@ func mapCaptionToDelay(cap string, minLength, maxLength int, minDelay, maxDelay 
 	seconds := ((maxDelay - minDelay) * percent) + minDelay
 	duration := time.Duration(seconds * float64(time.Second))
 
-	// log.Debug("caption delay", "duration", duration, "percent", percent, "seconds", seconds)
+	// slog.Debug("caption delay", "duration", duration, "percent", percent, "seconds", seconds)
 
 	return duration
 }

@@ -4,15 +4,17 @@ import (
 	"context"
 	"embed"
 	"flag"
+	"fmt"
 	"html/template"
 	"io/fs"
+	"log/slog"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
 	"github.com/russross/blackfriday/v2"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/server"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
 )
@@ -32,7 +34,7 @@ var assets embed.FS
 //go:embed importmap.json
 var importMap string
 
-var verbose, loadAssetsFromFs bool
+var verbose, loadAssetsFromFs, useJsonOutput bool
 var port, prefixLength, minCaptionLength, maxCaptionLength, fetchClipsWhenLowerThan int
 var maxCaptionDelay, minCaptionDelay float64
 var manifestCheckIntervalStr string
@@ -42,12 +44,8 @@ const assetsBuildDir = ".assets"
 
 func init() {
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Warnf("error loading .env file: %s", err)
-	}
-
 	flag.BoolVar(&verbose, "v", false, "verbose logging")
+	flag.BoolVar(&useJsonOutput, "j", false, "use json output")
 	flag.BoolVar(&loadAssetsFromFs, "a", false, "load assets from filesystem (for easier frontend development)")
 	flag.IntVar(&prefixLength, "p", 2, "markov chain prefix length")
 	flag.IntVar(&minCaptionLength, "minl", 7, "min caption length in words")
@@ -59,10 +57,14 @@ func init() {
 	flag.StringVar(&manifestCheckIntervalStr, "m", "1h", "manifest check interval")
 	flag.Parse()
 
-	if verbose {
-		log.SetLevel(log.DebugLevel)
-		log.SetReportTimestamp(false)
-		log.SetReportCaller(true)
+	logger.SetDefault(&logger.Config{
+		Verbose:    verbose,
+		JSONOutput: useJsonOutput,
+	})
+
+	err := godotenv.Load()
+	if err != nil {
+		slog.Warn("error loading .env", "error", err)
 	}
 
 }
@@ -74,13 +76,13 @@ func main() {
 	// strip out the name of the assets dir from the filesystem
 	assetsEmbeddedFs, err := fs.Sub(fs.FS(assets), assetsBuildDir)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// parse manifest check interval string into time.Duration
 	manifestCheckInterval, err := time.ParseDuration(manifestCheckIntervalStr)
 	if err != nil {
-		log.Fatalf("error parsing manifest interval %s: %s", manifestCheckIntervalStr, err)
+		panic(fmt.Sprintf("error parsing manifest interval %s: %s", manifestCheckIntervalStr, err))
 	}
 
 	// parse about markdown
@@ -105,13 +107,15 @@ func main() {
 
 	err = configloader.Load(cfg)
 	if err != nil {
-		log.Fatalf("error loading env vars: %s", err)
+		panic(fmt.Sprintf("error loading env vars: %s", err))
 	}
 
-	log.Info("creating new server")
-	log.Infof("%#v", cfg)
+	slog.Info("creating new server")
 
 	s := server.New(cfg)
 
-	log.Fatal(s.Start(ctx))
+	err = s.Start(ctx)
+	if err != nil {
+		panic(err)
+	}
 }

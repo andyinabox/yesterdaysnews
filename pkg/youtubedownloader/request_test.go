@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"os"
 	"testing"
-
-	"github.com/charmbracelet/log"
 )
 
 func TestDownloadVideoRequestToString(t *testing.T) {
@@ -35,7 +33,7 @@ func TestDownloadVideoRequestToString(t *testing.T) {
 		result := req.String()
 
 		if result != expected {
-			log.Errorf("expected:\n%q\ngot:\n%q\n", expected, result)
+			t.Errorf("expected:\n%q\ngot:\n%q\n", expected, result)
 		}
 
 	}
@@ -49,7 +47,7 @@ func TestDownloadVideoRequestToString(t *testing.T) {
 		result := req.String()
 
 		if result != expected {
-			log.Errorf("expected:\n%q\ngot:\n%q\n", expected, result)
+			t.Errorf("expected:\n%q\ngot:\n%q\n", expected, result)
 		}
 
 	}

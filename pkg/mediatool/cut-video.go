@@ -3,7 +3,6 @@ package mediatool
 import (
 	"context"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
 )
 
@@ -16,9 +15,9 @@ func (t *Tool) CutVideo(ctx context.Context, input, output string, start, durati
 		AddKeyed("-c", "copy").
 		Add(output)
 
-	result, err := t.executeFfmpeg(ctx, options)
+	_, err := t.executeFfmpeg(ctx, options)
 
-	log.Debug(string(result))
+	// slog.Debug("ffmpeg cut video", "result", string(result))
 
 	return err
 }

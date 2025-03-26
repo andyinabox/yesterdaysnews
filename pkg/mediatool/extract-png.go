@@ -3,7 +3,6 @@ package mediatool
 import (
 	"context"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
 )
 
@@ -14,9 +13,9 @@ func (t *Tool) ExtractPNG(ctx context.Context, input, output string, start Durat
 		AddKeyed("-frames:v", "1").
 		Add(output)
 
-	result, err := t.executeFfmpeg(ctx, options)
+	_, err := t.executeFfmpeg(ctx, options)
 
-	log.Debug(string(result))
+	// slog.Debug("ffmpeg extract png", "result", string(result))
 
 	return err
 }

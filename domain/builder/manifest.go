@@ -4,16 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
 func (b *Builder) Manifest(ctx context.Context, uploadDir string, manifest *domain.Manifest) (string, error) {
-	log.Info("saving manifest")
+	slog.Info("saving manifest")
 
 	// TODO: check manifest?
 
@@ -30,12 +30,12 @@ func (b *Builder) Manifest(ctx context.Context, uploadDir string, manifest *doma
 
 	// finish here if skipping upload step
 	if b.cfg.SkipUpload {
-		log.Info("SkipUpload is true, skipping manifest upload")
+		slog.Info("SkipUpload is true, skipping manifest upload")
 		return strings.TrimPrefix(manifestFilePath, b.cfg.OutputDir+"/"), nil
 	}
 
 	manifestFileKey := filepath.Join(uploadDir, domain.ManifestFileName)
-	log.Infof("uploading %q as %q", manifestFilePath, manifestFileKey)
+	slog.Info("uploading manifest file", "from", manifestFilePath, "to", manifestFileKey)
 	manifestFileKey, err = b.cs.UploadFile(ctx, manifestFilePath, manifestFileKey, "application/json", false)
 	if err != nil {
 		return "", fmt.Errorf("error uploading manifest file %q: %w", manifestFilePath, err)

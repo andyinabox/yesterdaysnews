@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
 )
 
@@ -29,29 +29,26 @@ func (t *Tool) GetVideoLength(ctx context.Context, inputPath string) (Duration, 
 
 	result, err := t.executeFfprobe(ctx, options)
 
-	log.Debug(string(result))
+	// slog.Debug("ffprobe get video info", "result", string(result))
 
 	if err != nil {
-		log.Error("error getting video info", "result", string(result))
-		return 0, err
+		return 0, fmt.Errorf("error getting video info: %w", err)
 	}
 
 	data := ffprobeVideLengthResp{}
 	err = json.Unmarshal(result, &data)
 	if err != nil {
-		log.Error("error unmarshaling data", "result", string(result))
-		return 0, err
+		return 0, fmt.Errorf("error unmarshaling video info: %w", err)
 	}
 
 	if data.Format.Duration == "" {
 		err = errors.New("duration is empty")
-		log.Error(err)
-		return 0, err
+		return 0, fmt.Errorf("error getting video duration: %w", err)
 	}
 
 	d, err := time.ParseDuration(strings.TrimSpace(data.Format.Duration) + "s")
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("error parsing video duration: %w", err)
 	}
 
 	return Duration(d), nil

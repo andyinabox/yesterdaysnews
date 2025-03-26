@@ -4,13 +4,9 @@ import (
 	"context"
 	"testing"
 	"time"
-
-	"github.com/charmbracelet/log"
 )
 
 func TestGetVideoEditPoints(t *testing.T) {
-
-	log.SetLevel(log.DebugLevel)
 
 	vp := New(&Config{})
 

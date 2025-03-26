@@ -5,10 +5,9 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"log/slog"
 	"os"
 	"path/filepath"
-
-	"github.com/charmbracelet/log"
 )
 
 const MaxBatchSize = 255
@@ -48,7 +47,7 @@ func (c *Client) Run(paths []string, outFile string, width, height int) (string,
 		return "", fmt.Errorf("error creating tmp dir: %w", err)
 	}
 
-	log.Debugf("created temp dir %q", c.dir)
+	slog.Debug("created temp dir", "dir", c.dir)
 
 	// setup bounds
 	c.width = width
@@ -93,7 +92,7 @@ func (c *Client) run(paths []string, outFile string, count int) (string, error) 
 	batchCount := (len(paths) / batchSize) + 1
 	batchPaths := make([]string, batchCount)
 
-	log.Debugf("breaking into %d batches of %d", batchCount, batchSize)
+	slog.Debug("breaking into batches", "batchCount", batchCount, "batchSize", batchSize)
 	var start, end int
 	for i := 0; i < batchCount; i++ {
 		start = batchSize * i
@@ -104,11 +103,11 @@ func (c *Client) run(paths []string, outFile string, count int) (string, error) 
 
 		// skip a batch of size 0
 		if start == end {
-			log.Warnf("found batch of size zero, skipping")
+			slog.Warn("found batch of size zero, skipping")
 			continue
 		}
 
-		log.Debug("batch slice", "start", start, "end", end)
+		slog.Debug("batch slice", "start", start, "end", end)
 
 		count++
 		batchPaths[i], err = c.avg(paths[start:end], count)
@@ -118,7 +117,7 @@ func (c *Client) run(paths []string, outFile string, count int) (string, error) 
 	}
 
 	count++
-	log.Debugf("finished creating intermediary images, now running batch %d with %d images", count, len(batchPaths))
+	slog.Debug("finished creating intermediary images, running new batch", "batchNumber", count, "imageCount", len(batchPaths))
 	return c.run(batchPaths, outFile, count)
 }
 
@@ -130,7 +129,7 @@ func (c *Client) avg(paths []string, count int) (string, error) {
 
 	for _, path := range paths {
 
-		log.Debugf("collect pixels for %q", path)
+		slog.Debug("collect pixels for", "path", path)
 
 		// open file
 		f, err := os.Open(path)

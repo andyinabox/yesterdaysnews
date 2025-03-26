@@ -3,12 +3,12 @@ package builder
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
@@ -18,7 +18,7 @@ import (
 func (b *Builder) Cleanup(ctx context.Context, toKeep int) ([]string, error) {
 
 	if !b.cfg.KeepOutputFiles {
-		log.Infof("removing contents of dir %q", b.cfg.OutputDir)
+		slog.Info("removing contents of dir", "dir", b.cfg.OutputDir)
 		err := util.RemoveContents(b.cfg.OutputDir)
 		if err != nil {
 			return nil, fmt.Errorf("error removing %q from filesystem: %w", b.cfg.OutputDir, err)
@@ -26,7 +26,7 @@ func (b *Builder) Cleanup(ctx context.Context, toKeep int) ([]string, error) {
 	}
 
 	if b.cfg.SkipUpload {
-		log.Info("SkipUpload is true, skipping ObjectStore cleanup")
+		slog.Info("SkipUpload is true, skipping ObjectStore cleanup")
 		return []string{}, nil
 	}
 
@@ -66,13 +66,13 @@ func (b *Builder) cleanupObjectStore(ctx context.Context, toKeep int) ([]string,
 		// note that prefix includes "/" so we don't need to add here
 		key := fmt.Sprintf("%s%s", pre, domain.ManifestFileName)
 
-		log.Debugf("checking to see if %q exists", key)
+		slog.Debug("checking to see if object exists", "key", key)
 		exists, err := b.cs.ObjectExists(ctx, key)
 		if err != nil {
 			b.errs <- errorhandler.Err(domain.ErrTypeCleanup, fmt.Errorf("error checking if object %q exists: %w", key, err))
 			return true
 		}
-		log.Debugf("%q exists? %v", key, exists)
+		slog.Debug("does object exists", "key", key, "exists", exists)
 
 		return exists
 	}
@@ -109,17 +109,17 @@ func (b *Builder) getCullingToDelete(ctx context.Context, toCull <-chan string, 
 			case <-ctx.Done():
 				return
 			default:
-				log.Debugf("checking if %q should be deleted", prefix)
+				slog.Debug("checking if prefix should be deleted", "prefix", prefix)
 
 				// skip until we've reached our limit
 				if kept < toKeep {
-					log.Debugf("only %d prefixes have been kept, keeping %q", kept, prefix)
+					slog.Debug("keep prefix", "prefix", prefix, "prefixesKept", kept)
 					kept++
 					continue
 				}
 
-				// elete the rest
-				log.Debugf("%d prefixes have already been kept, deleting %q", kept, prefix)
+				// delete the rest
+				slog.Debug("delete prefix", "prefix", prefix, "prefixesKept", kept)
 				toDelete <- prefix
 			}
 		}

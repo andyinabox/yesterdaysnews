@@ -3,10 +3,10 @@ package builder
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
@@ -20,7 +20,7 @@ func (b *Builder) Setup(ctx context.Context) error {
 	}
 
 	if util.DoesFileExist(b.cfg.OutputDir) {
-		log.Infof("removing contents of dir %q", b.cfg.OutputDir)
+		slog.Info("removing contents of dir", "dir", b.cfg.OutputDir)
 		err = util.RemoveContents(b.cfg.OutputDir)
 		if err != nil {
 			return fmt.Errorf("error removing dir %q: %w", b.cfg.OutputDir, err)
@@ -29,7 +29,7 @@ func (b *Builder) Setup(ctx context.Context) error {
 
 	clipsDir := filepath.Join(b.cfg.OutputDir, domain.ClipsDirName)
 
-	log.Infof("creating dir %q", clipsDir)
+	slog.Info("creating dir", "dir", clipsDir)
 	err = os.MkdirAll(clipsDir, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("error creating dir %q: %w", clipsDir, err)

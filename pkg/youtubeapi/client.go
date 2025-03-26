@@ -5,10 +5,9 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
-
-	"github.com/charmbracelet/log"
 )
 
 const APIBase = "https://youtube.googleapis.com/youtube/v3"
@@ -66,7 +65,7 @@ func (c *Client) newAPIRequest(ctx context.Context, method, endpoint string, que
 	u := fmt.Sprintf("%s/%s?%s", APIBase, endpoint, query.Encode())
 
 	// send request
-	log.Debug("new request", "url", u)
+	slog.Debug("new request", "url", u)
 	return http.NewRequestWithContext(ctx, method, u, bytes.NewReader(body))
 }
 
@@ -76,7 +75,7 @@ func (c *Client) parseBody(r *http.Response) (data []byte, err error) {
 	data, err = io.ReadAll(r.Body)
 
 	if err != nil {
-		log.Error("error parsing response body", "error", err, "url", r.Request.URL)
+		slog.Error("error parsing response body", "error", err, "url", r.Request.URL)
 		return
 	}
 

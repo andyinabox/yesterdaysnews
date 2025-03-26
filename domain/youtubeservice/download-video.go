@@ -2,10 +2,10 @@ package youtubeservice
 
 import (
 	"context"
+	"log/slog"
 	"path/filepath"
 	"sync"
 
-	"github.com/charmbracelet/log"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
@@ -34,7 +34,7 @@ func (s *Service) DownloadVideoStream(ctx context.Context, errs chan<- domain.Er
 
 	// wait for existing
 	cleanup := func() {
-		log.Debug("cleaning up video download stream")
+		slog.Debug("cleaning up video download stream")
 		wg.Wait()
 		close(downloadPaths)
 	}
@@ -44,7 +44,7 @@ func (s *Service) DownloadVideoStream(ctx context.Context, errs chan<- domain.Er
 	downloadVideo := func(id string) {
 		defer wg.Done()
 
-		log.Info("Download video", "id", id)
+		slog.Info("Download video", "id", id)
 		path, err := s.DownloadVideo(ctx, id, outDir)
 
 		// handle error
