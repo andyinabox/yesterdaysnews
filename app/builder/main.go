@@ -38,6 +38,7 @@ var (
 	verbose       bool
 	jsonLogOutput bool
 	buildPhase    string
+	buildId       string
 
 	playlistIDs              string
 	objectStoreContainerName string
@@ -60,6 +61,7 @@ func init() {
 	flag.BoolVar(&verbose, "v", false, "verbose output")
 	flag.BoolVar(&jsonLogOutput, "j", false, "json log output")
 	flag.StringVar(&buildPhase, "b", "all", "build phase to execute")
+	flag.StringVar(&buildId, "id", "", "build ID")
 
 	// config flags
 	flag.StringVar(&playlistIDs, "playlistids", defaultPlaylists, "comma-separated list of playlists to download")
@@ -83,9 +85,14 @@ func init() {
 
 	flag.Parse()
 
+	if buildId == "" {
+		buildId = util.Timestamp(time.Now())
+	}
+
 	logger.SetDefault(&logger.Config{
 		Verbose:    verbose,
 		JSONOutput: jsonLogOutput,
+		WithAttr:   []any{"buildId", buildId},
 	})
 
 	err := godotenv.Load()
@@ -264,7 +271,7 @@ func uploadVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHa
 		return errors.New("no clip found")
 	}
 
-	uploadDir := util.Timestamp(time.Now())
+	uploadDir := buildId
 	clipsStream := streams.StringStreamThrottled(ctx, time.Millisecond, clips...)
 	uploadsStream := b.UploadVideos(ctx, uploadDir, clipsStream)
 
@@ -305,7 +312,7 @@ func posterImage(ctx context.Context, config *builder.Config, eh domain.ErrorHan
 		return errors.New("no clip found")
 	}
 
-	uploadDir := util.Timestamp(time.Now())
+	uploadDir := buildId
 
 	posterImage, err := b.PosterImage(ctx, uploadDir, images)
 	if err != nil {
@@ -377,7 +384,7 @@ func buildManifest(ctx context.Context, config *builder.Config, eh domain.ErrorH
 	}
 
 	buildDate := time.Now()
-	buildID := util.Timestamp(buildDate)
+	buildID := buildId
 
 	manifest := &domain.Manifest{
 		BuildDate:   buildDate,
@@ -436,7 +443,7 @@ func buildCleanup(ctx context.Context, config *builder.Config, eh domain.ErrorHa
 func getBuildID(config *builder.Config) string {
 	manifest, err := getManifest(config)
 	if err != nil || manifest.ID == "" {
-		return util.Timestamp(time.Now())
+		return buildId
 	}
 	return manifest.ID
 }

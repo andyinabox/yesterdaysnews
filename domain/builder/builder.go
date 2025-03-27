@@ -22,6 +22,7 @@ type Config struct {
 	BinPathFFPROBE string `env:"YN_FFPROBE_PATH"`
 
 	// config variables
+	BuildID                     string
 	PlaylistIDs                 []string
 	ObjectStoreContainerName    string
 	OutputDir                   string

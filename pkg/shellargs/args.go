@@ -1,7 +1,5 @@
 package shellargs
 
-import "fmt"
-
 type Args struct {
 	args [][]string
 }
@@ -28,7 +26,7 @@ func (a *Args) AddKeyedSingleQuoted(key, value string) *Args {
 }
 
 func (a *Args) String() string {
-	fmt.Print(len(a.args))
+	// fmt.Print(len(a.args))
 	output := ""
 	for _, values := range a.args {
 		if len(values) == 2 {

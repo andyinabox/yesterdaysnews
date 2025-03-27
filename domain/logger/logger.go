@@ -10,17 +10,24 @@ import (
 type Config struct {
 	Verbose    bool
 	JSONOutput bool
+	WithAttr   []any
 }
 
 func New(c *Config) (logger *slog.Logger) {
 
 	// for json output we'll just use the slog library
 	if c.JSONOutput {
-		return newSlog(c)
+		logger = newSlog(c)
+		// for text output we'll use charmbracelet
+	} else {
+		logger = newCharm(c)
 	}
 
-	// for text output we'll use charmbracelet
-	return newCharm(c)
+	if c.WithAttr != nil {
+		logger = logger.With(c.WithAttr...)
+	}
+
+	return
 }
 
 func newSlog(c *Config) (logger *slog.Logger) {
@@ -33,6 +40,7 @@ func newSlog(c *Config) (logger *slog.Logger) {
 	}
 
 	logger = slog.New(slog.NewJSONHandler(os.Stdout, options))
+
 	return
 }
 
