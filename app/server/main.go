@@ -34,7 +34,8 @@ var assets embed.FS
 //go:embed importmap.json
 var importMap string
 
-var verbose, loadAssetsFromFs, useJsonOutput bool
+var verbose, loadAssetsFromFs bool
+var loggerType string
 var port, prefixLength, minCaptionLength, maxCaptionLength, fetchClipsWhenLowerThan int
 var maxCaptionDelay, minCaptionDelay float64
 var manifestCheckIntervalStr string
@@ -45,7 +46,7 @@ const assetsBuildDir = ".assets"
 func init() {
 
 	flag.BoolVar(&verbose, "v", false, "verbose logging")
-	flag.BoolVar(&useJsonOutput, "j", false, "use json output")
+	flag.StringVar(&loggerType, "log", "text", "logger type (text, json, loki)")
 	flag.BoolVar(&loadAssetsFromFs, "a", false, "load assets from filesystem (for easier frontend development)")
 	flag.IntVar(&prefixLength, "p", 2, "markov chain prefix length")
 	flag.IntVar(&minCaptionLength, "minl", 7, "min caption length in words")
@@ -58,8 +59,8 @@ func init() {
 	flag.Parse()
 
 	logger.SetDefault(&logger.Config{
-		Verbose:    verbose,
-		JSONOutput: useJsonOutput,
+		Type:    logger.LoggerType(loggerType),
+		Verbose: verbose,
 	})
 
 	err := godotenv.Load()

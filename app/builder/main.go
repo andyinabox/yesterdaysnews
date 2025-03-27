@@ -35,10 +35,10 @@ var overlayImage []byte
 const defaultPlaylists = "UUupvZG-5ko_eiXAupbDfxWw,UUaXkIU1QidjPwiAYu6GcHjg,UUXIJgqnII2ZOINSWNOGFThA"
 
 var (
-	verbose       bool
-	jsonLogOutput bool
-	buildPhase    string
-	buildId       string
+	verbose    bool
+	loggerType string
+	buildPhase string
+	buildId    string
 
 	playlistIDs              string
 	objectStoreContainerName string
@@ -59,7 +59,7 @@ var (
 func init() {
 	// meta flags
 	flag.BoolVar(&verbose, "v", false, "verbose output")
-	flag.BoolVar(&jsonLogOutput, "j", false, "json log output")
+	flag.StringVar(&loggerType, "log", "text", "logger type (text, json, loki)")
 	flag.StringVar(&buildPhase, "b", "all", "build phase to execute")
 	flag.StringVar(&buildId, "id", "", "build ID")
 
@@ -90,9 +90,9 @@ func init() {
 	}
 
 	logger.SetDefault(&logger.Config{
-		Verbose:    verbose,
-		JSONOutput: jsonLogOutput,
-		WithAttr:   []any{"buildId", buildId},
+		Type:     logger.LoggerType(loggerType),
+		Verbose:  verbose,
+		WithAttr: []any{"buildId", buildId},
 	})
 
 	err := godotenv.Load()
