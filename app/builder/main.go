@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"path"
 	"path/filepath"
 	"strings"
 	"syscall"
@@ -374,8 +375,22 @@ func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 
 func buildCombinedVideo(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
-	_ = b
-	return errors.New("not implemented")
+
+	clipFiles, err := filepath.Glob(filepath.Join(config.OutputDir, domain.ClipsDirName, "*.webm"))
+	if err != nil {
+		return err
+	}
+
+	modelFile := path.Join(config.OutputDir, domain.ModelFileName)
+
+	videoFile, subsFile, err := b.GenerateCombinedVideo(ctx, "", modelFile, clipFiles)
+	if err != nil {
+		return err
+	}
+
+	slog.Info("finished creating combined video", "videoFile", videoFile, "subsFile", subsFile)
+
+	return nil
 }
 
 func buildManifest(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
