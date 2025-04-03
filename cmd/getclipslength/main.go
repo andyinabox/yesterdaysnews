@@ -1,0 +1,56 @@
+package main
+
+import (
+	"context"
+	"flag"
+	"fmt"
+	"log/slog"
+	"path/filepath"
+
+	"github.com/joho/godotenv"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
+)
+
+var channelName string
+var verbose bool
+
+func init() {
+	flag.BoolVar(&verbose, "v", false, "verbose output")
+	flag.Parse()
+
+	logger.SetDefault(&logger.Config{
+		Verbose: verbose,
+	})
+
+	err := godotenv.Load()
+	if err != nil {
+		slog.Warn("error getting .env", "error", err)
+	}
+}
+
+func main() {
+
+	ctx := context.Background()
+
+	clips, err := filepath.Glob("dist/clips/*.webm")
+	if err != nil {
+		panic(err)
+	}
+
+	mt := mediatool.New("", "")
+
+	var total mediatool.Duration
+	for _, fn := range clips {
+		length, err := mt.GetVideoLength(ctx, fn)
+		if err != nil {
+			slog.Error("error getting video length", "file", fn, "error", err)
+		}
+
+		fmt.Printf("%s: %s\n", fn, length)
+		total = total + length
+	}
+
+	fmt.Printf("TOTAL: %s\n", total)
+
+}

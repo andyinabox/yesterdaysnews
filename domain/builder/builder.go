@@ -48,6 +48,7 @@ type Builder struct {
 	vp   domain.VideoProcessor
 	ip   domain.ImageProcessor
 	cs   domain.ContainerService
+	cg   domain.CaptionGenerator
 	eh   domain.ErrorHandler
 	errs chan<- domain.Error
 	cfg  *Config

@@ -2,22 +2,67 @@ package builder
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
+	"os"
 	"path/filepath"
 
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/captiongenerator"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
 )
 
 func (b *Builder) GenerateCombinedVideo(ctx context.Context, uploadDir, modelFile string, clips []string) (string, string, error) {
 
-	slog.Info("GenerateCombinedVideo", "uploadDir", uploadDir, "modelFile", modelFile, "clipsCount", len(clips))
-
 	videoFile := filepath.Join(b.cfg.OutputDir, domain.VideoFileName)
-	slog.Info("combining video files", "count", len(clips), "file", videoFile)
+	slog.Debug("combining video files", "count", len(clips), "file", videoFile)
 	videoFile, err := b.vp.ShuffleClipsAndCombine(ctx, clips, videoFile)
 	if err != nil {
-		return "", "", err
+		return "", "", fmt.Errorf("error combining video clips: %w", err)
+	}
+
+	videoLength, err := b.vp.GetVideoLength(ctx, videoFile)
+	if err != nil {
+		return "", "", fmt.Errorf("error getting video length: %w", err)
+	}
+
+	chain, err := b.buildMarkovChain(ctx, modelFile)
+	if err != nil {
+		return "", "", fmt.Errorf("error building markov chain: %w", err)
+	}
+
+	cg := captiongenerator.New(chain, &captiongenerator.Config{
+		MinCaptionLength: 7,
+		MaxCaptionLength: 15,
+	})
+
+	slog.Debug("generating subtitles", "videoLength", videoLength)
+	subs, err := cg.Subtitles(videoLength)
+	if err != nil {
+		return "", "", fmt.Errorf("error generating subtitles: %w", err)
+	}
+	subsFile := filepath.Join(b.cfg.OutputDir, domain.SubsFileName)
+	err = os.WriteFile(subsFile, subs, os.ModePerm)
+	if err != nil {
+		return "", "", fmt.Errorf("error writing subtitles file: %w", err)
 	}
 
 	return videoFile, "", nil
+}
+
+func (b *Builder) buildMarkovChain(ctx context.Context, modelFile string) (markov.Chain, error) {
+
+	modelData, err := os.ReadFile(modelFile)
+	if err != nil {
+		return nil, err
+	}
+
+	chain := captionschain.New(b.cfg.CaptionPrefixLength)
+	err = chain.Load(modelData)
+	if err != nil {
+		return nil, err
+	}
+
+	return chain, nil
 }

@@ -25,6 +25,13 @@ func (t *Tool) CombineVideos(ctx context.Context, files []string, outFile string
 	var fileList string
 	for _, f := range files {
 		// ffmpeg format is "file 'path/to/file.mp4'"
+
+		err := t.Validate(ctx, f)
+		if err != nil {
+			slog.Warn("CombineVideos: file is invalid, skipping", "file", f, "error", err)
+			continue
+		}
+
 		fileList = fileList + fmt.Sprintf("file '%s'\n", f)
 	}
 
@@ -37,12 +44,12 @@ func (t *Tool) CombineVideos(ctx context.Context, files []string, outFile string
 		AddKeyed("-c", "copy").
 		Add(outFile)
 
-	_, err = t.executeFfmpeg(ctx, options)
+	result, err := t.executeFfmpeg(ctx, options)
 	if err != nil {
 		return
 	}
 
-	// slog.Debug("ffmpeg combine videos", "result", string(result))
+	slog.Debug("ffmpeg combine videos", "result", string(result))
 
 	return outFile, nil
 }
