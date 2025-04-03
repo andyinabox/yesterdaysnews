@@ -26,10 +26,6 @@ func (a *Args) AddKeyedSingleQuoted(key, value string) *Args {
 }
 
 func (a *Args) String() string {
-<<<<<<< HEAD
-	// fmt.Print(len(a.args))
-=======
->>>>>>> main
 	output := ""
 	for _, values := range a.args {
 		if len(values) == 2 {
