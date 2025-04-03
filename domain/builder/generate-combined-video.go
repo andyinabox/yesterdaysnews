@@ -11,11 +11,21 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain/captiongenerator"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 func (b *Builder) GenerateCombinedVideo(ctx context.Context, uploadDir, modelFile string, clips []string) (string, string, error) {
 
 	videoFile := filepath.Join(b.cfg.OutputDir, domain.VideoFileName)
+
+	if util.DoesFileExist(videoFile) {
+		slog.Info("video file already exists, deleting", "file", videoFile)
+		err := os.Remove(videoFile)
+		if err != nil {
+			return "", "", fmt.Errorf("error removing video file: %w", err)
+		}
+	}
+
 	slog.Debug("combining video files", "count", len(clips), "file", videoFile)
 	videoFile, err := b.vp.ShuffleClipsAndCombine(ctx, clips, videoFile)
 	if err != nil {
