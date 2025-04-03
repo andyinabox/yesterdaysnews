@@ -4,7 +4,7 @@ import "time"
 
 type CaptionGenerator interface {
 	Caption(string) string
-	Subtitles(d time.Duration) ([]byte, error)
+	Subtitles(length time.Duration, minDuration, maxDuration float64) ([]byte, error)
 	MinCaptionLength() int
 	MaxCaptionLength() int
 }

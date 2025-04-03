@@ -30,17 +30,22 @@ func New() *SRT {
 	}
 }
 
-func (s *SRT) Add(start time.Time, duration time.Duration, text string) {
-	s.mu.Lock()
-	s.Captions = append(s.Captions, Caption{
+func (s *SRT) Add(start time.Time, duration time.Duration, text string) time.Time {
+
+	c := Caption{
 		Start:    start,
 		Duration: duration,
 		Text:     text,
-	})
+	}
+
+	s.mu.Lock()
+	s.Captions = append(s.Captions, c)
 	s.mu.Unlock()
+
+	return c.End()
 }
 
-func (s *SRT) AddToEnd(duration time.Duration, text string) {
+func (s *SRT) AddToEnd(duration time.Duration, text string) time.Time {
 
 	var start time.Time
 
@@ -48,8 +53,7 @@ func (s *SRT) AddToEnd(duration time.Duration, text string) {
 		start = s.Captions[len(s.Captions)-1].End()
 	}
 
-	s.Add(start, duration, text)
-
+	return s.Add(start, duration, text)
 }
 
 func (s *SRT) String() (out string) {
