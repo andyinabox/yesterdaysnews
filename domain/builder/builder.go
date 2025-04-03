@@ -53,7 +53,7 @@ type Builder struct {
 	cfg  *Config
 }
 
-func New(cfg *Config, eh domain.ErrorHandler) *Builder {
+func New(cfg *Config, eh domain.ErrorHandler) domain.Builder {
 
 	yt := youtubeservice.New(&youtubeservice.Config{
 		GoogleAPIKey:        cfg.GoogleAPIKey,

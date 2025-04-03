@@ -188,6 +188,10 @@ func main() {
 		err = buildModel(ctx, &config, eh)
 		handleBuildPhaseErr(err)
 
+	case domain.BuildPhaseGenerateCombinedVideo:
+		err = buildCombinedVideo(ctx, &config, eh)
+		handleBuildPhaseErr(err)
+
 	case domain.BuildPhaseManifest:
 		err = buildManifest(ctx, &config, eh)
 		handleBuildPhaseErr(err)
@@ -366,6 +370,12 @@ func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 	// }
 
 	return nil
+}
+
+func buildCombinedVideo(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
+	b := builder.New(config, eh)
+	_ = b
+	return errors.New("not implemented")
 }
 
 func buildManifest(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
