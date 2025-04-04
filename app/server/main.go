@@ -46,7 +46,7 @@ const assetsBuildDir = ".assets"
 func init() {
 
 	flag.BoolVar(&verbose, "v", false, "verbose logging")
-	flag.StringVar(&loggerType, "log", "text", "logger type (text, json, loki)")
+	flag.StringVar(&loggerType, "log", "text", "logger type (text, json)")
 	flag.BoolVar(&loadAssetsFromFs, "a", false, "load assets from filesystem (for easier frontend development)")
 	flag.IntVar(&prefixLength, "p", 2, "markov chain prefix length")
 	flag.IntVar(&minCaptionLength, "minl", 7, "min caption length in words")
