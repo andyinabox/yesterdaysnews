@@ -28,7 +28,7 @@ func (p *Processor) CutVideo(ctx context.Context, inFile, outFile string, edit d
 	if err != nil {
 
 		if removeErr := os.Remove(progressFile); removeErr != nil {
-			slog.Error("error removing invalid file", "file", progressFile, "error", removeErr)
+			slog.Warn("error removing invalid file", "file", progressFile, "error", removeErr)
 		}
 
 		return "", fmt.Errorf("error validating %q: %w", progressFile, err)
