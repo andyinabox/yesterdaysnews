@@ -23,14 +23,9 @@ func (t *Tool) CombineVideos(ctx context.Context, files []string, outFile string
 
 	// generate file with filenames
 	var fileList string
-	for _, f := range t.validateMultiple(ctx, files) {
+	for _, f := range files {
 		// ffmpeg format is "file 'path/to/file.mp4'"
 		fileList = fileList + fmt.Sprintf("file '%s'\n", f)
-	}
-
-	if fileList == "" {
-		err = errors.New("no valid files found")
-		return
 	}
 
 	err = os.WriteFile(VideoListFileName, []byte(fileList), os.ModePerm)

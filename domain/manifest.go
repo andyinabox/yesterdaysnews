@@ -12,5 +12,7 @@ type Manifest struct {
 type ManifestFiles struct {
 	PosterImageFile string   `json:"posterImage"`
 	ModelFile       string   `json:"model"`
+	VideoFile       string   `json:"video"`
+	SubtitlesFile   string   `json:"subtitles"`
 	Clips           []string `json:"clips"`
 }

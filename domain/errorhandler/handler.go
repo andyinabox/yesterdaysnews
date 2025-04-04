@@ -17,7 +17,7 @@ var defaultErrorFunc, defaultFatalFunc func(string, error)
 
 func init() {
 	defaultErrorFunc = func(typ string, err error) {
-		slog.Error(fmt.Sprintf("%s error", typ), "type", typ, "error", err)
+		slog.Warn(fmt.Sprintf("%s error", typ), "type", typ, "error", err)
 	}
 	defaultFatalFunc = func(typ string, err error) {
 		slog.Error(fmt.Sprintf("%s error", typ), "type", typ, "error", err)
@@ -158,7 +158,7 @@ func (h *errorHandler) Log() {
 
 	slog.LogAttrs(
 		h.ctx,
-		slog.LevelError,
+		slog.LevelWarn,
 		"ErrorHandler Errors",
 		slogErrs...,
 	)

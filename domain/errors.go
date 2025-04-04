@@ -10,6 +10,7 @@ const (
 	ErrTypeGetVideoID    = "ErrTypeGetVideoID"
 	ErrTypeDownloadVideo = "ErrTypeDownloadVideo"
 	ErrTypeCutVideo      = "ErrTypeCutVideo"
+	ErrTypeValidateVideo = "ErrTypeValidateVideo"
 	ErrTypeCleanup       = "ErrTypeCleanup"
 	ErrTypeExtractImage  = "ErrTypeExtractImage"
 	ErrTypeAverageImage  = "ErrTypeAverageImage"

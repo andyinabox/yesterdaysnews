@@ -30,7 +30,7 @@ func (b *Builder) GenerateCombinedVideo(ctx context.Context, uploadDir, modelFil
 	}
 
 	slog.Debug("combining video files", "count", len(clips), "file", videoFile)
-	videoFile, err := b.vp.ShuffleClipsAndCombine(ctx, clips, videoFile)
+	videoFile, err := b.vp.ShuffleClipsAndCombine(ctx, b.errs, clips, videoFile)
 	if err != nil {
 		return "", "", fmt.Errorf("error combining video clips: %w", err)
 	}
@@ -66,8 +66,8 @@ func (b *Builder) GenerateCombinedVideo(ctx context.Context, uploadDir, modelFil
 	}
 
 	dateStr := util.DateString(util.Yesterday())
-	videoKey := filepath.Join(domain.ArchivePrefix, dateStr+".mp4")
-	subsKey := filepath.Join(domain.ArchivePrefix, dateStr+".srt")
+	videoKey := filepath.Join(uploadDir, dateStr+".mp4")
+	subsKey := filepath.Join(uploadDir, dateStr+".srt")
 
 	slog.Info("uploading combined video file", "file", videoFile, "key", videoKey)
 	videoKey, err = b.cs.UploadFile(

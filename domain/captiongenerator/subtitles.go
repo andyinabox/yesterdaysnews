@@ -1,7 +1,6 @@
 package captiongenerator
 
 import (
-	"log/slog"
 	"time"
 
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/srt"
@@ -27,12 +26,12 @@ func (g *Generator) Subtitles(targetDuration time.Duration, minCaptionDuration, 
 		}
 		duration = util.MapCaptionToDelay(caption, g.cfg.MinCaptionLength, g.cfg.MaxCaptionLength, minCaptionDuration, maxCaptionDuration)
 
-		slog.Debug("check subtitles length", "current", current.Add(duration), "target", end)
+		// slog.Debug("check subtitles length", "current", current.Add(duration), "target", end)
 		if current.Add(duration).After(end) {
 			break
 		}
 
-		slog.Debug("add caption to subtitles", "duration", duration, "text", caption)
+		// slog.Debug("add caption to subtitles", "duration", duration, "text", caption)
 		current = subs.AddToEnd(duration, caption)
 
 		previousCaption = caption

@@ -383,7 +383,7 @@ func buildCombinedVideo(ctx context.Context, config *builder.Config, eh domain.E
 
 	modelFile := path.Join(config.OutputDir, domain.ModelFileName)
 
-	videoFile, subsFile, err := b.GenerateCombinedVideo(ctx, "", modelFile, clipFiles)
+	videoFile, subsFile, err := b.GenerateCombinedVideo(ctx, domain.ArchivePrefix, modelFile, clipFiles)
 	if err != nil {
 		return err
 	}

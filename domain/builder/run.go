@@ -89,6 +89,23 @@ func (b *Builder) Run(ctx context.Context) error {
 	manifest.Files.ModelFile = modelFile
 	slog.Info("successfully uploaded model", "key", modelFile)
 
+	slog.Info("combining video files and generating subtitles...")
+	clipFiles, err := filepath.Glob(filepath.Join(b.cfg.OutputDir, domain.ClipsDirName, "*.webm"))
+	if err != nil {
+		return fmt.Errorf("error getting video clip files: %w", err)
+	}
+	videoFile, subsFile, err := b.GenerateCombinedVideo(
+		ctx,
+		domain.ArchivePrefix,
+		filepath.Join(b.cfg.OutputDir, modelFile),
+		clipFiles,
+	)
+	if err != nil {
+		return fmt.Errorf("error generating combined video: %w", err)
+	}
+	manifest.Files.VideoFile = videoFile
+	manifest.Files.SubtitlesFile = subsFile
+
 	slog.Info("uploading manifest...")
 	manifestKey, err := b.Manifest(ctx, manifest.ID, manifest)
 	if err != nil {
