@@ -6,8 +6,6 @@ import (
 	"os"
 
 	"github.com/charmbracelet/log"
-	"github.com/grafana/loki-client-go/loki"
-	slogloki "github.com/samber/slog-loki/v3"
 )
 
 type LoggerType string
@@ -15,15 +13,15 @@ type LoggerType string
 const (
 	LoggerTypeText LoggerType = "text"
 	LoggerTypeJSON LoggerType = "json"
-	LoggerTypeLoki LoggerType = "loki"
+	// LoggerTypeLoki LoggerType = "loki"
 )
 
 type Config struct {
-	Type         LoggerType
-	Verbose      bool
-	WithAttr     []any
-	LokiEndpoint string
-	LokiTenentID string
+	Type     LoggerType
+	Verbose  bool
+	WithAttr []any
+	// LokiEndpoint string
+	// LokiTenentID string
 }
 
 // New creates a new `slog.Logger`
@@ -39,12 +37,12 @@ func New(c *Config) (logger *slog.Logger) {
 		logger = newText(c)
 	case LoggerTypeJSON:
 		logger = newJson(c)
-	case LoggerTypeLoki:
-		var err error
-		logger, err = newLoki(c)
-		if err != nil {
-			panic(fmt.Errorf("error starting loki logger: %w", err))
-		}
+	// case LoggerTypeLoki:
+	// 	var err error
+	// 	logger, err = newLoki(c)
+	// 	if err != nil {
+	// 		panic(fmt.Errorf("error starting loki logger: %w", err))
+	// 	}
 	default:
 		panic(fmt.Errorf("invalid logger type: %s", c.Type))
 	}
@@ -62,35 +60,35 @@ func SetDefault(c *Config) {
 	slog.SetDefault(logger)
 }
 
-func newLoki(c *Config) (logger *slog.Logger, err error) {
-	// setup loki client
-	var config loki.Config
-	config, err = loki.NewDefaultConfig(c.LokiEndpoint)
-	if err != nil {
-		err = fmt.Errorf("error creating loki config: %w", err)
-		return
-	}
-	config.TenantID = c.LokiTenentID
+// func newLoki(c *Config) (logger *slog.Logger, err error) {
+// 	// setup loki client
+// 	var config loki.Config
+// 	config, err = loki.NewDefaultConfig(c.LokiEndpoint)
+// 	if err != nil {
+// 		err = fmt.Errorf("error creating loki config: %w", err)
+// 		return
+// 	}
+// 	config.TenantID = c.LokiTenentID
 
-	var client *loki.Client
-	client, err = loki.New(config)
-	if err != nil {
-		err = fmt.Errorf("error creating loki config: %w", err)
-		return
-	}
+// 	var client *loki.Client
+// 	client, err = loki.New(config)
+// 	if err != nil {
+// 		err = fmt.Errorf("error creating loki config: %w", err)
+// 		return
+// 	}
 
-	options := slogloki.Option{
-		Client: client,
-	}
+// 	options := slogloki.Option{
+// 		Client: client,
+// 	}
 
-	if c.Verbose {
-		options.Level = slog.LevelDebug
-	}
+// 	if c.Verbose {
+// 		options.Level = slog.LevelDebug
+// 	}
 
-	logger = slog.New(options.NewLokiHandler())
+// 	logger = slog.New(options.NewLokiHandler())
 
-	return
-}
+// 	return
+// }
 
 func newJson(c *Config) (logger *slog.Logger) {
 	var options *slog.HandlerOptions
