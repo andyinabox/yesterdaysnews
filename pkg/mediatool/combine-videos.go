@@ -14,7 +14,7 @@ const VideoListFileName = ".file-list.txt"
 
 func (t *Tool) CombineVideos(ctx context.Context, files []string, outFile string) (file string, err error) {
 
-	slog.Debug("combine videos", "files", files, "outFile", outFile)
+	slog.Debug("combine videos", "count", len(files), "outFile", outFile)
 
 	if len(files) == 0 {
 		err = errors.New("no input files provided")
