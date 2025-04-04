@@ -94,8 +94,8 @@ func newJson(c *Config) (logger *slog.Logger) {
 	var options *slog.HandlerOptions
 	if c.Verbose {
 		options = &slog.HandlerOptions{
-			AddSource: true,
-			Level:     slog.LevelDebug,
+			// AddSource: true,
+			Level: slog.LevelDebug,
 		}
 	}
 
@@ -109,7 +109,7 @@ func newText(c *Config) (logger *slog.Logger) {
 
 	if c.Verbose {
 		handler.SetLevel(log.DebugLevel)
-		handler.SetReportCaller(true)
+		// handler.SetReportCaller(true)
 	}
 
 	logger = slog.New(handler)

@@ -130,6 +130,8 @@ func main() {
 
 	// load config
 	config := builder.Config{
+		BuildID: buildId,
+
 		PlaylistIDs:                 strings.Split(playlistIDs, ","),
 		ObjectStoreContainerName:    objectStoreContainerName,
 		OutputDir:                   outputDir,

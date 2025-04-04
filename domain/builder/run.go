@@ -16,6 +16,8 @@ import (
 func (b *Builder) Run(ctx context.Context) error {
 	var err error
 
+	slog.Info("starting build", "id", b.cfg.BuildID)
+
 	defer func() {
 		slog.Info("cleaning up...")
 		removed, err := b.Cleanup(ctx, b.cfg.TotalBuildsToKeep)

@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"log/slog"
 	"time"
 
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
@@ -8,6 +9,7 @@ import (
 )
 
 func (b *Builder) createManifest(buildId string) *domain.Manifest {
+	slog.Debug("create manifest", "id", buildId)
 	now := time.Now()
 	if buildId == "" {
 		buildId = util.Timestamp(now)
