@@ -32,7 +32,7 @@ func (b *Builder) Run(ctx context.Context) error {
 	}
 
 	// create additional build vars
-	manifest := b.createManifest()
+	manifest := b.createManifest(b.cfg.BuildID)
 
 	slog.Info("building video clips...")
 	downloadPathStream := b.DownloadVideos(ctx, manifest.ContentDate)
