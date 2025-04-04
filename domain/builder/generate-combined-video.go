@@ -14,9 +14,6 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
-// const minCaptionDuration = 3.0
-// const maxCaptionDuration = 7.0
-
 func (b *Builder) GenerateCombinedVideo(ctx context.Context, uploadDir, modelFile string, clips []string) (string, string, error) {
 
 	videoFile := filepath.Join(b.cfg.OutputDir, domain.VideoFileName)
