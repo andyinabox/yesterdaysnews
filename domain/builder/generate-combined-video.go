@@ -66,7 +66,7 @@ func (b *Builder) GenerateCombinedVideo(ctx context.Context, uploadDir, modelFil
 	videoKey := filepath.Join(uploadDir, dateStr+".mp4")
 	subsKey := filepath.Join(uploadDir, dateStr+".srt")
 
-	slog.Info("uploading combined video file", "file", videoFile, "key", videoKey)
+	slog.Info("uploading combined video file (this may take a while)", "file", videoFile, "key", videoKey)
 	videoKey, err = b.cs.UploadFile(
 		ctx,
 		videoFile,
