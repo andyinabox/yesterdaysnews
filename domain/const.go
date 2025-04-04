@@ -8,6 +8,7 @@ const (
 	PosterImageFileName    = "poster.png"
 	ClipsDirName           = "clips"
 	CurrentBuildIDFileName = "current.txt"
+	ArchivePrefix          = "archive"
 	VideoWidth             = 1280
 	VideoHeight            = 720
 )

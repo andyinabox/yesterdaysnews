@@ -40,7 +40,7 @@ func (b *Builder) GenerateCombinedVideo(ctx context.Context, uploadDir, modelFil
 		return "", "", fmt.Errorf("error getting video length: %w", err)
 	}
 
-	chain, err := b.buildMarkovChain(ctx, modelFile)
+	chain, err := b.buildMarkovChain(modelFile)
 	if err != nil {
 		return "", "", fmt.Errorf("error building markov chain: %w", err)
 	}
@@ -61,10 +61,42 @@ func (b *Builder) GenerateCombinedVideo(ctx context.Context, uploadDir, modelFil
 		return "", "", fmt.Errorf("error writing subtitles file: %w", err)
 	}
 
-	return videoFile, "", nil
+	if b.cfg.SkipUpload {
+		return videoFile, subsFile, nil
+	}
+
+	dateStr := util.DateString(util.Yesterday())
+	videoKey := filepath.Join(domain.ArchivePrefix, dateStr+".mp4")
+	subsKey := filepath.Join(domain.ArchivePrefix, dateStr+".srt")
+
+	slog.Info("uploading combined video file", "file", videoFile, "key", videoKey)
+	videoKey, err = b.cs.UploadFile(
+		ctx,
+		videoFile,
+		videoKey,
+		"video/mp4",
+		true,
+	)
+	if err != nil {
+		return "", "", fmt.Errorf("error uploading video file: %w", err)
+	}
+
+	slog.Info("uploading combined subs file", "file", subsFile, "key", subsKey)
+	subsKey, err = b.cs.UploadFile(
+		ctx,
+		subsFile,
+		subsKey,
+		"text/plain",
+		false,
+	)
+	if err != nil {
+		return "", "", fmt.Errorf("error uploading subs file: %w", err)
+	}
+
+	return videoKey, subsKey, nil
 }
 
-func (b *Builder) buildMarkovChain(ctx context.Context, modelFile string) (markov.Chain, error) {
+func (b *Builder) buildMarkovChain(modelFile string) (markov.Chain, error) {
 
 	modelData, err := os.ReadFile(modelFile)
 	if err != nil {
