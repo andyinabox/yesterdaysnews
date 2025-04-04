@@ -60,7 +60,7 @@ var (
 func init() {
 	// meta flags
 	flag.BoolVar(&verbose, "v", false, "verbose output")
-	flag.StringVar(&loggerType, "log", "text", "logger type (text, json, loki)")
+	flag.StringVar(&loggerType, "log", "text", "logger type (text, json)")
 	flag.StringVar(&buildPhase, "b", "all", "build phase to execute")
 	flag.StringVar(&buildId, "id", "", "build ID")
 
