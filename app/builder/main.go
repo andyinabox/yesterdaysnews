@@ -10,7 +10,6 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"path"
 	"path/filepath"
 	"strings"
 	"syscall"
@@ -395,7 +394,7 @@ func buildCombinedVideo(ctx context.Context, config *builder.Config, eh domain.E
 		return err
 	}
 
-	modelFile := path.Join(config.OutputDir, domain.ModelFileName)
+	modelFile := filepath.Join(config.OutputDir, domain.ModelFileName)
 
 	videoFile, subsFile, err := b.GenerateCombinedVideo(ctx, domain.ArchivePrefix, modelFile, clipFiles)
 	if err != nil {
