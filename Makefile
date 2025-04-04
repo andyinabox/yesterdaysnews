@@ -7,11 +7,11 @@
 
 .PHONY: builder
 builder:
-	go run ./app/builder/main.go --keepoutput
+	go run ./app/builder/main.go -v --keepoutput
 
 .PHONY: builder-local
 builder-local:
-	go run ./app/builder/main.go --keepoutput --skipupload
+	go run ./app/builder/main.go -v --keepoutput --skipupload
 
 .PHONY: builder-docker
 builder-docker: clean-bin bin/builder-linux-amd64

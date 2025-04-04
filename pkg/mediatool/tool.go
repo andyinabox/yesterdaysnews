@@ -39,7 +39,7 @@ func (t *Tool) execute(ctx context.Context, exePath string, options *shellargs.A
 
 	command := fmt.Sprintf("%s%s", exePath, options)
 
-	slog.Debug("execute mediatool command", "cmd", command)
+	// slog.Debug("execute mediatool command", "cmd", command)
 
 	data, err := t.shell.Execute(ctx, command)
 

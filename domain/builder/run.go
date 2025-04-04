@@ -16,6 +16,8 @@ import (
 func (b *Builder) Run(ctx context.Context) error {
 	var err error
 
+	slog.Info("starting build", "id", b.cfg.BuildID)
+
 	defer func() {
 		slog.Info("cleaning up...")
 		removed, err := b.Cleanup(ctx, b.cfg.TotalBuildsToKeep)
@@ -32,7 +34,7 @@ func (b *Builder) Run(ctx context.Context) error {
 	}
 
 	// create additional build vars
-	manifest := b.createManifest()
+	manifest := b.createManifest(b.cfg.BuildID)
 
 	slog.Info("building video clips...")
 	downloadPathStream := b.DownloadVideos(ctx, manifest.ContentDate)
@@ -88,6 +90,23 @@ func (b *Builder) Run(ctx context.Context) error {
 	}
 	manifest.Files.ModelFile = modelFile
 	slog.Info("successfully uploaded model", "key", modelFile)
+
+	slog.Info("combining video files and generating subtitles...")
+	clipFiles, err := filepath.Glob(filepath.Join(b.cfg.OutputDir, domain.ClipsDirName, "*.webm"))
+	if err != nil {
+		return fmt.Errorf("error getting video clip files: %w", err)
+	}
+	videoFile, subsFile, err := b.GenerateCombinedVideo(
+		ctx,
+		domain.ArchivePrefix,
+		filepath.Join(b.cfg.OutputDir, modelFile),
+		clipFiles,
+	)
+	if err != nil {
+		return fmt.Errorf("error generating combined video: %w", err)
+	}
+	manifest.Files.VideoFile = videoFile
+	manifest.Files.SubtitlesFile = subsFile
 
 	slog.Info("uploading manifest...")
 	manifestKey, err := b.Manifest(ctx, manifest.ID, manifest)

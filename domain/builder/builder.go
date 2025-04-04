@@ -22,6 +22,7 @@ type Config struct {
 	BinPathFFPROBE string `env:"YN_FFPROBE_PATH"`
 
 	// config variables
+	BuildID                     string
 	PlaylistIDs                 []string
 	ObjectStoreContainerName    string
 	OutputDir                   string
@@ -33,6 +34,8 @@ type Config struct {
 	CaptionPrefixLength         int
 	CaptionNewsCorpusWeight     int
 	CaptionHospitalCorpusWeight int
+	CaptionMinDuration          float64
+	CaptionMaxDuration          float64
 	TotalBuildsToKeep           int
 	KeepOutputFiles             bool
 	SkipUpload                  bool
@@ -48,12 +51,13 @@ type Builder struct {
 	vp   domain.VideoProcessor
 	ip   domain.ImageProcessor
 	cs   domain.ContainerService
+	cg   domain.CaptionGenerator
 	eh   domain.ErrorHandler
 	errs chan<- domain.Error
 	cfg  *Config
 }
 
-func New(cfg *Config, eh domain.ErrorHandler) *Builder {
+func New(cfg *Config, eh domain.ErrorHandler) domain.Builder {
 
 	yt := youtubeservice.New(&youtubeservice.Config{
 		GoogleAPIKey:        cfg.GoogleAPIKey,

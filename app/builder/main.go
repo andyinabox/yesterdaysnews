@@ -35,9 +35,10 @@ var overlayImage []byte
 const defaultPlaylists = "UUupvZG-5ko_eiXAupbDfxWw,UUaXkIU1QidjPwiAYu6GcHjg,UUXIJgqnII2ZOINSWNOGFThA"
 
 var (
-	verbose       bool
-	jsonLogOutput bool
-	buildPhase    string
+	verbose    bool
+	loggerType string
+	buildPhase string
+	buildId    string
 
 	playlistIDs              string
 	objectStoreContainerName string
@@ -50,6 +51,7 @@ var (
 	minClipLengthSeconds, maxClipLengthSeconds           int
 	captionPrefixLength                                  int
 	captionNewsCorpusWeight, captionHospitalCorpusWeight int
+	captionMinDuration, captionMaxDuration               float64
 	totalBuildsToKeep                                    int
 
 	keepOutputFiles, skipUpload bool
@@ -58,8 +60,9 @@ var (
 func init() {
 	// meta flags
 	flag.BoolVar(&verbose, "v", false, "verbose output")
-	flag.BoolVar(&jsonLogOutput, "j", false, "json log output")
+	flag.StringVar(&loggerType, "log", "text", "logger type (text, json)")
 	flag.StringVar(&buildPhase, "b", "all", "build phase to execute")
+	flag.StringVar(&buildId, "id", "", "build ID")
 
 	// config flags
 	flag.StringVar(&playlistIDs, "playlistids", defaultPlaylists, "comma-separated list of playlists to download")
@@ -75,6 +78,8 @@ func init() {
 	flag.IntVar(&captionPrefixLength, "prefixlength", 2, "caption chain prefix length")
 	flag.IntVar(&captionNewsCorpusWeight, "newsweight", 1, "weight for the news corpus in chain")
 	flag.IntVar(&captionHospitalCorpusWeight, "hospitalweight", 1, "weight for the hospital corpus in chain")
+	flag.Float64Var(&captionMinDuration, "mincap", 3.0, "minimum caption duration (seconds)")
+	flag.Float64Var(&captionMaxDuration, "maxcap", 7.0, "maximum caption duration (seconds)")
 	flag.IntVar(&totalBuildsToKeep, "buildstokeep", 5, "total completed builds to keep when cleaning up")
 
 	// just to clarify, by default this WILL remove files but adding the --keepoutput flag will cancel cleanup
@@ -83,9 +88,14 @@ func init() {
 
 	flag.Parse()
 
+	if buildId == "" {
+		buildId = util.Timestamp(time.Now())
+	}
+
 	logger.SetDefault(&logger.Config{
-		Verbose:    verbose,
-		JSONOutput: jsonLogOutput,
+		Type:     logger.LoggerType(loggerType),
+		Verbose:  verbose,
+		WithAttr: []any{"buildId", buildId},
 	})
 
 	err := godotenv.Load()
@@ -119,6 +129,8 @@ func main() {
 
 	// load config
 	config := builder.Config{
+		BuildID: buildId,
+
 		PlaylistIDs:                 strings.Split(playlistIDs, ","),
 		ObjectStoreContainerName:    objectStoreContainerName,
 		OutputDir:                   outputDir,
@@ -130,6 +142,8 @@ func main() {
 		CaptionPrefixLength:         captionPrefixLength,
 		CaptionNewsCorpusWeight:     captionNewsCorpusWeight,
 		CaptionHospitalCorpusWeight: captionHospitalCorpusWeight,
+		CaptionMinDuration:          captionMinDuration,
+		CaptionMaxDuration:          captionMaxDuration,
 		TotalBuildsToKeep:           totalBuildsToKeep,
 		KeepOutputFiles:             keepOutputFiles,
 		SkipUpload:                  skipUpload,
@@ -186,6 +200,10 @@ func main() {
 
 	case domain.BuildPhaseModel:
 		err = buildModel(ctx, &config, eh)
+		handleBuildPhaseErr(err)
+
+	case domain.BuildPhaseGenerateCombinedVideo:
+		err = buildCombinedVideo(ctx, &config, eh)
 		handleBuildPhaseErr(err)
 
 	case domain.BuildPhaseManifest:
@@ -264,7 +282,7 @@ func uploadVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHa
 		return errors.New("no clip found")
 	}
 
-	uploadDir := util.Timestamp(time.Now())
+	uploadDir := buildId
 	clipsStream := streams.StringStreamThrottled(ctx, time.Millisecond, clips...)
 	uploadsStream := b.UploadVideos(ctx, uploadDir, clipsStream)
 
@@ -305,7 +323,7 @@ func posterImage(ctx context.Context, config *builder.Config, eh domain.ErrorHan
 		return errors.New("no clip found")
 	}
 
-	uploadDir := util.Timestamp(time.Now())
+	uploadDir := buildId
 
 	posterImage, err := b.PosterImage(ctx, uploadDir, images)
 	if err != nil {
@@ -368,6 +386,26 @@ func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 	return nil
 }
 
+func buildCombinedVideo(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
+	b := builder.New(config, eh)
+
+	clipFiles, err := filepath.Glob(filepath.Join(config.OutputDir, domain.ClipsDirName, "*.webm"))
+	if err != nil {
+		return err
+	}
+
+	modelFile := filepath.Join(config.OutputDir, domain.ModelFileName)
+
+	videoFile, subsFile, err := b.GenerateCombinedVideo(ctx, domain.ArchivePrefix, modelFile, clipFiles)
+	if err != nil {
+		return err
+	}
+
+	slog.Info("finished creating combined video", "videoFile", videoFile, "subsFile", subsFile)
+
+	return nil
+}
+
 func buildManifest(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
@@ -377,7 +415,7 @@ func buildManifest(ctx context.Context, config *builder.Config, eh domain.ErrorH
 	}
 
 	buildDate := time.Now()
-	buildID := util.Timestamp(buildDate)
+	buildID := buildId
 
 	manifest := &domain.Manifest{
 		BuildDate:   buildDate,
@@ -436,7 +474,7 @@ func buildCleanup(ctx context.Context, config *builder.Config, eh domain.ErrorHa
 func getBuildID(config *builder.Config) string {
 	manifest, err := getManifest(config)
 	if err != nil || manifest.ID == "" {
-		return util.Timestamp(time.Now())
+		return buildId
 	}
 	return manifest.ID
 }

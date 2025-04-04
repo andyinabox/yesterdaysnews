@@ -3,6 +3,7 @@ package videoprocessor
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,6 +26,11 @@ func (p *Processor) CutVideo(ctx context.Context, inFile, outFile string, edit d
 
 	err = p.mt.Validate(ctx, progressFile)
 	if err != nil {
+
+		if removeErr := os.Remove(progressFile); removeErr != nil {
+			slog.Warn("error removing invalid file", "file", progressFile, "error", removeErr)
+		}
+
 		return "", fmt.Errorf("error validating %q: %w", progressFile, err)
 	}
 

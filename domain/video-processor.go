@@ -16,7 +16,8 @@ type VideoEdit interface {
 }
 
 type VideoProcessor interface {
-	// ShuffleClipsAndCombine(ctx context.Context, files []string, outFile string) (string, error)
+	ShuffleClipsAndCombine(ctx context.Context, errs chan<- Error, files []string, outFile string) (string, error)
+	GetVideoLength(ctx context.Context, videoFile string) (time.Duration, error)
 	GetVideoEditPoints(ctx context.Context, videoFile string, minClipLength, maxClipLength time.Duration) ([]VideoEdit, error)
 	CutVideo(ctx context.Context, inFile, outFile string, edit VideoEdit) (string, error)
 	CutVideoStream(ctx context.Context, errs chan<- Error, inFile, outDir string, edits []VideoEdit) <-chan string
