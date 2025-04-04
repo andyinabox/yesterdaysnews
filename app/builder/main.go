@@ -51,6 +51,7 @@ var (
 	minClipLengthSeconds, maxClipLengthSeconds           int
 	captionPrefixLength                                  int
 	captionNewsCorpusWeight, captionHospitalCorpusWeight int
+	captionMinDuration, captionMaxDuration               float64
 	totalBuildsToKeep                                    int
 
 	keepOutputFiles, skipUpload bool
@@ -76,6 +77,8 @@ func init() {
 	flag.IntVar(&captionPrefixLength, "prefixlength", 2, "caption chain prefix length")
 	flag.IntVar(&captionNewsCorpusWeight, "newsweight", 1, "weight for the news corpus in chain")
 	flag.IntVar(&captionHospitalCorpusWeight, "hospitalweight", 1, "weight for the hospital corpus in chain")
+	flag.Float64Var(&captionMinDuration, "mincap", 3.0, "minimum caption duration (seconds)")
+	flag.Float64Var(&captionMaxDuration, "maxcap", 7.0, "maximum caption duration (seconds)")
 	flag.IntVar(&totalBuildsToKeep, "buildstokeep", 5, "total completed builds to keep when cleaning up")
 
 	// just to clarify, by default this WILL remove files but adding the --keepoutput flag will cancel cleanup
@@ -131,6 +134,8 @@ func main() {
 		CaptionPrefixLength:         captionPrefixLength,
 		CaptionNewsCorpusWeight:     captionNewsCorpusWeight,
 		CaptionHospitalCorpusWeight: captionHospitalCorpusWeight,
+		CaptionMinDuration:          captionMinDuration,
+		CaptionMaxDuration:          captionMaxDuration,
 		TotalBuildsToKeep:           totalBuildsToKeep,
 		KeepOutputFiles:             keepOutputFiles,
 		SkipUpload:                  skipUpload,

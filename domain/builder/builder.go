@@ -33,6 +33,8 @@ type Config struct {
 	CaptionPrefixLength         int
 	CaptionNewsCorpusWeight     int
 	CaptionHospitalCorpusWeight int
+	CaptionMinDuration          float64
+	CaptionMaxDuration          float64
 	TotalBuildsToKeep           int
 	KeepOutputFiles             bool
 	SkipUpload                  bool
