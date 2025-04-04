@@ -63,6 +63,13 @@ func (b *Builder) cleanupObjectStore(ctx context.Context, toKeep int) ([]string,
 	// returns false if manifest.json does not exist, on the assumption that
 	// it means the build did not finished and can be deleted
 	prefixesBifurcateFn := func(pre string) bool {
+
+		// we never want to delete the archive dir
+		if strings.Contains(pre, domain.ArchivePrefix) {
+			slog.Debug("skipping archive dir in cleanup", "prefix", pre)
+			return true
+		}
+
 		// note that prefix includes "/" so we don't need to add here
 		key := fmt.Sprintf("%s%s", pre, domain.ManifestFileName)
 
@@ -110,6 +117,12 @@ func (b *Builder) getCullingToDelete(ctx context.Context, toCull <-chan string, 
 				return
 			default:
 				slog.Debug("checking if prefix should be deleted", "prefix", prefix)
+
+				// we never want to delete the archive directory
+				if strings.Contains(prefix, domain.ArchivePrefix) {
+					slog.Debug("skipping archive dir in culling", "prefix", prefix)
+					continue
+				}
 
 				// skip until we've reached our limit
 				if kept < toKeep {
