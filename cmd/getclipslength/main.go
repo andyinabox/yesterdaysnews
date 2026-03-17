@@ -33,7 +33,11 @@ func main() {
 
 	ctx := context.Background()
 
-	clips := util.GlobVideoFiles("dist/clips", "*")
+	clips, err := util.GlobVideoFiles("dist/clips", "*")
+	if err != nil {
+		slog.Error("error globbing clip files", "error", err)
+		return
+	}
 
 	mt := mediatool.New("", "")
 

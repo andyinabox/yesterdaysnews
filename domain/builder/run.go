@@ -93,7 +93,10 @@ func (b *Builder) Run(ctx context.Context) error {
 	slog.Info("successfully uploaded model", "key", modelFile)
 
 	slog.Info("combining video files and generating subtitles...")
-	clipFiles := util.GlobVideoFiles(filepath.Join(b.cfg.OutputDir, domain.ClipsDirName), "*")
+	clipFiles, err := util.GlobVideoFiles(filepath.Join(b.cfg.OutputDir, domain.ClipsDirName), "*")
+	if err != nil {
+		return fmt.Errorf("error globbing clip files: %w", err)
+	}
 	videoFile, subsFile, err := b.GenerateCombinedVideo(
 		ctx,
 		domain.ArchivePrefix,
