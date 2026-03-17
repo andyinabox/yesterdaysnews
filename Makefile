@@ -7,11 +7,11 @@
 
 .PHONY: builder
 builder:
-	go run ./app/builder/main.go -v --keepoutput
+	go run ./app/builder/main.go -v --keepoutput 2>&1 | tee builder.log
 
 .PHONY: builder-local
 builder-local:
-	go run ./app/builder/main.go -v --keepoutput --skipupload
+	go run ./app/builder/main.go -v --keepoutput --skipupload 2>&1 | tee builder-local.log
 
 .PHONY: builder-docker
 builder-docker: clean-bin bin/builder-linux-amd64
