@@ -54,7 +54,7 @@ Source in `app/server/assets/` → bundled via esbuild (`cmd/esbuild/`) → outp
 - **Go version**: 1.22 (toolchain 1.22.10)
 - **Dependency injection**: Services accept config structs and implement domain interfaces
 - **Streaming**: Operations use channels for async progress/error reporting
-- **Error wrapping**: Uses `fmt.Errorf("...%w", err)` consistently
+- **Error handling**: Errors must always be handled, never discarded with `_`. Use `fmt.Errorf("...%w", err)` for wrapping. For non-fatal errors in streaming/batch operations, send errors to the `ErrorHandler` via `eh.Add(typ, err)` or `eh.Channel()` rather than returning early — this allows the operation to continue while tracking error counts per type and panicking if a threshold is exceeded.
 - **Logging**: `github.com/charmbracelet/log` (structured, supports JSON format)
 - **Config**: Environment variables loaded from `.env` via godotenv + `codingconcepts/env` tags
 
