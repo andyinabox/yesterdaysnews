@@ -1,6 +1,7 @@
 package youtubedownloader
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 )
@@ -17,7 +18,7 @@ func (c *Client) GetVideoInfo(ctx context.Context, url string, format string) (*
 	}
 
 	video := YouTubeVideo{}
-	err = json.Unmarshal(result, &video)
+	err = json.NewDecoder(bytes.NewReader(result)).Decode(&video)
 	if err != nil {
 		return nil, err
 	}

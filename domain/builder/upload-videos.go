@@ -2,25 +2,51 @@ package builder
 
 import (
 	"context"
+	"log/slog"
+	"path/filepath"
 	"strings"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 )
 
+func mimeTypeFromExt(path string) string {
+	switch filepath.Ext(path) {
+	case ".mp4":
+		return "video/mp4"
+	default:
+		return "video/webm"
+	}
+}
+
 func (b *Builder) UploadVideos(ctx context.Context, uploadDir string, clips <-chan string) <-chan string {
-	// take clip paths amd make stream of upload paths
-	uploadPaths := streams.StringStreamTo2StringSliceStream(ctx, clips, func(s string) [2]string {
-		// first string is the file name, second is the the object key
-		return [2]string{s, strings.Replace(s, b.cfg.OutputDir, uploadDir, 1)}
-	})
+	out := make(chan string)
 
-	// upload files
-	clipUploads := b.cs.UploadFileStream(ctx, b.errs, uploadPaths, "video/webm", false)
+	go func() {
+		defer close(out)
+		for clipPath := range clips {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
 
-	// remove upload dir to get relative paths from upload root
-	clipPathsStream := streams.StringTransformStream(ctx, clipUploads, func(s string) string {
-		return strings.Replace(s, uploadDir+"/", "", 1)
-	})
+			fileKey := strings.Replace(clipPath, b.cfg.OutputDir, uploadDir, 1)
+			contentType := mimeTypeFromExt(clipPath)
 
-	return clipPathsStream
+			key, err := b.cs.UploadFile(ctx, clipPath, fileKey, contentType, false)
+			if err != nil {
+				b.errs <- errorhandler.Err(domain.ErrTypeUploadFile, err)
+				continue
+			}
+
+			slog.Debug("uploaded clip", "key", key)
+
+			// remove upload dir to get relative paths from upload root
+			relPath := strings.Replace(key, uploadDir+"/", "", 1)
+			out <- relPath
+		}
+	}()
+
+	return out
 }

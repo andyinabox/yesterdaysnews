@@ -254,10 +254,7 @@ func downloadVideos(ctx context.Context, config *builder.Config, eh domain.Error
 func cutVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
-	paths, err := filepath.Glob("dist/*.webm")
-	if err != nil {
-		return fmt.Errorf("error getting video paths: %w", err)
-	}
+	paths := util.GlobVideoFiles("dist", "*")
 	if len(paths) == 0 {
 		return errors.New("no videos found")
 	}
@@ -274,10 +271,7 @@ func cutVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHandl
 func uploadVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
-	clips, err := filepath.Glob("dist/clips/*.webm")
-	if err != nil {
-		return fmt.Errorf("error getting clip paths: %w", err)
-	}
+	clips := util.GlobVideoFiles("dist/clips", "*")
 	if len(clips) == 0 {
 		return errors.New("no clip found")
 	}
@@ -295,10 +289,7 @@ func uploadVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHa
 func extractImages(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
-	clips, err := filepath.Glob("dist/clips/*.webm")
-	if err != nil {
-		return fmt.Errorf("error getting clip paths: %w", err)
-	}
+	clips := util.GlobVideoFiles("dist/clips", "*")
 	if len(clips) == 0 {
 		return errors.New("no clip found")
 	}
@@ -389,10 +380,7 @@ func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 func buildCombinedVideo(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
-	clipFiles, err := filepath.Glob(filepath.Join(config.OutputDir, domain.ClipsDirName, "*.webm"))
-	if err != nil {
-		return err
-	}
+	clipFiles := util.GlobVideoFiles(filepath.Join(config.OutputDir, domain.ClipsDirName), "*")
 
 	modelFile := filepath.Join(config.OutputDir, domain.ModelFileName)
 
@@ -409,10 +397,7 @@ func buildCombinedVideo(ctx context.Context, config *builder.Config, eh domain.E
 func buildManifest(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
-	clips, err := filepath.Glob("dist/clips/*.webm")
-	if err != nil {
-		return err
-	}
+	clips := util.GlobVideoFiles("dist/clips", "*")
 
 	buildDate := time.Now()
 	buildID := buildId

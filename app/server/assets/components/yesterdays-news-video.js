@@ -194,7 +194,6 @@ export function YesterdaysNewsVideo({
     >
       <source
         ${ref(sourceEl)}
-        type="video/webm"
         src=${initialClipUrl}
         @error=${onSourceError}
       />

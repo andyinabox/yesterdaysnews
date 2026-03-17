@@ -5,11 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
-	"path/filepath"
 
 	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 var channelName string
@@ -33,10 +33,7 @@ func main() {
 
 	ctx := context.Background()
 
-	clips, err := filepath.Glob("dist/clips/*.webm")
-	if err != nil {
-		panic(err)
-	}
+	clips := util.GlobVideoFiles("dist/clips", "*")
 
 	mt := mediatool.New("", "")
 
