@@ -67,7 +67,7 @@ func TestUploadFileStream(t *testing.T) {
 
 	filePathStream := makeTest2StringStream(10, filePathFunc, fileKeyFunc)
 
-	stream := s.UploadFileStream(ctx, errs, filePathStream, "text/plain", false)
+	stream := s.UploadFileStream(ctx, errs, filePathStream, false)
 
 	for upload := range stream {
 		t.Log(upload)

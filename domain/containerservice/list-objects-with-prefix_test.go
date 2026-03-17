@@ -68,7 +68,7 @@ func TestListObjectsWithPrefixStream(t *testing.T) {
 
 	filePathStream := makeTest2StringStream(10, filePathFunc, fileKeyFunc)
 
-	uploadStream := s.UploadFileStream(ctx, errs, filePathStream, "text/plain", false)
+	uploadStream := s.UploadFileStream(ctx, errs, filePathStream, false)
 
 	for upload := range uploadStream {
 		t.Logf("upload: %s", upload)
