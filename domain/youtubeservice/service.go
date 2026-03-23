@@ -7,7 +7,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
 )
 
-const VideoFormatString = "bv[ext=webm][width<=1280][aspect_ratio>1]"
+const VideoFormatString = "bv*[width<=1280][aspect_ratio>1]"
 const VideoSubFormat = "vtt"
 
 type Config struct {

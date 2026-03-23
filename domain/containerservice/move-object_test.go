@@ -67,7 +67,7 @@ func TestMoveFileStream(t *testing.T) {
 	}
 
 	filePathStream := makeTest2StringStream(10, filePathFunc, fileKeyFunc)
-	uploads := s.UploadFileStream(ctx, errs, filePathStream, "text/plain", false)
+	uploads := s.UploadFileStream(ctx, errs, filePathStream, false)
 	movePathStream := makeTestStringTo2StringStream(uploads, func(s string) string {
 		return strings.Replace(s, "test-move-file-stream", "test-move-file-stream-moved", 1)
 	})

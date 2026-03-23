@@ -40,8 +40,16 @@ server-docker: clean-bin clean-assets bin/server-linux-amd64
 	docker run --rm --env-file .env -p 8080:8080 andyinabox/yesterdaysnews-server:dev
 
 #
+# test
+#
+
+.PHONY: test
+test:
+	go test ./...
+
+#
 # utils
-# 
+#
 
 .PHONY: objectstoremock
 objectstoremock:

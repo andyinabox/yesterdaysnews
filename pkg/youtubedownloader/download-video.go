@@ -1,6 +1,7 @@
 package youtubedownloader
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -20,7 +21,7 @@ func (c *Client) DownloadVideo(ctx context.Context, url string, req Request) (*Y
 	}
 
 	video := YouTubeVideo{}
-	err = json.Unmarshal(result, &video)
+	err = json.NewDecoder(bytes.NewReader(result)).Decode(&video)
 	if err != nil {
 
 		// if there is an error it will be printed on the first line, follwed by json

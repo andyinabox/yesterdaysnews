@@ -254,9 +254,9 @@ func downloadVideos(ctx context.Context, config *builder.Config, eh domain.Error
 func cutVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
-	paths, err := filepath.Glob("dist/*.webm")
+	paths, err := util.GlobVideoFiles("dist", "*")
 	if err != nil {
-		return fmt.Errorf("error getting video paths: %w", err)
+		return fmt.Errorf("error globbing video files: %w", err)
 	}
 	if len(paths) == 0 {
 		return errors.New("no videos found")
@@ -274,9 +274,9 @@ func cutVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHandl
 func uploadVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
-	clips, err := filepath.Glob("dist/clips/*.webm")
+	clips, err := util.GlobVideoFiles("dist/clips", "*")
 	if err != nil {
-		return fmt.Errorf("error getting clip paths: %w", err)
+		return fmt.Errorf("error globbing clip files: %w", err)
 	}
 	if len(clips) == 0 {
 		return errors.New("no clip found")
@@ -295,9 +295,9 @@ func uploadVideos(ctx context.Context, config *builder.Config, eh domain.ErrorHa
 func extractImages(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
-	clips, err := filepath.Glob("dist/clips/*.webm")
+	clips, err := util.GlobVideoFiles("dist/clips", "*")
 	if err != nil {
-		return fmt.Errorf("error getting clip paths: %w", err)
+		return fmt.Errorf("error globbing clip files: %w", err)
 	}
 	if len(clips) == 0 {
 		return errors.New("no clip found")
@@ -389,9 +389,9 @@ func buildModel(ctx context.Context, config *builder.Config, eh domain.ErrorHand
 func buildCombinedVideo(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
-	clipFiles, err := filepath.Glob(filepath.Join(config.OutputDir, domain.ClipsDirName, "*.webm"))
+	clipFiles, err := util.GlobVideoFiles(filepath.Join(config.OutputDir, domain.ClipsDirName), "*")
 	if err != nil {
-		return err
+		return fmt.Errorf("error globbing clip files: %w", err)
 	}
 
 	modelFile := filepath.Join(config.OutputDir, domain.ModelFileName)
@@ -409,9 +409,9 @@ func buildCombinedVideo(ctx context.Context, config *builder.Config, eh domain.E
 func buildManifest(ctx context.Context, config *builder.Config, eh domain.ErrorHandler) error {
 	b := builder.New(config, eh)
 
-	clips, err := filepath.Glob("dist/clips/*.webm")
+	clips, err := util.GlobVideoFiles("dist/clips", "*")
 	if err != nil {
-		return err
+		return fmt.Errorf("error globbing clip files: %w", err)
 	}
 
 	buildDate := time.Now()

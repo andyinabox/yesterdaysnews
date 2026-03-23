@@ -11,6 +11,7 @@ import (
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
+	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
 
 func (b *Builder) Run(ctx context.Context) error {
@@ -92,9 +93,9 @@ func (b *Builder) Run(ctx context.Context) error {
 	slog.Info("successfully uploaded model", "key", modelFile)
 
 	slog.Info("combining video files and generating subtitles...")
-	clipFiles, err := filepath.Glob(filepath.Join(b.cfg.OutputDir, domain.ClipsDirName, "*.webm"))
+	clipFiles, err := util.GlobVideoFiles(filepath.Join(b.cfg.OutputDir, domain.ClipsDirName), "*")
 	if err != nil {
-		return fmt.Errorf("error getting video clip files: %w", err)
+		return fmt.Errorf("error globbing clip files: %w", err)
 	}
 	videoFile, subsFile, err := b.GenerateCombinedVideo(
 		ctx,

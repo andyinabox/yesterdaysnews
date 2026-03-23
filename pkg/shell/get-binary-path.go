@@ -27,7 +27,7 @@ func (s *Shell) MustGetBinaryPath(cmd string) (path string) {
 	var err error
 	path, err = s.GetBinaryPath(context.Background(), cmd)
 	if err != nil {
-		panic(fmt.Sprintf("uable to find find binary path", "cmd", cmd, "error", err))
+		panic(fmt.Sprintf("unable to find binary path: cmd=%s, error=%s", cmd, err))
 	}
 	return
 }

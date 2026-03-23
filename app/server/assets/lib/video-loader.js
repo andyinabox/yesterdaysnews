@@ -58,7 +58,9 @@ export class VideoLoader {
       if (!this.#clips.length) {
         throw new Error('attempted to preload with no clips')
       }
-      const objectURL = await fetchObjectURL(this.#clips.pop(), 'video/webm')
+      const clipUrl = this.#clips.pop()
+      const mimeType = clipUrl.endsWith('.mp4') ? 'video/mp4' : 'video/webm'
+      const objectURL = await fetchObjectURL(clipUrl, mimeType)
       this.#preloaded.push(objectURL)
     })()
   }

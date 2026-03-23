@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"mime"
 	"os"
+	"path/filepath"
 	"sync"
 
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
@@ -21,7 +23,7 @@ func (s *Service) UploadFile(ctx context.Context, filePath, fileKey, contentType
 	return s.UploadReader(ctx, file, fileKey, contentType, multipart)
 }
 
-func (s *Service) UploadFileStream(ctx context.Context, errs chan<- domain.Error, filePaths <-chan [2]string, contentType string, multipart bool) <-chan string {
+func (s *Service) UploadFileStream(ctx context.Context, errs chan<- domain.Error, filePaths <-chan [2]string, multipart bool) <-chan string {
 	stream := make(chan string)
 
 	var wg sync.WaitGroup
@@ -35,6 +37,7 @@ func (s *Service) UploadFileStream(ctx context.Context, errs chan<- domain.Error
 	uploadFile := func(filePath, fileKey string) {
 		defer wg.Done()
 
+		contentType := mime.TypeByExtension(filepath.Ext(filePath))
 		slog.Info("uploading file", "path", filePath, "key", fileKey)
 		fileKey, err := s.UploadFile(ctx, filePath, fileKey, contentType, multipart)
 		if err != nil {

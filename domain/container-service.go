@@ -13,7 +13,7 @@ type ContainerService interface {
 	ListObjectsWithPrefixStream(ctx context.Context, errs chan<- Error, prefixes <-chan string) <-chan string
 	UploadReader(ctx context.Context, r io.Reader, fileKey, contentType string, multipart bool) (string, error)
 	UploadFile(ctx context.Context, filePath, fileKey, contentType string, multipart bool) (string, error)
-	UploadFileStream(ctx context.Context, errs chan<- Error, filePaths <-chan [2]string, contentType string, multipart bool) <-chan string
+	UploadFileStream(ctx context.Context, errs chan<- Error, filePaths <-chan [2]string, multipart bool) <-chan string
 	CopyObject(ctx context.Context, from, to string) (string, error)
 	CopyObjectStream(context.Context, chan<- Error, <-chan [2]string) <-chan string
 	MoveObject(ctx context.Context, from, to string) (string, error)
