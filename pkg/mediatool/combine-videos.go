@@ -33,6 +33,7 @@ func (t *Tool) CombineVideos(ctx context.Context, files []string, outFile string
 
 	options := shellargs.New().
 		AddKeyed("-f", "concat").
+		AddKeyed("-safe", "0").
 		AddKeyedSingleQuoted("-i", VideoListFileName).
 		AddKeyed("-c", "copy").
 		Add(outFile)
