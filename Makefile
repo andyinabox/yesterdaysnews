@@ -1,6 +1,16 @@
+# Detect host architecture for local builds
+ARCH := $(shell uname -m)
+ifeq ($(ARCH),arm64)
+  GOARCH := arm64
+else ifeq ($(ARCH),aarch64)
+  GOARCH := arm64
+else
+  GOARCH := amd64
+endif
+
 #
 # app runners
-# 
+#
 
 
 # builder
@@ -14,10 +24,14 @@ builder-local:
 	go run ./app/builder/main.go -v --keepoutput --skipupload 2>&1 | tee builder-local.log
 
 .PHONY: builder-docker
-builder-docker: clean-bin bin/builder-linux-amd64
-	docker buildx build --platform linux/amd64 -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder:dev .
+builder-docker: clean-bin bin/builder-linux-$(GOARCH)
+	docker buildx build --platform linux/$(GOARCH) -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder:dev .
 	mkdir -p dist
-	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder:dev --output /dist -v --keepoutput --skipupload
+	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder:dev --output /dist -v --keepoutput --skipupload --throttledl 1s
+
+.PHONY: builder-docker-amd64
+builder-docker-amd64: clean-bin bin/builder-linux-amd64
+	docker buildx build --platform linux/amd64 -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder:dev .
 
 # server
 
@@ -81,6 +95,9 @@ bin/server-linux-amd64: clean-assets app/server/.assets
 
 bin/builder-linux-amd64:
 	GOOS=linux GOARCH=amd64 go build -o $@ ./app/builder/main.go
+
+bin/builder-linux-arm64:
+	GOOS=linux GOARCH=arm64 go build -o $@ ./app/builder/main.go
 
 # assets
 

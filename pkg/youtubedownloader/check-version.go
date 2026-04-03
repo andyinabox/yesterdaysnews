@@ -9,7 +9,7 @@ import (
 var requiredVersion binVersion
 
 func init() {
-	requiredVersion = NewVersion(2024, 12, 06)
+	requiredVersion = NewVersion(2026, 03, 03)
 }
 
 func (c *Client) CheckVersion(ctx context.Context) error {
