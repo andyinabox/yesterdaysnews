@@ -3,6 +3,7 @@ package captionschain
 import (
 	"bufio"
 	"fmt"
+	"html"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -122,6 +123,8 @@ scanloop:
 		if strings.Contains(line, "<c>") {
 			continue scanloop
 		}
+
+		line = html.UnescapeString(line)
 
 		if startInput {
 			// avoid duplicates
