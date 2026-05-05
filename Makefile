@@ -8,6 +8,17 @@ else
   GOARCH := amd64
 endif
 
+# Pass YN_* env vars (loaded by direnv) through to Docker containers
+DOCKER_ENV := \
+  -e YN_OBJECTSTORE_URL \
+  -e YN_CDN_URL \
+  -e YN_GOOGLE_API_KEY \
+  -e YN_S3_ENDPOINT \
+  -e YN_S3_REGION \
+  -e YN_S3_BUCKET_NAME \
+  -e YN_S3_ACCESS_KEY \
+  -e YN_S3_SECRET_ACCESS_KEY
+
 #
 # app runners
 #
@@ -27,7 +38,7 @@ builder-local:
 builder-docker: clean-bin bin/builder-linux-$(GOARCH)
 	docker buildx build --platform linux/$(GOARCH) -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder:dev .
 	mkdir -p dist
-	docker run --rm --env-file .env  -v ./dist:/dist andyinabox/yesterdaysnews-builder:dev --output /dist -v --keepoutput --skipupload --throttledl 1s
+	docker run --rm $(DOCKER_ENV) -v ./dist:/dist andyinabox/yesterdaysnews-builder:dev --output /dist -v --keepoutput --skipupload --throttledl 1s
 
 .PHONY: builder-docker-amd64
 builder-docker-amd64: clean-bin bin/builder-linux-amd64
@@ -35,7 +46,7 @@ builder-docker-amd64: clean-bin bin/builder-linux-amd64
 
 # server
 
-# run server, using object store credential in .env
+# run server, using object store credentials from direnv-loaded environment
 .PHONY: server
 server:
 	go run ./app/server/main.go -a -v -m 20s
@@ -51,7 +62,7 @@ server-local:
 .PHONY: server-docker
 server-docker: clean-bin clean-assets bin/server-linux-amd64
 	docker buildx build --platform linux/amd64 -f app/server/Dockerfile -t andyinabox/yesterdaysnews-server:dev .
-	docker run --rm --env-file .env -p 8080:8080 andyinabox/yesterdaysnews-server:dev
+	docker run --rm $(DOCKER_ENV) -p 8080:8080 andyinabox/yesterdaysnews-server:dev
 
 #
 # test

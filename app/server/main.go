@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/russross/blackfriday/v2"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/server"
@@ -62,11 +61,6 @@ func init() {
 		Type:    logger.LoggerType(loggerType),
 		Verbose: verbose,
 	})
-
-	err := godotenv.Load()
-	if err != nil {
-		slog.Warn("error loading .env", "error", err)
-	}
 
 }
 

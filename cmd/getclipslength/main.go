@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
@@ -22,11 +21,6 @@ func init() {
 	logger.SetDefault(&logger.Config{
 		Verbose: verbose,
 	})
-
-	err := godotenv.Load()
-	if err != nil {
-		slog.Warn("error getting .env", "error", err)
-	}
 }
 
 func main() {
