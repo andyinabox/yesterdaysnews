@@ -8,7 +8,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/youtubeservice"
 )
@@ -28,11 +27,6 @@ func init() {
 	if channelName == "" {
 		slog.Error("channel name is required")
 		os.Exit(1)
-	}
-
-	err := godotenv.Load()
-	if err != nil {
-		slog.Warn("error getting .env", "error", err)
 	}
 }
 

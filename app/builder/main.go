@@ -15,7 +15,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/domain"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/builder"
 	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
@@ -97,11 +96,6 @@ func init() {
 		Verbose:  verbose,
 		WithAttr: []any{"buildId", buildId},
 	})
-
-	err := godotenv.Load()
-	if err != nil {
-		slog.Warn("error loading .env", "error", err)
-	}
 }
 
 func main() {

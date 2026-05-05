@@ -10,16 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/joho/godotenv"
 	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
 )
-
-func init() {
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		panic(err)
-	}
-}
 
 func TestUploadFile(t *testing.T) {
 

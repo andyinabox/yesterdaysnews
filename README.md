@@ -48,6 +48,30 @@ Dependencies:
 
 Additionaally the builder requires more resources to work well, so it's a good idea to give it more RAM and CPUs.
 
+## Setup
+
+This project uses [`direnv`](https://direnv.net/) to load environment variables, with secrets pulled from [`pass`](https://www.passwordstore.org/).
+
+1. Install `direnv` and `pass` (e.g. `brew install direnv pass`) and [hook `direnv` into your shell](https://direnv.net/docs/hook.html).
+2. Initialize `pass` if you haven't already (`pass init <gpg-id>`).
+3. Add the required secrets to your password store:
+
+   ```bash
+   pass insert yesterdaysnews/google-api-key
+   pass insert yesterdaysnews/s3-access-key
+   pass insert yesterdaysnews/s3-secret-access-key
+   ```
+
+4. From the repo root, allow the `.envrc`:
+
+   ```bash
+   direnv allow
+   ```
+
+The non-secret values (object store / CDN URLs, S3 region and bucket) are committed in `.envrc`; edit it locally if you need different defaults. The Docker make targets (`make server-docker`, `make builder-docker`) pass these env vars through to the container automatically.
+
+`make server-local` runs against a local `objectstoremock` and does not require any of the S3 or Google API credentials. `make server`, `make builder`, and the `*-docker` targets do.
+
 ## Running locally
 
 First you will want to run the Builder locally:

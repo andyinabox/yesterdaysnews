@@ -15,7 +15,6 @@ require (
 	github.com/charmbracelet/log v0.4.0
 	github.com/codingconcepts/env v0.0.0-20240618133406-5b0845441187
 	github.com/evanw/esbuild v0.24.2
-	github.com/joho/godotenv v1.5.1
 	github.com/russross/blackfriday/v2 v2.1.0
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
 )
