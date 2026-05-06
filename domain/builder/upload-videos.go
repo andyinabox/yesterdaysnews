@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/streams"
 )
 
 func (b *Builder) UploadVideos(ctx context.Context, uploadDir string, clips <-chan string) <-chan string {

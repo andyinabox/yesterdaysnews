@@ -12,7 +12,7 @@ import (
 	"os"
 	"reflect"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/util"
 )
 
 func (p *Processor) OverlayImages(ctx context.Context, baseReader, overlayReader io.Reader, outputFilePath string) (string, error) {

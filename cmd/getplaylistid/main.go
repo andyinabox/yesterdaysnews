@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/youtubeservice"
+	"code.andydayton.com/andy/yesterdaysnews/domain/logger"
+	"code.andydayton.com/andy/yesterdaysnews/domain/youtubeservice"
 )
 
 var channelName string

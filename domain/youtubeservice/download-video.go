@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"sync"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/errorhandler"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/youtubedownloader"
 )
 
 func (s *Service) DownloadVideo(ctx context.Context, id, outDir string) (string, error) {

@@ -3,11 +3,11 @@ package builder
 import (
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/containerservice"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/imageprocessor"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/videoprocessor"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/youtubeservice"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/containerservice"
+	"code.andydayton.com/andy/yesterdaysnews/domain/imageprocessor"
+	"code.andydayton.com/andy/yesterdaysnews/domain/videoprocessor"
+	"code.andydayton.com/andy/yesterdaysnews/domain/youtubeservice"
 )
 
 type Config struct {

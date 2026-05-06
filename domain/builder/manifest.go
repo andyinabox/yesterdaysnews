@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
 )
 
 func (b *Builder) Manifest(ctx context.Context, uploadDir string, manifest *domain.Manifest) (string, error) {

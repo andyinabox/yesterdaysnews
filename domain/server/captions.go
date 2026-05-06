@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/util"
 )
 
 func (s *Server) Captions() http.HandlerFunc {

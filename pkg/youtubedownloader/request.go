@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/shellargs"
 )
 
 type Request struct {

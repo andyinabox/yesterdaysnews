@@ -3,8 +3,8 @@ package youtubeservice
 import (
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/youtubeapi"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/youtubedownloader"
 )
 
 const VideoFormatString = "bv*[width<=1280][aspect_ratio>1]"

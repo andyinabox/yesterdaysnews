@@ -3,7 +3,7 @@ package basicchain
 import (
 	"math/rand"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/markov"
 )
 
 func (c *Chain) Next(p markov.Prefix) string {

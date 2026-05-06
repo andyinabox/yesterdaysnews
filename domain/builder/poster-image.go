@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
 )
 
 func (b *Builder) PosterImage(ctx context.Context, uploadDir string, paths []string) (string, error) {

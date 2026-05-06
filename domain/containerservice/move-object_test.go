@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/util"
 )
 
 func TestMoveObject(t *testing.T) {

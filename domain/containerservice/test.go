@@ -6,7 +6,7 @@ package containerservice
 import (
 	"testing"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
 )
 
 func makeTestErrorStream(t *testing.T) chan<- domain.Error {

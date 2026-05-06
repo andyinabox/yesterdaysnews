@@ -50,7 +50,7 @@ Source in `app/server/assets/` → bundled via esbuild (`cmd/esbuild/`) → outp
 
 ## Key patterns
 
-- **Go module path**: `gitlab.com/andyinabox/yesterdaysnews`
+- **Go module path**: `code.andydayton.com/andy/yesterdaysnews`
 - **Go version**: 1.22 (toolchain 1.22.10)
 - **Dependency injection**: Services accept config structs and implement domain interfaces
 - **Streaming**: Operations use channels for async progress/error reporting

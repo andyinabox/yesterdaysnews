@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/util"
 )
 
 func (b *Builder) CutVideos(ctx context.Context, paths <-chan string) <-chan string {

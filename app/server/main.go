@@ -13,9 +13,9 @@ import (
 	"time"
 
 	"github.com/russross/blackfriday/v2"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/server"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
+	"code.andydayton.com/andy/yesterdaysnews/domain/logger"
+	"code.andydayton.com/andy/yesterdaysnews/domain/server"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/configloader"
 )
 
 //go:embed tmpl/*.tmpl

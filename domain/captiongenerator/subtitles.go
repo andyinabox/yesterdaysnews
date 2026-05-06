@@ -3,8 +3,8 @@ package captiongenerator
 import (
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/srt"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/srt"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/util"
 )
 
 // Subtitles will generate randomized subtitles for the given duration of time

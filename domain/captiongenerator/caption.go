@@ -3,7 +3,7 @@ package captiongenerator
 import (
 	"strings"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/markov"
 )
 
 func (g *Generator) Caption(prevSentence string) string {

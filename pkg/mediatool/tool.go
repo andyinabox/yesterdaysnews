@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log/slog"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/shell"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/shell"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/shellargs"
 )
 
 type Tool struct {

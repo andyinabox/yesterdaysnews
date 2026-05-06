@@ -1,7 +1,7 @@
 package captionschain
 
 import (
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov/basicchain"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/markov/basicchain"
 )
 
 type Chain struct {

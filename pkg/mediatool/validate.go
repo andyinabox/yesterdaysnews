@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/shellargs"
 )
 
 func (t *Tool) Validate(ctx context.Context, path string) error {

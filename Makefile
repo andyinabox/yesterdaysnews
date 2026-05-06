@@ -36,13 +36,13 @@ builder-local:
 
 .PHONY: builder-docker
 builder-docker: clean-bin bin/builder-linux-$(GOARCH)
-	docker buildx build --platform linux/$(GOARCH) -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder:dev .
+	docker buildx build --platform linux/$(GOARCH) -f app/builder/Dockerfile -t yesterdaysnews-builder:dev .
 	mkdir -p dist
-	docker run --rm $(DOCKER_ENV) -v ./dist:/dist andyinabox/yesterdaysnews-builder:dev --output /dist -v --keepoutput --skipupload --throttledl 1s
+	docker run --rm $(DOCKER_ENV) -v ./dist:/dist yesterdaysnews-builder:dev --output /dist -v --keepoutput --skipupload --throttledl 1s
 
 .PHONY: builder-docker-amd64
 builder-docker-amd64: clean-bin bin/builder-linux-amd64
-	docker buildx build --platform linux/amd64 -f app/builder/Dockerfile -t andyinabox/yesterdaysnews-builder:dev .
+	docker buildx build --platform linux/amd64 -f app/builder/Dockerfile -t yesterdaysnews-builder:dev .
 
 # server
 
@@ -61,8 +61,8 @@ server-local:
 
 .PHONY: server-docker
 server-docker: clean-bin clean-assets bin/server-linux-amd64
-	docker buildx build --platform linux/amd64 -f app/server/Dockerfile -t andyinabox/yesterdaysnews-server:dev .
-	docker run --rm $(DOCKER_ENV) -p 8080:8080 andyinabox/yesterdaysnews-server:dev
+	docker buildx build --platform linux/amd64 -f app/server/Dockerfile -t yesterdaysnews-server:dev .
+	docker run --rm $(DOCKER_ENV) -p 8080:8080 yesterdaysnews-server:dev
 
 #
 # test

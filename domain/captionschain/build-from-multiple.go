@@ -10,7 +10,7 @@ import (
 	"strings"
 	"unicode"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
 )
 
 func (c *Chain) BuildFromMultiple(sources []domain.Corpus) error {

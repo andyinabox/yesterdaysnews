@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/assetshandler"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/assetshandler"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/util"
 )
 
 type Config struct {

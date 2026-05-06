@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"strings"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/shell"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/shell"
 )
 
 var (

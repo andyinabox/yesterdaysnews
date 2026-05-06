@@ -1,4 +1,4 @@
-module gitlab.com/andyinabox/yesterdaysnews
+module code.andydayton.com/andy/yesterdaysnews
 
 go 1.22.4
 

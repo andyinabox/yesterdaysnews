@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/errorhandler"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/mediatool"
 )
 
 func (p *Processor) ExtractImage(ctx context.Context, inFile, outFile string, t time.Duration) (string, error) {

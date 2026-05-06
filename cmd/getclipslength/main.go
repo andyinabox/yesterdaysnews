@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"log/slog"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
+	"code.andydayton.com/andy/yesterdaysnews/domain/logger"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/mediatool"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/util"
 )
 
 var channelName string

@@ -3,7 +3,7 @@ package errorhandler
 import (
 	"context"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
 )
 
 func DefaultErrorHandler(ctx context.Context, totalDownloadTargets int) domain.ErrorHandler {

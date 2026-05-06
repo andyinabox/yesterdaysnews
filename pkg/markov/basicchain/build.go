@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov/basicprefix"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/markov/basicprefix"
 )
 
 func (c *Chain) Build(r io.Reader) {
