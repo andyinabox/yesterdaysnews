@@ -8,4 +8,4 @@ The video ordering is purely random, but the text follows its own internal logic
 
 —[Andy](https://andydayton.com/)
 
-<small>_You can find the source code for this project [here](https://gitlab.com/andyinabox/yesterdaysnews/-/blob/main/README.md)_</small>
+<small>_You can find the source code for this project [here](https://code.andydayton.com/andy/yesterdaysnews)_</small>
