@@ -1,6 +1,6 @@
 package domain
 
-import "gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
+import "code.andydayton.com/andy/yesterdaysnews/pkg/markov"
 
 type CorpusType string
 

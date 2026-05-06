@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"os"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/shellargs"
 )
 
 const VideoListFileName = ".file-list.txt"

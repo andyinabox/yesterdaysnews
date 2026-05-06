@@ -8,12 +8,12 @@ import (
 	"sync"
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi/response"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubedownloader"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/errorhandler"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/util"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/youtubeapi"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/youtubeapi/response"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/youtubedownloader"
 )
 
 func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Error, date time.Time, maxSize uint, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {

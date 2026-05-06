@@ -1,7 +1,7 @@
 package videoprocessor
 
 import (
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/mediatool"
 )
 
 type Config struct {

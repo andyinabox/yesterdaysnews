@@ -3,8 +3,8 @@ package videoprocessor
 import (
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/mediatool"
 )
 
 type edit [2]time.Duration

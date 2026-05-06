@@ -3,7 +3,7 @@ package mediatool
 import (
 	"context"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/shellargs"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/shellargs"
 )
 
 func (t *Tool) CutVideo(ctx context.Context, input, output string, start, duration Duration) error {

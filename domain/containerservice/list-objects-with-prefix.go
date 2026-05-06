@@ -7,9 +7,9 @@ import (
 	"strings"
 	"sync"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/errorhandler"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/objectstoreclient"
 )
 
 func (s *Service) ListObjectsWithPrefix(ctx context.Context, prefix string) ([]string, error) {

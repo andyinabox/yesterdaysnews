@@ -8,9 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/assetshandler"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/logger"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/assetshandler"
 )
 
 var port int

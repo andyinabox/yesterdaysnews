@@ -1,8 +1,8 @@
 package basicchain
 
 import (
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov/basicprefix"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/markov"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/markov/basicprefix"
 )
 
 func (c *Chain) NewPrefix(s string) markov.Prefix {

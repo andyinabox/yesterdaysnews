@@ -3,9 +3,9 @@ package imageprocessor
 import (
 	"context"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/imgavg"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/errorhandler"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/imgavg"
 )
 
 func (p *Processor) AverageImages(ctx context.Context, errs chan<- domain.Error, paths []string, width, height int, outputFile string) (string, error) {

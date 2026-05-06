@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi/response"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/youtubeapi/response"
 )
 
 const channelsListEndpoint = "channels"

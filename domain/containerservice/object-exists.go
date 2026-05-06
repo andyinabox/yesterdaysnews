@@ -3,7 +3,7 @@ package containerservice
 import (
 	"context"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/objectstoreclient"
 )
 
 func (s *Service) ObjectExists(ctx context.Context, fileKey string) (bool, error) {

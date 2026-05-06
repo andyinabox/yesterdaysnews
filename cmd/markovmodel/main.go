@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov/basicchain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/logger"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/markov/basicchain"
 )
 
 var prefixLength int

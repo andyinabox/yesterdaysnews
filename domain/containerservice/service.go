@@ -1,7 +1,7 @@
 package containerservice
 
 import (
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/objectstoreclient"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/objectstoreclient"
 )
 
 type Config struct {

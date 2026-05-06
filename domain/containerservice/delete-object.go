@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"sync"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/errorhandler"
 )
 
 func (s *Service) DeleteObject(ctx context.Context, key string) (string, error) {

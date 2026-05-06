@@ -5,8 +5,8 @@ import (
 	"math/rand/v2"
 	"sync"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/errorhandler"
 )
 
 func (p *Processor) ShuffleClipsAndCombine(ctx context.Context, errs chan<- domain.Error, files []string, outFile string) (file string, err error) {

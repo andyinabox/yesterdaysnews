@@ -3,7 +3,7 @@ package errorhandler
 import (
 	"fmt"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
 )
 
 type err struct {

@@ -7,11 +7,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/captiongenerator"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/captiongenerator"
+	"code.andydayton.com/andy/yesterdaysnews/domain/captionschain"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/markov"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/util"
 )
 
 func (b *Builder) GenerateCombinedVideo(ctx context.Context, uploadDir, modelFile string, clips []string) (string, string, error) {

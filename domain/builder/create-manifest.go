@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/util"
 )
 
 func (b *Builder) createManifest(buildId string) *domain.Manifest {

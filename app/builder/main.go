@@ -15,14 +15,14 @@ import (
 	"syscall"
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/builder"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/logger"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/configloader"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/streams"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/util"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/builder"
+	"code.andydayton.com/andy/yesterdaysnews/domain/captionschain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/errorhandler"
+	"code.andydayton.com/andy/yesterdaysnews/domain/logger"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/configloader"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/streams"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/util"
 )
 
 //go:embed hospital.txt

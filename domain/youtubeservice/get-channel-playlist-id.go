@@ -3,7 +3,7 @@ package youtubeservice
 import (
 	"context"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/youtubeapi"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/youtubeapi"
 )
 
 func (s *Service) GetChannelPlaylistID(ctx context.Context, userName string) (id string, err error) {

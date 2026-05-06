@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov/basicprefix"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/markov/basicprefix"
 )
 
 func (c *Chain) Load(data []byte) error {

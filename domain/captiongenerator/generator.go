@@ -1,7 +1,7 @@
 package captiongenerator
 
 import (
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/markov"
 )
 
 const DefaultPrefixLength = 2

@@ -9,9 +9,9 @@ import (
 	"strings"
 	"sync"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/errorhandler"
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/mediatool"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/errorhandler"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/mediatool"
 )
 
 func (p *Processor) CutVideo(ctx context.Context, inFile, outFile string, edit domain.VideoEdit) (string, error) {

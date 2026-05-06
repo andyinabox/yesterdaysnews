@@ -3,7 +3,7 @@ package markov
 import (
 	"strings"
 
-	"gitlab.com/andyinabox/yesterdaysnews/pkg/markov"
+	"code.andydayton.com/andy/yesterdaysnews/pkg/markov"
 )
 
 type Generator struct {

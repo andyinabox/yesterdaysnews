@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"strings"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
 )
 
 func (b *Builder) Promote(ctx context.Context, buildId string) error {

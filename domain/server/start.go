@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/captiongenerator"
-	"gitlab.com/andyinabox/yesterdaysnews/domain/captionschain"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain/captiongenerator"
+	"code.andydayton.com/andy/yesterdaysnews/domain/captionschain"
 )
 
 func (s *Server) Start(ctx context.Context) error {
