@@ -1,9 +1,10 @@
 #!/bin/bash
 #
 # Tag a release of `builder` or `server`, build a Linux/amd64 Docker image,
-# and push it to Docker Hub as both :<tag> and :latest. The git tag is
-# namespaced per app (e.g. server-v0.1.0) so the two apps can release
-# independently from the same repo.
+# and push it to the Forgejo container registry at code.andydayton.com as
+# both :<tag> and :latest. The git tag is namespaced per app (e.g.
+# server-v0.1.0) so the two apps can release independently from the same
+# repo. Requires `docker login code.andydayton.com` to have been run.
 #
 # Pass --dry-run to print every mutating command without executing it.
 
@@ -71,6 +72,29 @@ run() {
 # end would fail after we've already pushed the git tag.
 if ! docker info >/dev/null 2>&1; then
   echo "Error: Docker daemon is not running"
+  exit 1
+fi
+
+# Verify we can reach the Forgejo registry as an authenticated user, so an
+# expired/missing token fails here instead of after the git tag is already
+# pushed. We probe a general-use sentinel image that lives on the registry
+# purely for this purpose. `docker manifest inspect` is used (over `docker
+# pull`) because it always hits the registry — no local-cache fast path —
+# and doesn't write any bytes to disk.
+#
+# If the sentinel image ever needs to be recreated:
+#
+#   cat > /tmp/Dockerfile.sentinel <<'EOF'
+#   FROM scratch
+#   LABEL purpose="general-use auth preflight sentinel for code.andydayton.com"
+#   EOF
+#   docker buildx build --platform linux/amd64 \
+#     -t code.andydayton.com/andy/sentinel-image:latest \
+#     -f /tmp/Dockerfile.sentinel /tmp
+#   docker push code.andydayton.com/andy/sentinel-image:latest
+if ! docker manifest inspect code.andydayton.com/andy/sentinel-image:latest >/dev/null 2>&1; then
+  echo "Error: cannot reach Forgejo registry at code.andydayton.com as authenticated user"
+  echo "Run: docker login code.andydayton.com"
   exit 1
 fi
 
@@ -157,12 +181,12 @@ run make clean-bin "bin/$APP-linux-amd64"
 # production host runs — buildx handles cross-compile from arm64 macs.
 run docker buildx build --platform linux/amd64 \
   -f "app/$APP/Dockerfile" \
-  -t "andyinabox/yesterdaysnews-$APP:$TAG" .
+  -t "code.andydayton.com/andy/yesterdaysnews-$APP:$TAG" .
 
 # Push the tagged image first, then re-tag and push as :latest. Doing it in
 # this order means :latest never points at an image that isn't also pushed
 # under its versioned tag.
-run docker push "andyinabox/yesterdaysnews-$APP:$TAG"
+run docker push "code.andydayton.com/andy/yesterdaysnews-$APP:$TAG"
 
-run docker tag "andyinabox/yesterdaysnews-$APP:$TAG" "andyinabox/yesterdaysnews-$APP:latest"
-run docker push "andyinabox/yesterdaysnews-$APP:latest"
+run docker tag "code.andydayton.com/andy/yesterdaysnews-$APP:$TAG" "code.andydayton.com/andy/yesterdaysnews-$APP:latest"
+run docker push "code.andydayton.com/andy/yesterdaysnews-$APP:latest"
