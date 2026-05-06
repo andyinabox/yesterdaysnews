@@ -170,6 +170,12 @@ fi
 # Tag locally, push only this tag (not `--tags`, which would push every
 # unrelated local tag), then check the tag out so the build is reproducible
 # from the tag ref rather than whatever HEAD happened to be.
+# Capture the commit SHA for the image.revision label below. Done before
+# `git tag` so it works under --dry-run (where the tag is never created).
+# `git tag "$GITTAG"` with no commit-ish argument tags HEAD, so this is the
+# same SHA the tag will point at.
+COMMIT_SHA=$(git rev-parse HEAD)
+
 run git tag "$GITTAG"
 run git push origin "$GITTAG"
 run git checkout "$GITTAG"
@@ -179,8 +185,15 @@ run make clean-bin "bin/$APP-linux-amd64"
 
 # Build the container image. Pinned to linux/amd64 because that's what the
 # production host runs — buildx handles cross-compile from arm64 macs.
+#
+# The OCI image.source label is what Forgejo uses to auto-link the pushed
+# package to the source repo, so it appears under the repo's Packages tab
+# instead of as an orphan under the user namespace.
 run docker buildx build --platform linux/amd64 \
   -f "app/$APP/Dockerfile" \
+  --label "org.opencontainers.image.source=https://code.andydayton.com/andy/yesterdaysnews" \
+  --label "org.opencontainers.image.revision=$COMMIT_SHA" \
+  --label "org.opencontainers.image.version=$TAG" \
   -t "code.andydayton.com/andy/yesterdaysnews-$APP:$TAG" .
 
 # Push the tagged image first, then re-tag and push as :latest. Doing it in
