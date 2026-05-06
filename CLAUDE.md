@@ -67,8 +67,14 @@ Source in `app/server/assets/` → bundled via esbuild (`cmd/esbuild/`) → outp
 ## Release
 
 ```bash
-./release.sh server v0.1.0    # tag, build, push server Docker image
-./release.sh builder v0.1.0   # tag, build, push builder Docker image
+./release.sh server v0.1.0              # tag, build, push server image
+./release.sh builder v0.1.0             # tag, build, push builder image
+./release.sh server v0.1.0 --dry-run    # print every mutating step without executing it
 ```
 
-Publishes to Docker Hub as `andyinabox/yesterdaysnews-{server|builder}:{tag}`.
+Publishes to the Forgejo container registry at `code.andydayton.com` as
+`code.andydayton.com/andy/yesterdaysnews-{server|builder}:{tag}` (also tagged `:latest`).
+
+Prerequisites: Docker daemon running, clean working tree, and a valid login
+to the registry (`docker login code.andydayton.com`). The script pre-flights
+all three and aborts before pushing the git tag if any fail.
