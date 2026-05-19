@@ -3,7 +3,7 @@ package builder
 import (
 	"strings"
 
-	"gitlab.com/andyinabox/yesterdaysnews/domain"
+	"code.andydayton.com/andy/yesterdaysnews/domain"
 )
 
 // ParsePlaylists parses a comma-separated list of playlist sources. Each entry
