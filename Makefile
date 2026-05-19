@@ -27,11 +27,11 @@ DOCKER_ENV := \
 # builder
 
 .PHONY: builder
-builder:
+builder: clean-logs
 	go run ./app/builder/main.go -v --keepoutput 2>&1 | tee builder.log
 
 .PHONY: builder-local
-builder-local:
+builder-local: clean-logs
 	go run ./app/builder/main.go -v --keepoutput --skipupload 2>&1 | tee builder-local.log
 
 .PHONY: builder-docker
@@ -91,13 +91,17 @@ clean-dist:
 clean-bin:
 	-rm -rf bin/*
 
+.PHONY: clean-logs
+clean-logs:
+	-rm *.log
+
 .PHONY: clean-assets
 clean-assets:
 	-rm -rf app/server/.assets
 
 #
 # file-based targets
-# 
+#
 
 # binaries
 
@@ -122,6 +126,3 @@ app/server/.assets/styles.css:
 
 app/server/.assets/script.js:
 		go run ./cmd/esbuild/main.go app/server/assets/script.js --bundle --minify --outfile=app/server/.assets/script.js
-
-
-

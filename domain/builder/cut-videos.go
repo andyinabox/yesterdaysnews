@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"code.andydayton.com/andy/yesterdaysnews/domain"
 	"code.andydayton.com/andy/yesterdaysnews/pkg/util"
@@ -34,6 +35,12 @@ func (b *Builder) videoCutStream(ctx context.Context, videoFiles <-chan string) 
 			b.eh.Add(domain.ErrTypeCutVideo, err)
 			return
 		}
+
+		var totalDur time.Duration
+		for _, ep := range editPoints {
+			totalDur += ep.Duration()
+		}
+		b.recordSourceContribution(filePath, totalDur, len(editPoints))
 
 		slog.Info("cutting video into clips", "file", filePath, "count", len(editPoints))
 		outDir := filepath.Join(b.cfg.OutputDir, domain.ClipsDirName)

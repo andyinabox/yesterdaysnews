@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+type PlaylistSource struct {
+	Name string
+	ID   string
+}
+
 type BuildPhase string
 
 const (

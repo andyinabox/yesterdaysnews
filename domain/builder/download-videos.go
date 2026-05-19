@@ -5,31 +5,38 @@ import (
 	"log/slog"
 	"sync"
 	"time"
+
+	"gitlab.com/andyinabox/yesterdaysnews/domain"
 )
 
 func (b *Builder) DownloadVideos(ctx context.Context, date time.Time) <-chan string {
 	// get stream of ids
-	ids := b.videoIDStream(ctx, date, b.cfg.PlaylistIDs)
+	ids := b.videoIDStream(ctx, date, b.cfg.Playlists)
 
 	// get stream of downloaded video paths
 	return b.yt.DownloadVideoStream(ctx, b.errs, ids, b.cfg.OutputDir)
 }
 
-func (b *Builder) videoIDStream(ctx context.Context, date time.Time, playlistIDs []string) <-chan string {
+func (b *Builder) videoIDStream(ctx context.Context, date time.Time, playlists []domain.PlaylistSource) <-chan string {
 
 	stream := make(chan string)
 
 	var wg sync.WaitGroup
 
 	// combine multiple playlist streams into single stream
-	wg.Add(len(playlistIDs))
-	for _, playlistID := range playlistIDs {
+	wg.Add(len(playlists))
+	for _, playlist := range playlists {
 		go func() {
 			defer wg.Done()
-			slog.Info("getting video id stream", "playlistID", playlistID)
-			playlistIDs := b.yt.GetPlaylistVideoIDStream(ctx, b.errs, playlistID, date, b.cfg.MaxVideoSize, b.cfg.DownloadCountPerPlaylist)
-			for id := range playlistIDs {
-				slog.Info("got new video ID", "id", id)
+			slog.Info("getting video id stream", "playlistID", playlist.ID, "name", playlist.Name)
+			playlistID := playlist.ID
+			onFilter := func(reason domain.FilterReason) {
+				b.recordFilterReason(playlistID, reason)
+			}
+			ids := b.yt.GetPlaylistVideoIDStream(ctx, b.errs, playlist.ID, date, b.cfg.MaxVideoSize, b.cfg.DownloadCountPerPlaylist, onFilter)
+			for id := range ids {
+				slog.Info("got new video ID", "id", id, "playlistID", playlist.ID)
+				b.recordVideoSource(id, playlist.ID)
 				stream <- id
 			}
 		}()

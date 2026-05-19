@@ -31,7 +31,7 @@ var hospitalText string
 //go:embed overlay.png
 var overlayImage []byte
 
-const defaultPlaylists = "UUupvZG-5ko_eiXAupbDfxWw,UUaXkIU1QidjPwiAYu6GcHjg,UUXIJgqnII2ZOINSWNOGFThA"
+const defaultPlaylists = "@CBSNews:UU8p1vwvWtl6T73JiExfWs1g,@NBCNews:UUeY0bbntWzzVIaj2z3QigXg,@FoxNews:UUXIJgqnII2ZOINSWNOGFThA"
 
 var (
 	verbose    bool
@@ -125,7 +125,7 @@ func main() {
 	config := builder.Config{
 		BuildID: buildId,
 
-		PlaylistIDs:                 strings.Split(playlistIDs, ","),
+		Playlists:                   builder.ParsePlaylists(playlistIDs),
 		ObjectStoreContainerName:    objectStoreContainerName,
 		OutputDir:                   outputDir,
 		MaxVideoSize:                uint(maxVideoSize),

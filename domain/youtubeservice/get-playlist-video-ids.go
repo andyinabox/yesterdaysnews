@@ -16,12 +16,18 @@ import (
 	"code.andydayton.com/andy/yesterdaysnews/pkg/youtubedownloader"
 )
 
-func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Error, date time.Time, maxSize uint, playlistId, pageToken string) (ids []string, nextPageToken string, err error) {
+func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Error, date time.Time, maxSize uint, playlistId, pageToken string, onFilter domain.FilterCallback) (ids []string, nextPageToken string, err error) {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var resp *response.PlaylistItemsListResponse
 
 	ids = []string{}
+
+	report := func(reason domain.FilterReason) {
+		if onFilter != nil {
+			onFilter(reason)
+		}
+	}
 
 	// fetch a page of video ids
 	resp, err = s.ytapi.PlaylistItemsList(ctx, youtubeapi.PlaylistItemsListRequest{
@@ -37,7 +43,7 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 
 	throttler := time.Tick(s.cfg.ThrottleDownloadsBy)
 
-	slog.Info("recieved playlist items from YouTube API", "count", len(resp.Items), "page", pageToken)
+	slog.Info("recieved playlist items from YouTube API", "playlistId", playlistId, "count", len(resp.Items), "page", pageToken)
 
 	wg.Add(len(resp.Items))
 	for _, item := range resp.Items {
@@ -45,10 +51,12 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 			defer wg.Done()
 
 			id := item.Snippet.ResourceID.VideoID
+			report(domain.FilterReasonFetched)
 
 			// check date
 			if !util.IsSameDay(date, item.Snippet.PublishedAt) {
-				slog.Debug("skipping video: wrong date", "id", id, "date", item.Snippet.PublishedAt, "targetDate", date)
+				slog.Debug("skipping video: wrong date", "playlistId", playlistId, "id", id, "date", item.Snippet.PublishedAt, "targetDate", date)
+				report(domain.FilterReasonWrongDate)
 				return
 			}
 
@@ -61,23 +69,27 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 			videoInfo, err := s.ytdl.GetVideoInfo(ctx, id, VideoFormatString)
 			if err != nil {
 				if errors.Is(err, youtubedownloader.ErrRequestedFormatNotAvailable) {
-					slog.Debug("skipping video because requested format is not available", "id", id)
+					slog.Debug("skipping video because requested format is not available", "playlistId", playlistId, "id", id)
+					report(domain.FilterReasonFormatUnavailable)
 					return
 				}
 
 				errs <- errorhandler.Err(domain.ErrTypeGetVideoID, fmt.Errorf("skipping video %q: error getting video info: %s", id, err))
+				report(domain.FilterReasonInfoError)
 				return
 			}
 
 			// check filesize
 			if videoInfo.FilesizeApprox > maxSize {
-				slog.Debug("skipping video: size is too large", "id", id, "size", videoInfo.FilesizeApprox)
+				slog.Debug("skipping video: size is too large", "playlistId", playlistId, "id", id, "size", videoInfo.FilesizeApprox)
+				report(domain.FilterReasonTooLarge)
 				return
 			}
 
 			// check for captions
 			if c, ok := videoInfo.AutomaticCaptions["en"]; !ok || len(c) == 0 {
-				slog.Debug("skipping video: no subtitles", "id", id)
+				slog.Debug("skipping video: no subtitles", "playlistId", playlistId, "id", id)
+				report(domain.FilterReasonNoCaptions)
 				return
 			}
 
@@ -85,6 +97,7 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 			mu.Lock()
 			ids = append(ids, id)
 			mu.Unlock()
+			report(domain.FilterReasonAccepted)
 		}()
 	}
 
@@ -93,7 +106,7 @@ func (s *Service) GetPlaylistVideoIDs(ctx context.Context, errs chan<- domain.Er
 	return
 }
 
-func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- domain.Error, playlistId string, date time.Time, maxSize uint, count int) <-chan string {
+func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- domain.Error, playlistId string, date time.Time, maxSize uint, count int, onFilter domain.FilterCallback) <-chan string {
 	stream := make(chan string)
 
 	cleanup := func() {
@@ -122,7 +135,7 @@ func (s *Service) GetPlaylistVideoIDStream(ctx context.Context, errs chan<- doma
 					return
 				}
 
-				ids, pageToken, err = s.GetPlaylistVideoIDs(ctx, errs, date, maxSize, playlistId, pageToken)
+				ids, pageToken, err = s.GetPlaylistVideoIDs(ctx, errs, date, maxSize, playlistId, pageToken, onFilter)
 				totalRequests++
 				if err != nil {
 					errs <- errorhandler.Err(domain.ErrTypeGetVideoID, err)

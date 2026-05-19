@@ -60,6 +60,9 @@ func (b *Builder) Run(ctx context.Context) error {
 
 	slog.Info("processed clips", "count", len(manifest.Files.Clips))
 
+	// this will add info to the manifest about the source clips
+	b.finalizeSourceStats(manifest)
+
 	// right now this step takes up too much memory to run in the serverless job
 	// so leaving it disabled for now. might be better to use cli tool or something?
 	slog.Info("skipping poster image generation...")

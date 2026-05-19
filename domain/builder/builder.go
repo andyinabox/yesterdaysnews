@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"sync"
 	"time"
 
 	"code.andydayton.com/andy/yesterdaysnews/domain"
@@ -23,7 +24,7 @@ type Config struct {
 
 	// config variables
 	BuildID                     string
-	PlaylistIDs                 []string
+	Playlists                   []domain.PlaylistSource
 	ObjectStoreContainerName    string
 	OutputDir                   string
 	MaxVideoSize                uint
@@ -55,6 +56,12 @@ type Builder struct {
 	eh   domain.ErrorHandler
 	errs chan<- domain.Error
 	cfg  *Config
+
+	sourceMu          sync.Mutex
+	videoSourceMap    map[string]string
+	sourceDurations   map[string]time.Duration
+	sourceClipCounts  map[string]int
+	sourceFilterStats map[string]map[domain.FilterReason]int
 }
 
 func New(cfg *Config, eh domain.ErrorHandler) domain.Builder {
@@ -88,5 +95,10 @@ func New(cfg *Config, eh domain.ErrorHandler) domain.Builder {
 		eh:   eh,
 		errs: eh.Channel(),
 		cfg:  cfg,
+
+		videoSourceMap:    make(map[string]string),
+		sourceDurations:   make(map[string]time.Duration),
+		sourceClipCounts:  make(map[string]int),
+		sourceFilterStats: make(map[string]map[domain.FilterReason]int),
 	}
 }
